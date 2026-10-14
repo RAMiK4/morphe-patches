@@ -1310,8 +1310,21 @@ Məhdudiyyətlər:
 • Ekran faktiki olaraq HDR göstərə bilmirsə, rənglər problemli görünə bilər
 • Dekoder HDR-i emal edə bilməsə, oynatma uğursuz ola bilər
 • HDR hələ də video yayımları saxtalaşdır qəbuledicisindən asılıdır"</string>
-  <string name="morphe_video_codec_entry_default">Varsayılan</string>
+  <string name="morphe_video_codec_title">Video kodlayıcı</string>
+  <string name="morphe_video_codec_entry_default">İlkin</string>
   <!-- 'Spoof video streams' should be the same translation used for 'morphe_spoof_video_streams_screen_title'. -->
+  <string name="morphe_video_codec_avc_not_available">AVC-yə məcbur etmək üçün \'Video yayımlarını saxtalaşdırı\' \'Android Studio\', \'Android VR\' və ya \'visionOS\' olaraq dəyiş</string>
+  <string name="morphe_video_codec_user_dialog_message">"VP9
+• Batareya ömrünü yaxşılaşdıra və oynatma donmalarını düzəldə bilər
+• AV1-dən daha çox internet datası istifadə edir
+
+​AVC (H.264)
+• 'Android Studio', 'Android VR' və ya 'visionOS' video yayımı qəbuledicisinin saxtalaşdırılmasını tələb edir
+• Batareya ömrünü daha da yaxşılaşdıra bilər
+• Daha köhnə cihazlarda çatışmayan video görüntü imkanlarını bərpa edə bilər
+• Ən yüksək görüntü imkanı 1080p-dir
+• HDR videolar AVC istifadə etməyə bilər
+• Bəzi cihazlar AVC-yə məcbur edilə bilməz"</string>
   <!-- video.quality.advancedVideoQualityMenuPatch -->
   <string name="morphe_advanced_video_quality_menu_title">Təkmil keyfiyyət menyusunu aç</string>
   <string name="morphe_advanced_video_quality_menu_summary">Keyfiyyət seçimi menyusunu ötürür və birbaşa Təkmil keyfiyyət menyusunu açır</string>
@@ -1328,6 +1341,7 @@ Məhdudiyyətlər:
 
 Video oynatma AV1 ilə ilişə bilər və ya kadrlar buraxıla bilər."</string>
   <string name="morphe_spoof_video_streams_about_title">Saxtakarlıq yan təsirləri</string>
+  <string name="morphe_spoof_video_streams_about_failure">• Oynatma 1 dəqiqədən sonra uğursuz ola bilər</string>
   <string name="morphe_spoof_video_streams_about_no_audio_tracks">• \'Audio Trek\' menyusu çatışmır</string>
   <string name="morphe_spoof_video_streams_about_no_av1">• AV1 video kodlayıcı yoxdur</string>
   <string name="morphe_spoof_video_streams_about_no_immersive_mode">• 360° VR geniş rejimi əlçatan deyil</string>
