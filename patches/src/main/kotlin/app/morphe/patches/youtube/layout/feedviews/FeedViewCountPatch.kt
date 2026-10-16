@@ -22,11 +22,11 @@ import app.morphe.patches.youtube.shared.Constants.COMPATIBILITY_YOUTUBE
 import app.morphe.util.getReference
 import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.indexOfFirstInstructionOrThrow
-import app.morphe.util.indexOfFirstInstructionReversedOrThrow
 import app.morphe.util.setExtensionIsPatchIncluded
 import com.android.tools.smali.dexlib2.Opcode
-import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private const val EXTENSION_CLASS =
     "Lapp/morphe/extension/youtube/patches/FeedViewCountPatch;"
@@ -58,15 +58,28 @@ val feedViewCountPatch = bytecodePatch(
         // Same method the Hide view count option of the Hide layout components patch changes.
         HideViewCountFingerprint.method.apply {
             // Indexes are found again, because the other patch added instructions.
-            val applyDimensionIndex = indexOfFirstInstructionReversedOrThrow {
+            val stringIndex = indexOfFirstInstructionOrThrow {
+                getReference<StringReference>()?.string ==
+                        "Has attachmentRuns but drawableRequester is missing."
+            }
+            val applyDimensionIndex = indexOfFirstInstructionOrThrow(stringIndex) {
                 val reference = getReference<MethodReference>()
                 opcode == Opcode.INVOKE_STATIC &&
                         reference?.definingClass == "Landroid/util/TypedValue;" &&
                         reference.name == "applyDimension"
             }
-            val textRegister = getInstruction<OneRegisterInstruction>(
-                indexOfFirstInstructionOrThrow(applyDimensionIndex, Opcode.RETURN_OBJECT)
-            ).registerA
+
+            // The string passed to the span method is the returned string.
+            // 21.42+ jumps to a shared return, so the register of a return instruction can't be used.
+            val setSpanIndex = indexOfFirstInstructionOrThrow(applyDimensionIndex) {
+                val reference = getReference<MethodReference>()
+                opcode == Opcode.INVOKE_STATIC &&
+                        reference?.returnType == "V" &&
+                        reference.parameterTypes == listOf(
+                            "Landroid/text/SpannableString;", "Ljava/lang/Object;", "I", "Z", "I"
+                        )
+            }
+            val textRegister = getInstruction<FiveRegisterInstruction>(setSpanIndex).registerC
 
             // The view count is read before the other patch removes it from the text.
             val hideViewCountIndex = indexOfFirstInstruction {
