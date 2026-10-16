@@ -66,6 +66,13 @@ public final class FeedViewCountPatch {
 
     /** Delimiter of the texts below the title. */
     private static final String DELIMITER = " · ";
+    /** Delimiters of the texts below the title, of any layout. */
+    private static final Pattern SEGMENT_DELIMITER_PATTERN =
+            Pattern.compile("[\\s\u00A0\u202F]*[\u00B7\u2022][\\s\u00A0\u202F]*");
+    private static final int MAX_SUBTITLE_LENGTH = 150;
+    private static final int MAX_SEGMENT_LENGTH = 40;
+    /** Texts created with the view count span that were logged. */
+    private static int loggedSubtitles;
 
     /**
      * A number, such as 457, 4,7 or 1 234. Some languages show words before it.
@@ -268,6 +275,10 @@ public final class FeedViewCountPatch {
         }
         try {
             String string = text.toString();
+            if (loggedSubtitles < 5) {
+                loggedSubtitles++;
+                Logger.printDebug(() -> "Feed subtitle: " + string);
+            }
             final int first = string.indexOf(DELIMITER);
             if (first < 0) {
                 return;
@@ -356,6 +367,20 @@ public final class FeedViewCountPatch {
         String viewCount;
         @Nullable
         Rect duration;
+        /** Texts below the thumbnail, with their top and left. */
+        final List<PlacedText> texts = new ArrayList<>();
+    }
+
+    private static final class PlacedText {
+        final String text;
+        final int top;
+        final int left;
+
+        PlacedText(String text, int top, int left) {
+            this.text = text;
+            this.top = top;
+            this.left = left;
+        }
     }
 
     private static void findCardInfo(ComponentHost root, View view, CardInfo info, Rect rect) {
@@ -372,14 +397,18 @@ public final class FeedViewCountPatch {
                             info.viewCount = spans[0].viewCount;
                         }
                     }
+                    String item = text.toString().trim();
+                    rect.set(0, 0, host.getWidth(), host.getHeight());
+                    if (host != root) {
+                        root.offsetDescendantRectToMyCoords(host, rect);
+                    }
+                    if (!item.isEmpty() && rect.top >= thumbnailBottom(root)
+                            && item.length() <= MAX_SUBTITLE_LENGTH) {
+                        info.texts.add(new PlacedText(item, rect.top, rect.left));
+                    }
                     if (info.duration == null) {
-                        String item = text.toString().trim();
                         if ((item.length() <= MAX_DURATION_TEXT_LENGTH && DURATION_PATTERN.matcher(item).find())
                                 || BADGE_PATTERN.matcher(item).matches()) {
-                            rect.set(0, 0, host.getWidth(), host.getHeight());
-                            if (host != root) {
-                                root.offsetDescendantRectToMyCoords(host, rect);
-                            }
                             if (isDurationBadgeShaped(root, rect)) {
                                 info.duration = new Rect(rect);
                             }
@@ -396,6 +425,105 @@ public final class FeedViewCountPatch {
                 }
             }
         }
+    }
+
+    private static int thumbnailBottom(ComponentHost root) {
+        final float density = root.getResources().getDisplayMetrics().density;
+        return Math.round(root.getWidth() * FeedVideoCards.THUMBNAIL_RATIO - 4 * density);
+    }
+
+    /**
+     * @return The view count of the texts below the thumbnail, such as
+     *         "Channel · 4.7M views · 2 days ago", or null if not found.
+     *         Used when the text was not created with the view count span,
+     *         such as by a layout that creates the text another way.
+     */
+    @Nullable
+    private static String findViewCountInTexts(List<PlacedText> texts) {
+        texts.sort((a, b) -> a.top != b.top ? a.top - b.top : a.left - b.left);
+        Locale locale = Locale.getDefault();
+        List<String> numbered = new ArrayList<>();
+
+        for (int index = 0; index < texts.size(); index++) {
+            PlacedText placed = texts.get(index);
+            // The first text is the title, which can have numbers and delimiters too.
+            final boolean isTitle = index == 0 && texts.size() > 1;
+            String[] segments = SEGMENT_DELIMITER_PATTERN.split(placed.text);
+            List<ParsedViewCount> parsedSegments = new ArrayList<>();
+            List<Boolean> startsWithNumber = new ArrayList<>();
+            for (String segment : segments) {
+                String trimmed = segment.trim();
+                parsedSegments.add(trimmed.length() <= MAX_SEGMENT_LENGTH
+                        ? parseViewCount(trimmed, locale) : null);
+                startsWithNumber.add(!trimmed.isEmpty() && Character.isDigit(trimmed.charAt(0)));
+            }
+
+            // Words of view counts that were seen before.
+            for (ParsedViewCount parsed : parsedSegments) {
+                if (parsed != null && isViewWords(parsed.words)) {
+                    return parsed.count;
+                }
+            }
+
+            if (isTitle) {
+                continue;
+            }
+
+            if (segments.length == 3 && parsedSegments.get(1) != null) {
+                // The channel, the view count and the upload time.
+                ParsedViewCount parsed = parsedSegments.get(1);
+                addViewWords(parsed.words);
+                return parsed.count;
+            }
+
+            if (segments.length >= 2) {
+                // The view count is shown before the upload time.
+                ParsedViewCount first = null;
+                int count = 0;
+                for (int i = 0; i < segments.length; i++) {
+                    if (parsedSegments.get(i) != null && startsWithNumber.get(i)) {
+                        if (first == null) {
+                            first = parsedSegments.get(i);
+                        }
+                        count++;
+                    }
+                }
+                if (count >= 2) {
+                    addViewWords(first.words);
+                    return first.count;
+                }
+            } else if (parsedSegments.get(0) != null && startsWithNumber.get(0)) {
+                // Texts shown by themselves, such as a view count and an upload time.
+                numbered.add(placed.text);
+            }
+        }
+
+        if (numbered.size() == 2) {
+            // The view count is shown before the upload time.
+            ParsedViewCount parsed = parseViewCount(numbered.get(0), locale);
+            if (parsed != null) {
+                addViewWords(parsed.words);
+                return parsed.count;
+            }
+        }
+        return null;
+    }
+
+    /** Videos whose texts were logged, so each is logged once. */
+    private static final Set<String> loggedVideoIds = new LinkedHashSet<>();
+
+    private static void logTexts(String videoId, List<PlacedText> texts) {
+        if (!loggedVideoIds.add(videoId)) {
+            return;
+        }
+        if (loggedVideoIds.size() > 200) {
+            loggedVideoIds.clear();
+        }
+        StringBuilder builder = new StringBuilder();
+        for (PlacedText placed : texts) {
+            builder.append(" [").append(placed.text).append(']');
+        }
+        Logger.printDebug(() -> "View count not found: " + videoId + " texts:" + builder);
     }
 
     /**
@@ -421,7 +549,10 @@ public final class FeedViewCountPatch {
             viewCount = info.viewCount;
             duration = info.duration;
             if (viewCount == null) {
-                Logger.printDebug(() -> "View count not found: " + videoId);
+                viewCount = findViewCountInTexts(info.texts);
+            }
+            if (viewCount == null) {
+                logTexts(videoId, info.texts);
             }
             if (viewCount != null && duration == null) {
                 Logger.printDebug(() -> "Duration badge not found, default place is used: " + videoId);
