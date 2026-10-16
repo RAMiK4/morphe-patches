@@ -339,6 +339,8 @@ public class Settings extends SharedYouTubeSettings {
     // Feed engagement counts
     public static final BooleanSetting FEED_LIKE_COUNT = new BooleanSetting("morphe_feed_like_count", TRUE, true);
     public static final BooleanSetting FEED_LIKE_RATIO = new BooleanSetting("morphe_feed_like_ratio", TRUE, true);
+    // Feed view count
+    public static final BooleanSetting FEED_VIEW_COUNT = new BooleanSetting("morphe_feed_view_count", TRUE, true);
     public static final BooleanSetting VIDEO_QUALITY_DIALOG_BUTTON = new BooleanSetting("morphe_video_quality_dialog_button", FALSE, true);
     public static final BooleanSetting VIDEO_QUALITY_DIALOG_BUTTON_RESOLUTION = new BooleanSetting("morphe_video_quality_dialog_button_resolution", FALSE, parent(VIDEO_QUALITY_DIALOG_BUTTON));
 

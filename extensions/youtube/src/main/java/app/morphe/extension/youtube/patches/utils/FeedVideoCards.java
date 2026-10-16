@@ -1,6 +1,6 @@
 /*
  * Copyright 2026 Morphe.
- * https://github.com/MorpheApp/morphe-patches
+ * https://github.com/MorpheApp/morphe-patches/pull/3758
  *
  * See the included NOTICE file for GPLv3 Section 7 terms that apply to this code.
  */
@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.youtube.patches.FeedEngagementCountsPatch;
+import app.morphe.extension.youtube.patches.FeedViewCountPatch;
 import app.morphe.extension.youtube.patches.VideoInformation;
 import app.morphe.extension.youtube.settings.Settings;
 import app.morphe.extension.youtube.shared.PlayerType;
@@ -64,6 +65,7 @@ public final class FeedVideoCards {
     }
 
     private static final boolean ENABLED = FeedEngagementCountsPatch.ENABLED
+            || FeedViewCountPatch.ENABLED
             || Settings.FEED_WATCH_LATER_BUTTON.get();
 
     /** A card must be almost as wide as the screen. Shelves and grids are not used. */
@@ -119,6 +121,9 @@ public final class FeedVideoCards {
     static {
         if (FeedEngagementCountsPatch.ENABLED) {
             listeners.add(FeedEngagementCountsPatch.LISTENER);
+        }
+        if (FeedViewCountPatch.ENABLED) {
+            listeners.add(FeedViewCountPatch.LISTENER);
         }
         if (ENABLED) {
             // The inline player shows its buttons over the thumbnail, so what is drawn
