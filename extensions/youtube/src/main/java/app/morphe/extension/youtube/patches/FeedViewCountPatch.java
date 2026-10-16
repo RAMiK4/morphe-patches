@@ -420,6 +420,9 @@ public final class FeedViewCountPatch {
             findCardInfo(host, host, info, new Rect());
             viewCount = info.viewCount;
             duration = info.duration;
+            if (viewCount == null) {
+                Logger.printDebug(() -> "View count not found: " + videoId);
+            }
             if (viewCount != null && duration == null) {
                 Logger.printDebug(() -> "Duration badge not found, default place is used: " + videoId);
             }
