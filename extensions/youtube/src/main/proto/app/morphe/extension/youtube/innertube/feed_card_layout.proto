@@ -75,18 +75,20 @@ message VideoWithContextData {
     string menuAccessibilityText = 3;
     bytes onTap = 4;
     bytes menuOnTap = 5;
-    string menuTargetId = 21;
 }
 
 message VideoData {
     VideoThumbnail thumbnail = 1;
     ChannelAvatar avatar = 3;
     LockupMetadata lockupMetadata = 21;
+    LockupImage decoratedAvatar = 23; // Avatar with a ring, such as the avatar of live channels.
+    LockupImage avatarStack = 24; // Avatars of the channels of a collaboration.
 }
 
 message VideoThumbnail {
     bytes image = 1;
     string timestampText = 2;
+    string videoCountText = 6; // Playlists.
     string timestampAccessibilityText = 11;
 }
 
@@ -105,10 +107,11 @@ message LockupModel {
     LockupPadding padding = 1376;
 }
 
+// Padding of the card, in dp. Without it the card has the default horizontal margins.
 message LockupPadding {
     float start = 1;
-    float top = 2;
-    float end = 3;
+    float end = 2;
+    float top = 3;
     float bottom = 4;
 }
 
@@ -288,6 +291,7 @@ message InnertubeCommand {
 }
 
 message BrowseEndpoint {
+    string browseId = 2;
 }
 
 message LikeEndpoint {
