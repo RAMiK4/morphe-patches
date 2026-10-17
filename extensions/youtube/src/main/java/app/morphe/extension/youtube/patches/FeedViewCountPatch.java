@@ -21,11 +21,13 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.icu.text.CompactDecimalFormat;
-import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,15 +66,16 @@ public final class FeedViewCountPatch {
 
     public static final boolean ENABLED = isPatchIncluded() && Settings.FEED_VIEW_COUNT.get();
 
-    /** Delimiter of the texts below the title. */
-    private static final String DELIMITER = " · ";
-    /** Delimiters of the texts below the title, of any layout. */
+    /**
+     * Delimiters of the texts below the title. Older layouts show a dot as text,
+     * such as "Channel · 4.7M views · 2 days ago". Newer layouts draw the dot as an icon
+     * in place of spaces, such as "Channel      4.7M   2 days ago".
+     * A no-break space is used inside a view count, such as "4.7 M", so it is not a delimiter.
+     */
     private static final Pattern SEGMENT_DELIMITER_PATTERN =
-            Pattern.compile("[\\s\u00A0\u202F]*[\u00B7\u2022][\\s\u00A0\u202F]*");
+            Pattern.compile("[ \\t]{2,}|[ \\t\u00A0\u202F]*[\u00B7\u2022][ \\t\u00A0\u202F]*");
     private static final int MAX_SUBTITLE_LENGTH = 150;
     private static final int MAX_SEGMENT_LENGTH = 40;
-    /** Texts created with the view count span that were logged. */
-    private static int loggedSubtitles;
 
     /**
      * A number, such as 457, 4,7 or 1 234. Some languages show words before it.
@@ -264,55 +267,141 @@ public final class FeedViewCountPatch {
     }
 
     /**
+     * A part of the texts below the title, such as the channel, the view count or the upload time.
+     */
+    private static final class Segment {
+        final String text;
+        final int start;
+        final int end;
+
+        Segment(String text, int start, int end) {
+            this.text = text;
+            this.start = start;
+            this.end = end;
+        }
+
+        boolean startsWithNumber() {
+            return !text.isEmpty() && Character.isDigit(text.charAt(0));
+        }
+
+        boolean hasNumber() {
+            for (int i = 0, length = text.length(); i < length; i++) {
+                if (Character.isDigit(text.charAt(i))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private static List<Segment> splitSegments(String text) {
+        List<Segment> segments = new ArrayList<>();
+        Matcher matcher = SEGMENT_DELIMITER_PATTERN.matcher(text);
+        int start = 0;
+        while (matcher.find()) {
+            if (matcher.start() > start) {
+                segments.add(new Segment(text.substring(start, matcher.start()), start, matcher.start()));
+            }
+            start = matcher.end();
+        }
+        if (start < text.length()) {
+            segments.add(new Segment(text.substring(start), start, text.length()));
+        }
+        return segments;
+    }
+
+    /**
+     * @return The index of the view count of the texts below the title, or -1 if not found.
+     */
+    private static int findViewCountSegment(List<Segment> segments, ParsedViewCount[] result, Locale locale) {
+        final int size = segments.size();
+        if (size < 2 || size > 3) {
+            return -1;
+        }
+        ParsedViewCount[] parsed = new ParsedViewCount[size];
+        for (int i = 0; i < size; i++) {
+            Segment segment = segments.get(i);
+            if (segment.text.length() <= MAX_SEGMENT_LENGTH) {
+                parsed[i] = parseViewCount(segment.text, locale);
+            }
+        }
+
+        int index = -1;
+        for (int i = 0; i < size; i++) {
+            // Words of view counts that were seen before, such as "views".
+            if (parsed[i] != null && !parsed[i].words.isEmpty() && isViewWords(parsed[i].words)) {
+                index = i;
+                break;
+            }
+        }
+        if (index < 0) {
+            if (size == 3) {
+                // The channel, the view count and the upload time.
+                if (parsed[1] != null && segments.get(2).hasNumber()) {
+                    index = 1;
+                }
+            } else if (parsed[0] != null && segments.get(0).startsWithNumber()
+                    && segments.get(1).startsWithNumber()) {
+                // The view count and the upload time, such as on the channel page.
+                index = 0;
+            }
+        }
+        if (index < 0) {
+            return -1;
+        }
+        addViewWords(parsed[index].words);
+        result[0] = parsed[index];
+        return index;
+    }
+
+    /**
      * Injection point.
      * <p>
      * Called when the text below the title of a video is created, such as
-     * "Channel · 4.7M views · 2 days ago". The text is not changed, other than the span.
+     * "Channel · 4.7M views · 2 days ago". The view count is attached to the text as a span,
+     * and removed from the text if the Hide view count option is on.
      */
-    public static void onFeedSubtitleCreated(@Nullable CharSequence text) {
-        if (!ENABLED || !(text instanceof Spannable spannable)) {
-            return;
+    public static SpannableString onFeedSubtitleCreated(SpannableString text) {
+        if (!ENABLED || text == null) {
+            return text;
         }
         try {
             String string = text.toString();
-            if (loggedSubtitles < 5) {
-                loggedSubtitles++;
-                Logger.printDebug(() -> "Feed subtitle: " + string);
+            if (string.length() > MAX_SUBTITLE_LENGTH) {
+                return text;
             }
-            final int first = string.indexOf(DELIMITER);
-            if (first < 0) {
-                return;
-            }
-            final int second = string.indexOf(DELIMITER, first + DELIMITER.length());
-            if (second >= 0 && string.indexOf(DELIMITER, second + DELIMITER.length()) >= 0) {
-                // Not the channel, the views and the upload time.
-                return;
+            List<Segment> segments = splitSegments(string);
+            ParsedViewCount[] result = new ParsedViewCount[1];
+            final int index = findViewCountSegment(segments, result, Locale.getDefault());
+            if (index < 0) {
+                return text;
             }
 
-            Locale locale = Locale.getDefault();
-            ParsedViewCount parsed;
-            if (second >= 0) {
-                // The channel, the view count and the upload time. Same as the Hide view count option.
-                parsed = parseViewCount(string.substring(first + DELIMITER.length(), second), locale);
-                if (parsed == null) {
-                    return;
+            SpannableString replacement = text;
+            if (Settings.HIDE_VIEW_COUNT.get()) {
+                // The view count and the delimiter after it, or before it if it is the last text.
+                Segment segment = segments.get(index);
+                final int start;
+                final int end;
+                if (index < segments.size() - 1) {
+                    start = segment.start;
+                    end = segments.get(index + 1).start;
+                } else {
+                    start = segments.get(index - 1).end;
+                    end = segment.end;
                 }
-                addViewWords(parsed.words);
-            } else {
-                // The view count and the upload time, such as on the channel page.
-                // A channel name can begin with a number too, so only the words of
-                // view counts that were seen are used.
-                parsed = parseViewCount(string.substring(0, first), locale);
-                if (parsed == null || !isViewWords(parsed.words)) {
-                    return;
-                }
+                SpannableStringBuilder builder = new SpannableStringBuilder(text);
+                builder.delete(start, end);
+                replacement = new SpannableString(builder);
             }
 
-            spannable.setSpan(new ViewCountSpan(parsed.count), 0, spannable.length(),
+            replacement.setSpan(new ViewCountSpan(result[0].count), 0, replacement.length(),
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            return replacement;
         } catch (Exception ex) {
             Logger.printException(() -> "onFeedSubtitleCreated failure", ex);
         }
+        return text;
     }
 
     // endregion
@@ -384,6 +473,24 @@ public final class FeedViewCountPatch {
     }
 
     private static void findCardInfo(ComponentHost root, View view, CardInfo info, Rect rect) {
+        if (view instanceof TextView textView) {
+            CharSequence text = textView.getText();
+            if (text != null) {
+                if (info.viewCount == null && text instanceof Spanned spanned) {
+                    ViewCountSpan[] spans = spanned.getSpans(0, spanned.length(), ViewCountSpan.class);
+                    if (spans.length > 0) {
+                        info.viewCount = spans[0].viewCount;
+                    }
+                }
+                String item = text.toString().trim();
+                rect.set(0, 0, view.getWidth(), view.getHeight());
+                root.offsetDescendantRectToMyCoords(view, rect);
+                if (!item.isEmpty() && rect.top >= thumbnailBottom(root)
+                        && item.length() <= MAX_SUBTITLE_LENGTH) {
+                    info.texts.add(new PlacedText(item, rect.top, rect.left));
+                }
+            }
+        }
         if (view instanceof ComponentHost host) {
             TextContent textContent = host.getTextContent();
             if (textContent != null) {
@@ -435,75 +542,19 @@ public final class FeedViewCountPatch {
     /**
      * @return The view count of the texts below the thumbnail, such as
      *         "Channel · 4.7M views · 2 days ago", or null if not found.
-     *         Used when the text was not created with the view count span,
-     *         such as by a layout that creates the text another way.
+     *         Used when the text was not created with the view count span.
      */
     @Nullable
     private static String findViewCountInTexts(List<PlacedText> texts) {
         texts.sort((a, b) -> a.top != b.top ? a.top - b.top : a.left - b.left);
         Locale locale = Locale.getDefault();
-        List<String> numbered = new ArrayList<>();
-
-        for (int index = 0; index < texts.size(); index++) {
-            PlacedText placed = texts.get(index);
-            // The first text is the title, which can have numbers and delimiters too.
-            final boolean isTitle = index == 0 && texts.size() > 1;
-            String[] segments = SEGMENT_DELIMITER_PATTERN.split(placed.text);
-            List<ParsedViewCount> parsedSegments = new ArrayList<>();
-            List<Boolean> startsWithNumber = new ArrayList<>();
-            for (String segment : segments) {
-                String trimmed = segment.trim();
-                parsedSegments.add(trimmed.length() <= MAX_SEGMENT_LENGTH
-                        ? parseViewCount(trimmed, locale) : null);
-                startsWithNumber.add(!trimmed.isEmpty() && Character.isDigit(trimmed.charAt(0)));
-            }
-
-            // Words of view counts that were seen before.
-            for (ParsedViewCount parsed : parsedSegments) {
-                if (parsed != null && isViewWords(parsed.words)) {
-                    return parsed.count;
-                }
-            }
-
-            if (isTitle) {
-                continue;
-            }
-
-            if (segments.length == 3 && parsedSegments.get(1) != null) {
-                // The channel, the view count and the upload time.
-                ParsedViewCount parsed = parsedSegments.get(1);
-                addViewWords(parsed.words);
-                return parsed.count;
-            }
-
-            if (segments.length >= 2) {
-                // The view count is shown before the upload time.
-                ParsedViewCount first = null;
-                int count = 0;
-                for (int i = 0; i < segments.length; i++) {
-                    if (parsedSegments.get(i) != null && startsWithNumber.get(i)) {
-                        if (first == null) {
-                            first = parsedSegments.get(i);
-                        }
-                        count++;
-                    }
-                }
-                if (count >= 2) {
-                    addViewWords(first.words);
-                    return first.count;
-                }
-            } else if (parsedSegments.get(0) != null && startsWithNumber.get(0)) {
-                // Texts shown by themselves, such as a view count and an upload time.
-                numbered.add(placed.text);
-            }
-        }
-
-        if (numbered.size() == 2) {
-            // The view count is shown before the upload time.
-            ParsedViewCount parsed = parseViewCount(numbered.get(0), locale);
-            if (parsed != null) {
-                addViewWords(parsed.words);
-                return parsed.count;
+        ParsedViewCount[] result = new ParsedViewCount[1];
+        // The texts below the title are below it, so they are checked first.
+        // The title is the first text, and can have numbers and delimiters too.
+        final int first = texts.size() > 1 ? 1 : 0;
+        for (int i = texts.size() - 1; i >= first; i--) {
+            if (findViewCountSegment(splitSegments(texts.get(i).text), result, locale) >= 0) {
+                return result[0].count;
             }
         }
         return null;

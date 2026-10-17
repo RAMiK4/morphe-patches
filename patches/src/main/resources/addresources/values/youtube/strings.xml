@@ -468,7 +468,7 @@ Reports are public and are reviewed before a channel is added to a list. Removal
 
     <!-- layout.feedviews.feedViewCountPatch -->
     <string name="morphe_feed_view_count_title">Show view count on thumbnails</string>
-    <string name="morphe_feed_view_count_summary">The view count of feed videos is shown at the bottom left of their thumbnails. Turn on \'Hide view count\' to remove it from below the title</string>
+    <string name="morphe_feed_view_count_summary">The view count of feed videos is shown at the bottom left of their thumbnails. Turn on \'Hide view count\' to show it only on the thumbnails</string>
 
 
     <!-- layout.hide.signintotv.disableSignInToTVPopupPatch -->
