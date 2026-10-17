@@ -7,7 +7,7 @@
 
 package app.morphe.patches.youtube.layout.feedviews
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.all.misc.resources.addResourcesPatch
@@ -81,16 +81,19 @@ val feedViewCountPatch = bytecodePatch(
             }
             val textRegister = getInstruction<FiveRegisterInstruction>(setSpanIndex).registerC
 
-            // The view count is read before the other patch removes it from the text.
+            // Before the Hide view count option of the other patch, which only knows older layouts.
+            // The view count is attached to the text, and removed from it if that option is on.
             val hideViewCountIndex = indexOfFirstInstruction {
                 getReference<MethodReference>()?.name == "modifyFeedSubtitleSpan"
             }
             val insertIndex = if (hideViewCountIndex >= 0) hideViewCountIndex else applyDimensionIndex
 
-            addInstruction(
+            addInstructions(
                 insertIndex,
-                "invoke-static { v$textRegister }, $EXTENSION_CLASS->" +
-                        "onFeedSubtitleCreated(Ljava/lang/CharSequence;)V"
+                """
+                    invoke-static { v$textRegister }, $EXTENSION_CLASS->onFeedSubtitleCreated(Landroid/text/SpannableString;)Landroid/text/SpannableString;
+                    move-result-object v$textRegister
+                """
             )
         }
 
