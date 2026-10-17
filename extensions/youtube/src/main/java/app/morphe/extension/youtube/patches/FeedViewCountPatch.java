@@ -98,7 +98,8 @@ public final class FeedViewCountPatch {
     private static final float TEXT_SP = 12f;
     private static final float ICON_STROKE_DP = 1.4f;
 
-    private static final int BACKGROUND_COLOR = 0xB3000000;
+    /** Same as the duration badge of YouTube. */
+    private static final int BACKGROUND_COLOR = 0x99000000;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
 
     private static final Pattern DURATION_PATTERN =
@@ -246,7 +247,10 @@ public final class FeedViewCountPatch {
 
         String words = (text.substring(0, matcher.start()) + " " + text.substring(index))
                 .replaceAll("[\\s\u00A0\u202F]+", " ").trim();
-        return new ParsedViewCount(number + unit, words);
+        // A space keeps the unit apart from the number, so 78 B is not read as 788.
+        // Languages written without spaces show the unit attached to the number.
+        final boolean attachUnit = unit.isEmpty() || isWrittenWithoutSpaces(unit.charAt(0));
+        return new ParsedViewCount(attachUnit ? number + unit : number + "\u00A0" + unit, words);
     }
 
     private static void addViewWords(String words) {
@@ -299,15 +303,26 @@ public final class FeedViewCountPatch {
         Matcher matcher = SEGMENT_DELIMITER_PATTERN.matcher(text);
         int start = 0;
         while (matcher.find()) {
-            if (matcher.start() > start) {
-                segments.add(new Segment(text.substring(start, matcher.start()), start, matcher.start()));
-            }
+            addSegment(text, start, matcher.start(), segments);
             start = matcher.end();
         }
-        if (start < text.length()) {
-            segments.add(new Segment(text.substring(start), start, text.length()));
-        }
+        addSegment(text, start, text.length(), segments);
         return segments;
+    }
+
+    /**
+     * Adds the text without the spaces around it, such as the space after an icon.
+     */
+    private static void addSegment(String text, int start, int end, List<Segment> segments) {
+        while (start < end && isSeparator(text.charAt(start))) {
+            start++;
+        }
+        while (end > start && isSeparator(text.charAt(end - 1))) {
+            end--;
+        }
+        if (end > start) {
+            segments.add(new Segment(text.substring(start, end), start, end));
+        }
     }
 
     /**
@@ -355,6 +370,31 @@ public final class FeedViewCountPatch {
     }
 
     /**
+     * @return Where the icon right before the view count starts, or -1 if there is none.
+     *         Newer layouts draw icons as spans in place of spaces: the dots between the texts,
+     *         and a play icon before the view count. Older layouts show the dots as text.
+     */
+    private static int findIconBefore(Spanned text, List<Segment> segments, int index) {
+        final int runStart = index == 0 ? 0 : segments.get(index - 1).end;
+        final int runEnd = segments.get(index).start;
+        String run = text.subSequence(runStart, runEnd).toString();
+        if (run.indexOf('\u00B7') >= 0 || run.indexOf('\u2022') >= 0) {
+            return -1;
+        }
+        int iconStart = -1;
+        for (Object span : text.getSpans(runStart, runEnd, Object.class)) {
+            final int spanStart = text.getSpanStart(span);
+            final int spanEnd = text.getSpanEnd(span);
+            // Only spans inside the spaces, not spans of the whole text.
+            if (spanStart >= runStart && spanEnd <= runEnd && spanEnd > spanStart
+                    && spanStart > iconStart) {
+                iconStart = spanStart;
+            }
+        }
+        return iconStart;
+    }
+
+    /**
      * Injection point.
      * <p>
      * Called when the text below the title of a video is created, such as
@@ -381,7 +421,7 @@ public final class FeedViewCountPatch {
             if (Settings.HIDE_VIEW_COUNT.get()) {
                 // The view count and the delimiter after it, or before it if it is the last text.
                 Segment segment = segments.get(index);
-                final int start;
+                int start;
                 final int end;
                 if (index < segments.size() - 1) {
                     start = segment.start;
@@ -389,6 +429,11 @@ public final class FeedViewCountPatch {
                 } else {
                     start = segments.get(index - 1).end;
                     end = segment.end;
+                }
+                // Newer layouts show a play icon before the view count, which is removed with it.
+                final int iconStart = findIconBefore(text, segments, index);
+                if (iconStart >= 0) {
+                    start = Math.min(start, iconStart);
                 }
                 SpannableStringBuilder builder = new SpannableStringBuilder(text);
                 builder.delete(start, end);
@@ -582,13 +627,13 @@ public final class FeedViewCountPatch {
      */
     private static boolean isDurationBadgeShaped(ComponentHost root, Rect rect) {
         final float density = root.getResources().getDisplayMetrics().density;
-        final int thumbnailHeight = Math.round(root.getWidth() * FeedVideoCards.THUMBNAIL_RATIO);
+        // Thumbnails are 16:9 or square, such as of music videos.
         return rect.width() > 0
                 && rect.width() <= MAX_DURATION_WIDTH_DP * density
                 && rect.height() >= MIN_DURATION_HEIGHT_DP * density
                 && rect.height() <= MAX_DURATION_HEIGHT_DP * density
                 && rect.centerX() > root.getWidth() / 2
-                && rect.bottom <= thumbnailHeight + 4 * density;
+                && rect.bottom <= root.getWidth() + 4 * density;
     }
 
     private static void onCardLaidOut(ComponentHost host, @Nullable String videoId) {
@@ -600,6 +645,11 @@ public final class FeedViewCountPatch {
             viewCount = info.viewCount;
             duration = info.duration;
             if (viewCount == null) {
+                if (duration != null) {
+                    // A square thumbnail is taller than 16:9, so texts on it are not texts of the video.
+                    final int thumbnailBottom = duration.bottom;
+                    info.texts.removeIf(placed -> placed.top < thumbnailBottom);
+                }
                 viewCount = findViewCountInTexts(info.texts);
             }
             if (viewCount == null) {
