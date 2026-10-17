@@ -474,6 +474,13 @@ public final class FeedVideoCards {
         }
     }
 
+    /**
+     * Checks the card again a little later, such as when what is drawn on it was not found yet.
+     */
+    public static void checkAgainLater(ComponentHost root) {
+        scheduleRetry(root);
+    }
+
     private static void scheduleRetry(ComponentHost root) {
         Integer count = retries.get(root);
         final int attempt = count == null ? 0 : count;

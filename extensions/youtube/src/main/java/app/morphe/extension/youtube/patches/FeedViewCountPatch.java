@@ -725,6 +725,8 @@ public final class FeedViewCountPatch {
                 }
                 final String id = videoId == null ? "unknown" : videoId;
                 if (viewCount == null) {
+                    // The texts can be drawn after the layout of the card.
+                    FeedVideoCards.checkAgainLater(host);
                     logTexts(id, info.texts);
                 } else if (duration == null) {
                     final int bottom = thumbnailBottom;
