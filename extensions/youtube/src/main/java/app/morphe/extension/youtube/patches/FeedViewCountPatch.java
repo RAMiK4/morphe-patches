@@ -87,6 +87,10 @@ public final class FeedViewCountPatch {
     private static final int MAX_VIEW_WORDS = 8;
 
     private static final int FALLBACK_MARGIN_DP = 8;
+    /** A square thumbnail is this much taller than 16:9, at least. */
+    private static final int SQUARE_MIN_EXTRA_DP = 40;
+    /** Space between the thumbnail and the title. */
+    private static final int THUMBNAIL_TEXT_GAP_DP = 12;
     private static final int FALLBACK_HEIGHT_DP = 20;
     /** A duration badge larger than this is not the badge itself, but a host around it. */
     private static final int MAX_DURATION_WIDTH_DP = 120;
@@ -498,6 +502,8 @@ public final class FeedViewCountPatch {
         String viewCount;
         @Nullable
         Rect duration;
+        /** If the card shows a duration or a live badge, which videos do. */
+        boolean hasDuration;
         /** Bottom of the thumbnail, if a host of the size of the thumbnail shows the duration. */
         int thumbnailBottom = -1;
         /** Texts below the thumbnail, with their top and left. */
@@ -557,9 +563,12 @@ public final class FeedViewCountPatch {
                             && item.length() <= MAX_SUBTITLE_LENGTH) {
                         info.texts.add(new PlacedText(item, rect.top, rect.left));
                     }
+                    final boolean durationText = isDurationText(item);
+                    if (durationText) {
+                        info.hasDuration = true;
+                    }
                     if (info.duration == null) {
-                        if ((item.length() <= MAX_DURATION_TEXT_LENGTH && DURATION_PATTERN.matcher(item).find())
-                                || BADGE_PATTERN.matcher(item).matches()) {
+                        if (durationText) {
                             if (isDurationBadgeShaped(root, rect)) {
                                 info.duration = new Rect(rect);
                             } else if (info.thumbnailBottom < 0 && isThumbnailShaped(root, rect)) {
@@ -624,6 +633,41 @@ public final class FeedViewCountPatch {
         Logger.printDebug(() -> "View count not found: " + videoId + " texts:" + builder);
     }
 
+    private static boolean isDurationText(String item) {
+        return (item.length() <= MAX_DURATION_TEXT_LENGTH && DURATION_PATTERN.matcher(item).find())
+                || BADGE_PATTERN.matcher(item).matches();
+    }
+
+    private static boolean containsHorizontalList(ViewGroup group) {
+        for (int i = 0, count = group.getChildCount(); i < count; i++) {
+            View child = group.getChildAt(i);
+            if (FeedVideoCards.isHorizontalList(child)
+                    || (child instanceof ViewGroup childGroup && containsHorizontalList(childGroup))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return The bottom of a square thumbnail, found from the texts below it, or -1.
+     *         A square thumbnail is taller than 16:9, so the first text is lower.
+     */
+    private static int findSquareThumbnailBottom(ComponentHost root, List<PlacedText> texts) {
+        final float density = root.getResources().getDisplayMetrics().density;
+        int firstTextTop = Integer.MAX_VALUE;
+        for (PlacedText placed : texts) {
+            if (!isDurationText(placed.text)) {
+                firstTextTop = Math.min(firstTextTop, placed.top);
+            }
+        }
+        final float wideBottom = root.getWidth() * FeedVideoCards.THUMBNAIL_RATIO;
+        if (firstTextTop == Integer.MAX_VALUE || firstTextTop < wideBottom + SQUARE_MIN_EXTRA_DP * density) {
+            return -1;
+        }
+        return Math.round(firstTextTop - THUMBNAIL_TEXT_GAP_DP * density);
+    }
+
     /**
      * A host as wide as the card at its top, such as a 16:9 or a square thumbnail.
      */
@@ -654,26 +698,36 @@ public final class FeedViewCountPatch {
         String viewCount = null;
         Rect duration = null;
         int thumbnailBottom = -1;
-        if (videoId != null && !isInDialog(host)) {
+        // Videos of shelves are not known, but the view count is shown by the card itself,
+        // so it is shown on any card shaped like a video with a duration.
+        final boolean checkCard = videoId != null
+                || (FeedVideoCards.isVideoShaped(host) && !FeedVideoCards.isPlaylistCard(host)
+                && !containsHorizontalList(host));
+        if (checkCard && !isInDialog(host)) {
             CardInfo info = new CardInfo();
             findCardInfo(host, host, info, new Rect());
-            viewCount = info.viewCount;
-            duration = info.duration;
-            thumbnailBottom = info.thumbnailBottom;
-            if (viewCount == null) {
-                final int textsTop = duration != null ? duration.bottom : thumbnailBottom;
-                if (textsTop > 0) {
-                    // A square thumbnail is taller than 16:9, so texts on it are not texts of the video.
-                    info.texts.removeIf(placed -> placed.top < textsTop);
+            if (videoId != null || info.hasDuration) {
+                viewCount = info.viewCount;
+                duration = info.duration;
+                thumbnailBottom = info.thumbnailBottom;
+                if (duration == null && thumbnailBottom < 0) {
+                    thumbnailBottom = findSquareThumbnailBottom(host, info.texts);
                 }
-                viewCount = findViewCountInTexts(info.texts);
-            }
-            if (viewCount == null) {
-                logTexts(videoId, info.texts);
-            }
-            if (viewCount != null && duration == null) {
-                final int bottom = thumbnailBottom;
-                Logger.printDebug(() -> "Duration badge not found: " + videoId + " thumbnail bottom: " + bottom);
+                if (viewCount == null) {
+                    final int textsTop = duration != null ? duration.bottom : thumbnailBottom;
+                    if (textsTop > 0) {
+                        // Texts on a square thumbnail are not texts of the video.
+                        info.texts.removeIf(placed -> placed.top < textsTop);
+                    }
+                    viewCount = findViewCountInTexts(info.texts);
+                }
+                final String id = videoId == null ? "unknown" : videoId;
+                if (viewCount == null) {
+                    logTexts(id, info.texts);
+                } else if (duration == null) {
+                    final int bottom = thumbnailBottom;
+                    Logger.printDebug(() -> "Duration badge not found: " + id + " thumbnail bottom: " + bottom);
+                }
             }
         }
 
