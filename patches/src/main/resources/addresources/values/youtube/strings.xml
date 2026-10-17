@@ -473,7 +473,7 @@ Reports are public and are reviewed before a channel is added to a list. Removal
     <string name="morphe_feed_like_ratio_summary">The ratio of likes to dislikes of feed videos is shown below the like count, using the Return YouTube Dislike API</string>
     <!-- layout.feedviews.feedViewCountPatch -->
     <string name="morphe_feed_view_count_title">Show view count on thumbnails</string>
-    <string name="morphe_feed_view_count_summary">The view count of feed videos is shown at the bottom left of their thumbnails. Turn on \'Hide view count\' to show it only on the thumbnails</string>
+    <string name="morphe_feed_view_count_summary">The view count of feed videos is shown at the bottom left of their thumbnails instead of below the title. Some videos, such as in shelves, may not show a view count</string>
 
 
     <!-- layout.hide.signintotv.disableSignInToTVPopupPatch -->

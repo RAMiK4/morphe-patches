@@ -98,8 +98,7 @@ public final class FeedViewCountPatch {
     private static final float TEXT_SP = 12f;
     private static final float ICON_STROKE_DP = 1.4f;
 
-    /** Same as the duration badge of YouTube. */
-    private static final int BACKGROUND_COLOR = 0x99000000;
+    private static final int BACKGROUND_COLOR = 0xA6000000;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
 
     private static final Pattern DURATION_PATTERN =
@@ -399,7 +398,7 @@ public final class FeedViewCountPatch {
      * <p>
      * Called when the text below the title of a video is created, such as
      * "Channel · 4.7M views · 2 days ago". The view count is attached to the text as a span,
-     * and removed from the text if the Hide view count option is on.
+     * and removed from the text, since it is shown on the thumbnail.
      */
     public static SpannableString onFeedSubtitleCreated(SpannableString text) {
         if (!ENABLED || text == null) {
@@ -417,28 +416,26 @@ public final class FeedViewCountPatch {
                 return text;
             }
 
-            SpannableString replacement = text;
-            if (Settings.HIDE_VIEW_COUNT.get()) {
-                // The view count and the delimiter after it, or before it if it is the last text.
-                Segment segment = segments.get(index);
-                int start;
-                final int end;
-                if (index < segments.size() - 1) {
-                    start = segment.start;
-                    end = segments.get(index + 1).start;
-                } else {
-                    start = segments.get(index - 1).end;
-                    end = segment.end;
-                }
-                // Newer layouts show a play icon before the view count, which is removed with it.
-                final int iconStart = findIconBefore(text, segments, index);
-                if (iconStart >= 0) {
-                    start = Math.min(start, iconStart);
-                }
-                SpannableStringBuilder builder = new SpannableStringBuilder(text);
-                builder.delete(start, end);
-                replacement = new SpannableString(builder);
+            // The view count is shown on the thumbnail instead, so it is removed from the text:
+            // the view count and the delimiter after it, or before it if it is the last text.
+            Segment segment = segments.get(index);
+            int start;
+            final int end;
+            if (index < segments.size() - 1) {
+                start = segment.start;
+                end = segments.get(index + 1).start;
+            } else {
+                start = segments.get(index - 1).end;
+                end = segment.end;
             }
+            // Newer layouts show a play icon before the view count, which is removed with it.
+            final int iconStart = findIconBefore(text, segments, index);
+            if (iconStart >= 0) {
+                start = Math.min(start, iconStart);
+            }
+            SpannableStringBuilder builder = new SpannableStringBuilder(text);
+            builder.delete(start, end);
+            SpannableString replacement = new SpannableString(builder);
 
             replacement.setSpan(new ViewCountSpan(result[0].count), 0, replacement.length(),
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -501,6 +498,8 @@ public final class FeedViewCountPatch {
         String viewCount;
         @Nullable
         Rect duration;
+        /** Bottom of the thumbnail, if a host of the size of the thumbnail shows the duration. */
+        int thumbnailBottom = -1;
         /** Texts below the thumbnail, with their top and left. */
         final List<PlacedText> texts = new ArrayList<>();
     }
@@ -563,6 +562,9 @@ public final class FeedViewCountPatch {
                                 || BADGE_PATTERN.matcher(item).matches()) {
                             if (isDurationBadgeShaped(root, rect)) {
                                 info.duration = new Rect(rect);
+                            } else if (info.thumbnailBottom < 0 && isThumbnailShaped(root, rect)) {
+                                // The duration is drawn by the host of the whole thumbnail.
+                                info.thumbnailBottom = rect.bottom;
                             }
                         }
                     }
@@ -572,7 +574,7 @@ public final class FeedViewCountPatch {
         if (view instanceof ViewGroup group) {
             for (int i = 0, count = group.getChildCount(); i < count; i++) {
                 View child = group.getChildAt(i);
-                if (child.getVisibility() == View.VISIBLE) {
+                if (child.getVisibility() == View.VISIBLE && !FeedVideoCards.isHorizontalList(child)) {
                     findCardInfo(root, child, info, rect);
                 }
             }
@@ -623,6 +625,18 @@ public final class FeedViewCountPatch {
     }
 
     /**
+     * A host as wide as the card at its top, such as a 16:9 or a square thumbnail.
+     */
+    private static boolean isThumbnailShaped(ComponentHost root, Rect rect) {
+        final float density = root.getResources().getDisplayMetrics().density;
+        final int width = root.getWidth();
+        return rect.width() >= width * 0.9f
+                && rect.top <= 16 * density
+                && rect.bottom >= width * FeedVideoCards.THUMBNAIL_RATIO - 4 * density
+                && rect.bottom <= width + 4 * density;
+    }
+
+    /**
      * A host only as large as the badge, at the bottom right of the thumbnail.
      */
     private static boolean isDurationBadgeShaped(ComponentHost root, Rect rect) {
@@ -639,16 +653,18 @@ public final class FeedViewCountPatch {
     private static void onCardLaidOut(ComponentHost host, @Nullable String videoId) {
         String viewCount = null;
         Rect duration = null;
+        int thumbnailBottom = -1;
         if (videoId != null && !isInDialog(host)) {
             CardInfo info = new CardInfo();
             findCardInfo(host, host, info, new Rect());
             viewCount = info.viewCount;
             duration = info.duration;
+            thumbnailBottom = info.thumbnailBottom;
             if (viewCount == null) {
-                if (duration != null) {
+                final int textsTop = duration != null ? duration.bottom : thumbnailBottom;
+                if (textsTop > 0) {
                     // A square thumbnail is taller than 16:9, so texts on it are not texts of the video.
-                    final int thumbnailBottom = duration.bottom;
-                    info.texts.removeIf(placed -> placed.top < thumbnailBottom);
+                    info.texts.removeIf(placed -> placed.top < textsTop);
                 }
                 viewCount = findViewCountInTexts(info.texts);
             }
@@ -656,7 +672,8 @@ public final class FeedViewCountPatch {
                 logTexts(videoId, info.texts);
             }
             if (viewCount != null && duration == null) {
-                Logger.printDebug(() -> "Duration badge not found, default place is used: " + videoId);
+                final int bottom = thumbnailBottom;
+                Logger.printDebug(() -> "Duration badge not found: " + videoId + " thumbnail bottom: " + bottom);
             }
         }
 
@@ -672,7 +689,7 @@ public final class FeedViewCountPatch {
             badge = new ViewCountBadge(host);
             badges.put(host, badge);
         }
-        badge.bind(host, viewCount, duration);
+        badge.bind(host, viewCount, duration, thumbnailBottom);
     }
 
     // endregion
@@ -716,7 +733,7 @@ public final class FeedViewCountPatch {
             return Math.round(dp * density);
         }
 
-        void bind(ComponentHost host, String newViewCount, @Nullable Rect duration) {
+        void bind(ComponentHost host, String newViewCount, @Nullable Rect duration, int thumbnailBottom) {
             viewCount = newViewCount;
 
             // Same height, bottom and margin as the duration badge.
@@ -728,7 +745,9 @@ public final class FeedViewCountPatch {
                 bottom = duration.bottom;
                 left = Math.max(0, host.getWidth() - duration.right);
             } else {
-                final int thumbnailHeight = Math.round(host.getWidth() * FeedVideoCards.THUMBNAIL_RATIO);
+                final int thumbnailHeight = thumbnailBottom > 0
+                        ? thumbnailBottom
+                        : Math.round(host.getWidth() * FeedVideoCards.THUMBNAIL_RATIO);
                 bottom = thumbnailHeight - px(FALLBACK_MARGIN_DP);
                 top = bottom - px(FALLBACK_HEIGHT_DP);
                 left = px(FALLBACK_MARGIN_DP);
