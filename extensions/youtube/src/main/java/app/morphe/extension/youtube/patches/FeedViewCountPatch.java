@@ -87,6 +87,8 @@ public final class FeedViewCountPatch {
     private static final int MAX_VIEW_WORDS = 8;
 
     private static final int FALLBACK_MARGIN_DP = 8;
+    /** A little more space than the duration badge has, so the count is not at the very edge. */
+    private static final int EXTRA_LEFT_MARGIN_DP = 2;
     /** A square thumbnail is this much taller than 16:9, at least. */
     private static final int SQUARE_MIN_EXTRA_DP = 40;
     /** Space between the thumbnail and the title. */
@@ -797,14 +799,14 @@ public final class FeedViewCountPatch {
             if (duration != null) {
                 top = duration.top;
                 bottom = duration.bottom;
-                left = Math.max(0, host.getWidth() - duration.right);
+                left = Math.max(0, host.getWidth() - duration.right) + px(EXTRA_LEFT_MARGIN_DP);
             } else {
                 final int thumbnailHeight = thumbnailBottom > 0
                         ? thumbnailBottom
                         : Math.round(host.getWidth() * FeedVideoCards.THUMBNAIL_RATIO);
                 bottom = thumbnailHeight - px(FALLBACK_MARGIN_DP);
                 top = bottom - px(FALLBACK_HEIGHT_DP);
-                left = px(FALLBACK_MARGIN_DP);
+                left = px(FALLBACK_MARGIN_DP + EXTRA_LEFT_MARGIN_DP);
             }
             final int height = bottom - top;
 
