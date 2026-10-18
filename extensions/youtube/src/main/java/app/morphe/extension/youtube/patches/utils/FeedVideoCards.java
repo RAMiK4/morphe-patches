@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.youtube.patches.FeedEngagementCountsPatch;
+import app.morphe.extension.youtube.patches.FeedViewCountPatch;
 import app.morphe.extension.youtube.patches.VideoInformation;
 import app.morphe.extension.youtube.settings.Settings;
 import app.morphe.extension.youtube.shared.PlayerType;
@@ -66,6 +67,7 @@ public final class FeedVideoCards {
     }
 
     private static final boolean ENABLED = FeedEngagementCountsPatch.ENABLED
+            || FeedViewCountPatch.ENABLED
             || Settings.FEED_WATCH_LATER_BUTTON.get();
 
     /** A card must be almost as wide as the screen. Shelves and grids are not used. */
@@ -127,6 +129,9 @@ public final class FeedVideoCards {
     static {
         if (FeedEngagementCountsPatch.ENABLED) {
             listeners.add(FeedEngagementCountsPatch.LISTENER);
+        }
+        if (FeedViewCountPatch.ENABLED) {
+            listeners.add(FeedViewCountPatch.LISTENER);
         }
         if (ENABLED) {
             // The inline player shows its buttons over the thumbnail, so what is drawn
@@ -472,6 +477,13 @@ public final class FeedVideoCards {
             rootsUpdateScheduled = true;
             Utils.runOnMainThread(updateRootsRunnable);
         }
+    }
+
+    /**
+     * Checks the card again a little later, such as when what is drawn on it was not found yet.
+     */
+    public static void checkAgainLater(ComponentHost root) {
+        scheduleRetry(root);
     }
 
     private static void scheduleRetry(ComponentHost root) {
