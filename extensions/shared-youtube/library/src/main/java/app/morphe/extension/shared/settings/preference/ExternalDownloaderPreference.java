@@ -46,7 +46,38 @@ import app.morphe.extension.shared.ui.Dim;
 @SuppressWarnings({"unused", "deprecation"})
 public class ExternalDownloaderPreference extends CustomDialogListPreference {
 
+    /**
+     * Packages that understand the quick download extras of YTDLnis:
+     * {@code TYPE} (audio or video) and {@code BACKGROUND} (queue without showing a window).
+     */
+    private static final String[] QUICK_DOWNLOAD_PACKAGES = {
+            "com.deniscerri.ytdl",
+            "com.rl.ytindr"
+    };
+
+    /**
+     * @return If the chosen downloader can queue a download in the background.
+     */
+    public static boolean supportsQuickDownload() {
+        String packageName = SharedYouTubeSettings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
+        for (String quickPackage : QUICK_DOWNLOAD_PACKAGES) {
+            if (quickPackage.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void launchExternalDownloader(String videoId, @Nullable Context context, String url) {
+        launchExternalDownloader(videoId, context, url, null);
+    }
+
+    /**
+     * @param quickDownloadType If not null, the downloader queues the download in the background
+     *                          as this type ("audio" or "video") using its default settings.
+     */
+    public static void launchExternalDownloader(String videoId, @Nullable Context context, String url,
+                                                @Nullable String quickDownloadType) {
         try {
             Objects.requireNonNull(videoId);
             if (context == null) {
@@ -67,6 +98,10 @@ public class ExternalDownloaderPreference extends CustomDialogListPreference {
             intent.setType("text/plain");
             intent.setPackage(downloaderPackageName);
             intent.putExtra("android.intent.extra.TEXT", url);
+            if (quickDownloadType != null) {
+                intent.putExtra("TYPE", quickDownloadType);
+                intent.putExtra("BACKGROUND", true);
+            }
             // Opening the downloader is not the user leaving the app.
             // Without this flag a playing video enters picture-in-picture,
             // and the downloader's window opens over the home screen instead of over the video.

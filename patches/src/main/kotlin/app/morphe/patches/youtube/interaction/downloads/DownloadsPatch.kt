@@ -15,6 +15,8 @@ import app.morphe.patches.youtube.misc.settings.PreferenceScreen
 import app.morphe.patches.youtube.misc.settings.settingsPatch
 import app.morphe.patches.youtube.shared.Constants.COMPATIBILITY_YOUTUBE
 import app.morphe.patches.youtube.video.information.videoInformationPatch
+import app.morphe.util.ResourceGroup
+import app.morphe.util.copyResources
 
 private val downloadsResourcePatch = resourcePatch {
     dependsOn(
@@ -39,6 +41,16 @@ private val downloadsResourcePatch = resourcePatch {
         )
 
         copyPlayerButtonIcons("downloads", "morphe_yt_download_button")
+
+        copyResources(
+            "downloads",
+            ResourceGroup(
+                "drawable",
+                "morphe_external_downloader_quick_video.xml",
+                "morphe_external_downloader_quick_audio.xml",
+                "morphe_external_downloader_quick_options.xml"
+            )
+        )
     }
 
     finalize {
