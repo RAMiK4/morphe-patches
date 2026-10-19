@@ -343,7 +343,7 @@ public class Settings extends SharedYouTubeSettings {
 
     // Feed view count
     public static final BooleanSetting FEED_VIEW_COUNT = new BooleanSetting("morphe_feed_view_count", FALSE, true);
-    public static final StringSetting FEED_VIEW_COUNT_DIMENSIONS = new StringSetting("morphe_feed_view_count_dimensions", "", false, false);
+    public static final StringSetting FEED_VIEW_COUNT_PATHS = new StringSetting("morphe_feed_view_count_paths", "", false, false);
     public static final BooleanSetting VIDEO_QUALITY_DIALOG_BUTTON = new BooleanSetting("morphe_video_quality_dialog_button", FALSE, true);
     public static final BooleanSetting VIDEO_QUALITY_DIALOG_BUTTON_RESOLUTION = new BooleanSetting("morphe_video_quality_dialog_button_resolution", FALSE, parent(VIDEO_QUALITY_DIALOG_BUTTON));
 

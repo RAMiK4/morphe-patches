@@ -12,6 +12,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.all.misc.resources.addResourcesPatch
 import app.morphe.patches.shared.misc.settings.preference.SwitchPreference
+import app.morphe.patches.shared.misc.textcomponent.hookLithoSpannableString
+import app.morphe.patches.shared.misc.textcomponent.lithoSpannableStringPatch
 import app.morphe.patches.youtube.layout.hide.general.HideViewCountFingerprint
 import app.morphe.patches.youtube.layout.hide.general.hideLayoutComponentsPatch
 import app.morphe.patches.youtube.misc.extension.sharedExtensionPatch
@@ -25,7 +27,6 @@ import app.morphe.util.indexOfFirstInstructionOrThrow
 import app.morphe.util.setExtensionIsPatchIncluded
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
@@ -46,6 +47,9 @@ val feedViewCountPatch = bytecodePatch(
         // Its Hide view count option removes the view count from below the title.
         // It changes the same method first, so its indexes are not moved by this patch.
         hideLayoutComponentsPatch,
+        // The view count is removed from the texts of the cards that show the badge,
+        // known by the Litho path of the text.
+        lithoSpannableStringPatch,
     )
 
     compatibleWith(COMPATIBILITY_YOUTUBE)
@@ -82,10 +86,6 @@ val feedViewCountPatch = bytecodePatch(
             }
             val textRegister = getInstruction<FiveRegisterInstruction>(setSpanIndex).registerC
 
-            // A float value used to determine the size of the text, which differs between layouts.
-            // The same register the Hide view count option of the other patch uses.
-            val dimensionRegister = getInstruction<OneRegisterInstruction>(applyDimensionIndex + 1).registerA
-
             // Before the Hide view count option of the other patch, which only knows older layouts.
             // The view count is attached to the text, and removed from it if that option is on.
             val hideViewCountIndex = indexOfFirstInstruction {
@@ -96,11 +96,13 @@ val feedViewCountPatch = bytecodePatch(
             addInstructions(
                 insertIndex,
                 """
-                    invoke-static { v$textRegister, v$dimensionRegister }, $EXTENSION_CLASS->onFeedSubtitleCreated(Landroid/text/SpannableString;F)Landroid/text/SpannableString;
+                    invoke-static { v$textRegister }, $EXTENSION_CLASS->onFeedSubtitleCreated(Landroid/text/SpannableString;)Landroid/text/SpannableString;
                     move-result-object v$textRegister
                 """
             )
         }
+
+        hookLithoSpannableString(EXTENSION_CLASS)
 
         setExtensionIsPatchIncluded(EXTENSION_CLASS)
     }
