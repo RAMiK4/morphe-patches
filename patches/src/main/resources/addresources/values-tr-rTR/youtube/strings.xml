@@ -445,7 +445,7 @@ Raporlar herkese açıktır ve bir kanal listeye eklenmeden önce incelenir. Kal
   <string name="morphe_external_downloader_title">Harici indirme düğmesini göster</string>
   <string name="morphe_external_downloader_summary">Video oynatıcınızda harici indiricinizi açan bir katman düğmesi gösterir</string>
   <string name="morphe_external_downloader_quick_menu_title">Dokununca hızlı indirme</string>
-  <string name="morphe_external_downloader_quick_menu_summary">Açık: dokunmak hızlı indirme menüsünü, basılı tutmak indiricinin tüm seçeneklerini açar. Kapalı: tam tersi. YTDLnis ve YTindr ile çalışır</string>
+  <string name="morphe_external_downloader_quick_menu_summary">Açık: indirme düğmelerine (oynatıcı düğmesi, İndir düğmesi ve menüsü) dokunmak hızlı indirme menüsünü açar. Oynatıcı düğmesine basılı tutmak indiricinin tüm seçeneklerini açar. Kapalı: oynatıcı düğmesine basılı tutunca hızlı menü açılır. YTDLnis ve YTindir ile çalışır</string>
   <string name="morphe_external_downloader_quick_video_quality">Full HD (1080p)</string>
   <string name="morphe_external_downloader_quick_audio_quality">Orta (192 kbps)</string>
   <string name="morphe_external_downloader_quick_menu_header">Hızlı indirme</string>

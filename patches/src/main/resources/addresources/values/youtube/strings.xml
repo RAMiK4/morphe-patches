@@ -480,7 +480,7 @@ Reports are public and are reviewed before a channel is added to a list. Removal
     <string name="morphe_external_downloader_title">Show external download button</string>
     <string name="morphe_external_downloader_summary">Shows an overlay button in video player that opens your external downloader</string>
     <string name="morphe_external_downloader_quick_menu_title">Quick download on tap</string>
-    <string name="morphe_external_downloader_quick_menu_summary">On: tap opens the quick download menu, tap and hold opens all options of the downloader. Off: the other way round. Works with YTDLnis and YTindr</string>
+    <string name="morphe_external_downloader_quick_menu_summary">On: tapping a download button (player button, Download button or menu) opens the quick download menu. On the player button, tap and hold opens all options of the downloader. Off: the player button opens the quick menu on tap and hold. Works with YTDLnis and YTindir</string>
     <string name="morphe_external_downloader_quick_video_quality">Full HD (1080p)</string>
     <string name="morphe_external_downloader_quick_audio_quality">Medium (192 kbps)</string>
     <string name="morphe_external_downloader_quick_menu_header">Quick download</string>

@@ -4,6 +4,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.SharedYouTubeSettings;
 import app.morphe.extension.shared.settings.preference.ExternalDownloaderPreference;
+import app.morphe.extension.youtube.videoplayer.ExternalDownloadButton;
 
 @SuppressWarnings("unused")
 public final class DownloadsPatch {
@@ -21,6 +22,11 @@ public final class DownloadsPatch {
         try {
             if (!SharedYouTubeSettings.EXTERNAL_DOWNLOADER_ACTION_BUTTON.get()) {
                 return false;
+            }
+
+            if (ExternalDownloadButton.quickMenuOnTap()) {
+                ExternalDownloadButton.showQuickDownloadMenu(Utils.getActivity(), videoId);
+                return true;
             }
 
             ExternalDownloaderPreference.launchExternalDownloader(

@@ -52,7 +52,7 @@ public class ExternalDownloaderPreference extends CustomDialogListPreference {
      */
     private static final String[] QUICK_DOWNLOAD_PACKAGES = {
             "com.deniscerri.ytdl",
-            "com.rl.ytindr"
+            "com.rl.ytindr" /* YTindir */
     };
 
     /** Maximum video height of a quick video download. */
