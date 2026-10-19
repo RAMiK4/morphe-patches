@@ -25,6 +25,7 @@ import app.morphe.util.indexOfFirstInstructionOrThrow
 import app.morphe.util.setExtensionIsPatchIncluded
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
@@ -81,6 +82,10 @@ val feedViewCountPatch = bytecodePatch(
             }
             val textRegister = getInstruction<FiveRegisterInstruction>(setSpanIndex).registerC
 
+            // A float value used to determine the size of the text, which differs between layouts.
+            // The same register the Hide view count option of the other patch uses.
+            val dimensionRegister = getInstruction<OneRegisterInstruction>(applyDimensionIndex + 1).registerA
+
             // Before the Hide view count option of the other patch, which only knows older layouts.
             // The view count is attached to the text, and removed from it if that option is on.
             val hideViewCountIndex = indexOfFirstInstruction {
@@ -91,7 +96,7 @@ val feedViewCountPatch = bytecodePatch(
             addInstructions(
                 insertIndex,
                 """
-                    invoke-static { v$textRegister }, $EXTENSION_CLASS->onFeedSubtitleCreated(Landroid/text/SpannableString;)Landroid/text/SpannableString;
+                    invoke-static { v$textRegister, v$dimensionRegister }, $EXTENSION_CLASS->onFeedSubtitleCreated(Landroid/text/SpannableString;F)Landroid/text/SpannableString;
                     move-result-object v$textRegister
                 """
             )

@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +61,11 @@ import app.morphe.extension.youtube.settings.Settings;
  * The span is copied with the text, so it is kept when the Hide view count option
  * of the Hide layout components patch removes the view count from below the title.
  * No request is made, and the count is the same that YouTube shows.
+ * <p>
+ * The same text is used by other lists too, such as the videos of a playlist, where no badge is
+ * shown. The text is created with a dimension that differs between these layouts, so the view count
+ * is removed from below the title only for the dimensions of the cards that show the badge.
+ * Other texts keep their view count.
  */
 @SuppressWarnings("unused")
 public final class FeedViewCountPatch {
@@ -141,20 +147,72 @@ public final class FeedViewCountPatch {
      */
     private static final class ViewCountSpan {
         final String viewCount;
+        /** Dimension the text was created with, which differs between layouts. */
+        final float dimension;
+        /** If the view count was removed from the text. */
+        final boolean removed;
 
-        ViewCountSpan(String viewCount) {
+        ViewCountSpan(String viewCount, float dimension, boolean removed) {
             this.viewCount = viewCount;
+            this.dimension = dimension;
+            this.removed = removed;
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof ViewCountSpan other && other.viewCount.equals(viewCount);
+            return obj instanceof ViewCountSpan other && other.viewCount.equals(viewCount)
+                    && other.dimension == dimension && other.removed == removed;
         }
 
         @Override
         public int hashCode() {
-            return viewCount.hashCode();
+            return viewCount.hashCode() * 31 + Float.hashCode(dimension) * 2 + (removed ? 1 : 0);
         }
+    }
+
+    /**
+     * Dimensions of the texts of the cards that show the badge. The texts of other layouts,
+     * such as the videos of a playlist, keep their view count.
+     * The same dimensions the Hide view count option uses, and the ones found on cards with the badge.
+     * Used on more than one thread.
+     */
+    private static final Set<Float> cardDimensions = ConcurrentHashMap.newKeySet();
+    private static final int MAX_CARD_DIMENSIONS = 6;
+
+    static {
+        cardDimensions.add(16f);
+        cardDimensions.add(42f);
+        try {
+            for (String value : Settings.FEED_VIEW_COUNT_DIMENSIONS.get().split(",")) {
+                if (!value.isEmpty()) {
+                    cardDimensions.add(Float.parseFloat(value));
+                }
+            }
+        } catch (Exception ex) {
+            Logger.printException(() -> "Could not load the dimensions", ex);
+            Settings.FEED_VIEW_COUNT_DIMENSIONS.resetToDefault();
+        }
+    }
+
+    /**
+     * The view count of a text with this dimension was found on a card with the badge,
+     * so the view count is removed from the texts with this dimension from now on.
+     */
+    private static void addCardDimension(float dimension) {
+        if (cardDimensions.size() >= MAX_CARD_DIMENSIONS || !cardDimensions.add(dimension)) {
+            return;
+        }
+        Logger.printDebug(() -> "Card text dimension: " + dimension);
+        StringBuilder builder = new StringBuilder();
+        for (Float value : cardDimensions) {
+            if (value != 16f && value != 42f) {
+                if (builder.length() > 0) {
+                    builder.append(',');
+                }
+                builder.append(value);
+            }
+        }
+        Settings.FEED_VIEW_COUNT_DIMENSIONS.save(builder.toString());
     }
 
     // region view count text
@@ -404,9 +462,11 @@ public final class FeedViewCountPatch {
      * <p>
      * Called when the text below the title of a video is created, such as
      * "Channel · 4.7M views · 2 days ago". The view count is attached to the text as a span,
-     * and removed from the text, since it is shown on the thumbnail.
+     * and removed from the text if the text is of a card that shows the badge.
+     *
+     * @param dimension Dimension of the text, which differs between layouts.
      */
-    public static SpannableString onFeedSubtitleCreated(SpannableString text) {
+    public static SpannableString onFeedSubtitleCreated(SpannableString text, float dimension) {
         if (!ENABLED || text == null) {
             return text;
         }
@@ -420,6 +480,16 @@ public final class FeedViewCountPatch {
             final int index = findViewCountSegment(segments, result, Locale.getDefault());
             if (index < 0) {
                 return text;
+            }
+
+            final String viewCount = result[0].count;
+            if (!cardDimensions.contains(dimension)) {
+                // Not a card that shows the badge, such as the videos of a playlist.
+                // The text keeps its view count.
+                SpannableString kept = new SpannableString(text);
+                kept.setSpan(new ViewCountSpan(viewCount, dimension, false), 0, kept.length(),
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                return kept;
             }
 
             // The view count is shown on the thumbnail instead, so it is removed from the text:
@@ -443,7 +513,7 @@ public final class FeedViewCountPatch {
             builder.delete(start, end);
             SpannableString replacement = new SpannableString(builder);
 
-            replacement.setSpan(new ViewCountSpan(result[0].count), 0, replacement.length(),
+            replacement.setSpan(new ViewCountSpan(viewCount, dimension, true), 0, replacement.length(),
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             return replacement;
         } catch (Exception ex) {
@@ -502,6 +572,9 @@ public final class FeedViewCountPatch {
     private static final class CardInfo {
         @Nullable
         String viewCount;
+        /** Span of the text below the title, if the text was created with it. */
+        @Nullable
+        ViewCountSpan span;
         @Nullable
         Rect duration;
         /** If the card shows a duration or a live badge, which videos do. */
@@ -532,6 +605,7 @@ public final class FeedViewCountPatch {
                     ViewCountSpan[] spans = spanned.getSpans(0, spanned.length(), ViewCountSpan.class);
                     if (spans.length > 0) {
                         info.viewCount = spans[0].viewCount;
+                        info.span = spans[0];
                     }
                 }
                 String item = text.toString().trim();
@@ -554,6 +628,7 @@ public final class FeedViewCountPatch {
                         ViewCountSpan[] spans = spanned.getSpans(0, spanned.length(), ViewCountSpan.class);
                         if (spans.length > 0) {
                             info.viewCount = spans[0].viewCount;
+                            info.span = spans[0];
                         }
                     }
                     String item = text.toString().trim();
@@ -698,6 +773,7 @@ public final class FeedViewCountPatch {
 
     private static void onCardLaidOut(ComponentHost host, @Nullable String videoId) {
         String viewCount = null;
+        ViewCountSpan span = null;
         Rect duration = null;
         int thumbnailBottom = -1;
         // Videos of shelves are not known, but the view count is shown by the card itself,
@@ -710,6 +786,7 @@ public final class FeedViewCountPatch {
             findCardInfo(host, host, info, new Rect());
             if (videoId != null || info.hasDuration) {
                 viewCount = info.viewCount;
+                span = info.span;
                 duration = info.duration;
                 thumbnailBottom = info.thumbnailBottom;
                 if (duration == null && thumbnailBottom < 0) {
@@ -748,6 +825,12 @@ public final class FeedViewCountPatch {
             badges.put(host, badge);
         }
         badge.bind(host, viewCount, duration, thumbnailBottom);
+
+        if (span != null && !span.removed) {
+            // The badge is shown, but the text below the title still shows the view count,
+            // as its dimension was not known yet. Texts created from now on do not show it.
+            addCardDimension(span.dimension);
+        }
     }
 
     // endregion
