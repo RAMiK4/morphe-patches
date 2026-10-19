@@ -443,7 +443,11 @@ Raporlar herkese açıktır ve bir kanal listeye eklenmeden önce incelenir. Kal
   <!-- interaction.downloads.downloadsPatch -->
   <string name="morphe_external_downloader_screen_summary">Üçüncü taraf indirme uygulamalarıyla videolar, podcast\'ler veya şarkılar indirin</string>
   <string name="morphe_external_downloader_title">Harici indirme düğmesini göster</string>
-  <string name="morphe_external_downloader_summary">Video oynatıcınızda harici indiricinizi açan bir katman düğmesi gösterir</string>
+  <string name="morphe_external_downloader_summary">Video oynatıcınızda harici indiricinizi açan bir katman düğmesi gösterir. YTDLnis veya YTindr ile hızlı indirme menüsü için basılı tutun</string>
+  <string name="morphe_external_downloader_quick_menu_title">Hızlı indirme</string>
+  <string name="morphe_external_downloader_quick_video">En iyi video</string>
+  <string name="morphe_external_downloader_quick_audio">Ses</string>
+  <string name="morphe_external_downloader_quick_options">Tüm seçenekler</string>
   <!-- 'Download' should be translated using the same localized wording YouTube displays for the button. -->
   <string name="morphe_external_downloader_action_button_title">İndir düğmesi &amp; menüsünü değiştir</string>
   <string name="morphe_external_downloader_action_button_summary">Seçtiğiniz harici indiriciyi, yerleşik indirme özelliği yerine kullanır</string>
