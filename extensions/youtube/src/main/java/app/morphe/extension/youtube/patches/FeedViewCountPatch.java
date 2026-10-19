@@ -41,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.patches.components.ContextInterface;
 import app.morphe.extension.youtube.patches.utils.FeedVideoCards;
 import app.morphe.extension.youtube.settings.Settings;
 
@@ -63,9 +65,9 @@ import app.morphe.extension.youtube.settings.Settings;
  * No request is made, and the count is the same that YouTube shows.
  * <p>
  * The same text is used by other lists too, such as the videos of a playlist, where no badge is
- * shown. The text is created with a dimension that differs between these layouts, so the view count
- * is removed from below the title only for the dimensions of the cards that show the badge.
- * Other texts keep their view count.
+ * shown. So the view count is removed from below the title only for the texts of the components
+ * that show the badge, known by the Litho path of the text. A path is known when the badge is shown
+ * on a card whose text still shows the view count. Other texts keep their view count.
  */
 @SuppressWarnings("unused")
 public final class FeedViewCountPatch {
@@ -147,72 +149,91 @@ public final class FeedViewCountPatch {
      */
     private static final class ViewCountSpan {
         final String viewCount;
-        /** Dimension the text was created with, which differs between layouts. */
-        final float dimension;
+        /** Elements of the Litho path of the text, or null if not known yet. */
+        @Nullable
+        final String path;
         /** If the view count was removed from the text. */
         final boolean removed;
 
-        ViewCountSpan(String viewCount, float dimension, boolean removed) {
+        ViewCountSpan(String viewCount, @Nullable String path, boolean removed) {
             this.viewCount = viewCount;
-            this.dimension = dimension;
+            this.path = path;
             this.removed = removed;
         }
 
         @Override
         public boolean equals(Object obj) {
             return obj instanceof ViewCountSpan other && other.viewCount.equals(viewCount)
-                    && other.dimension == dimension && other.removed == removed;
+                    && Objects.equals(other.path, path) && other.removed == removed;
         }
 
         @Override
         public int hashCode() {
-            return viewCount.hashCode() * 31 + Float.hashCode(dimension) * 2 + (removed ? 1 : 0);
+            return Objects.hash(viewCount, path, removed);
         }
     }
 
     /**
-     * Dimensions of the texts of the cards that show the badge. The texts of other layouts,
-     * such as the videos of a playlist, keep their view count.
-     * The same dimensions the Hide view count option uses, and the ones found on cards with the badge.
+     * Litho paths of the texts of the cards that show the badge, such as the videos of the home feed.
+     * Texts of other paths, such as the videos of a playlist, keep their view count.
      * Used on more than one thread.
      */
-    private static final Set<Float> cardDimensions = ConcurrentHashMap.newKeySet();
-    private static final int MAX_CARD_DIMENSIONS = 6;
+    private static final Set<String> cardPaths = ConcurrentHashMap.newKeySet();
+    private static final int MAX_CARD_PATHS = 40;
+    private static final int MAX_PATH_LENGTH = 400;
+    private static final String PATH_SEPARATOR = "\n";
 
     static {
-        cardDimensions.add(16f);
-        cardDimensions.add(42f);
         try {
-            for (String value : Settings.FEED_VIEW_COUNT_DIMENSIONS.get().split(",")) {
-                if (!value.isEmpty()) {
-                    cardDimensions.add(Float.parseFloat(value));
+            for (String path : Settings.FEED_VIEW_COUNT_PATHS.get().split(PATH_SEPARATOR)) {
+                if (!path.isEmpty()) {
+                    cardPaths.add(path);
                 }
             }
         } catch (Exception ex) {
-            Logger.printException(() -> "Could not load the dimensions", ex);
-            Settings.FEED_VIEW_COUNT_DIMENSIONS.resetToDefault();
+            Logger.printException(() -> "Could not load the card paths", ex);
+            Settings.FEED_VIEW_COUNT_PATHS.resetToDefault();
         }
     }
 
     /**
-     * The view count of a text with this dimension was found on a card with the badge,
-     * so the view count is removed from the texts with this dimension from now on.
+     * The badge is shown on a card whose text still shows the view count,
+     * so the view count is removed from the texts of this path from now on.
      */
-    private static void addCardDimension(float dimension) {
-        if (cardDimensions.size() >= MAX_CARD_DIMENSIONS || !cardDimensions.add(dimension)) {
+    private static synchronized void addCardPath(String path) {
+        if (cardPaths.size() >= MAX_CARD_PATHS || !cardPaths.add(path)) {
             return;
         }
-        Logger.printDebug(() -> "Card text dimension: " + dimension);
-        StringBuilder builder = new StringBuilder();
-        for (Float value : cardDimensions) {
-            if (value != 16f && value != 42f) {
-                if (builder.length() > 0) {
-                    builder.append(',');
+        Logger.printDebug(() -> "Card text path: " + path);
+        Settings.FEED_VIEW_COUNT_PATHS.save(String.join(PATH_SEPARATOR, cardPaths));
+    }
+
+    /**
+     * @return The element names of the path, such as 'video_lockup_with_attachment.eml',
+     *         without the hashes and the types, which are the same for the same layout.
+     */
+    @Nullable
+    private static String getElementPath(@Nullable ContextInterface contextInterface) {
+        if (contextInterface == null) {
+            return null;
+        }
+        StringBuilder path = contextInterface.patch_getPathBuilder();
+        if (path == null || path.length() == 0) {
+            return null;
+        }
+        StringBuilder elements = new StringBuilder();
+        for (String part : path.toString().split("\\|")) {
+            if (part.indexOf('.') > 0) {
+                if (elements.length() > 0) {
+                    elements.append('|');
                 }
-                builder.append(value);
+                elements.append(part);
             }
         }
-        Settings.FEED_VIEW_COUNT_DIMENSIONS.save(builder.toString());
+        if (elements.length() == 0 || elements.length() > MAX_PATH_LENGTH) {
+            return null;
+        }
+        return elements.toString();
     }
 
     // region view count text
@@ -458,66 +479,116 @@ public final class FeedViewCountPatch {
     }
 
     /**
+     * @return The text without the view count and the delimiter next to it,
+     *         or null if the text has no view count.
+     */
+    @Nullable
+    private static SpannableString removeViewCount(CharSequence text, @Nullable ParsedViewCount[] result) {
+        String string = text.toString();
+        if (string.length() > MAX_SUBTITLE_LENGTH) {
+            return null;
+        }
+        List<Segment> segments = splitSegments(string);
+        if (result == null) {
+            result = new ParsedViewCount[1];
+        }
+        final int index = findViewCountSegment(segments, result, Locale.getDefault());
+        if (index < 0 || segments.size() < 2) {
+            return null;
+        }
+        // The view count and the delimiter after it, or before it if it is the last text.
+        Segment segment = segments.get(index);
+        int start;
+        final int end;
+        if (index < segments.size() - 1) {
+            start = segment.start;
+            end = segments.get(index + 1).start;
+        } else {
+            start = segments.get(index - 1).end;
+            end = segment.end;
+        }
+        // Newer layouts show a play icon before the view count, which is removed with it.
+        if (text instanceof Spanned spanned) {
+            final int iconStart = findIconBefore(spanned, segments, index);
+            if (iconStart >= 0) {
+                start = Math.min(start, iconStart);
+            }
+        }
+        SpannableStringBuilder builder = new SpannableStringBuilder(text);
+        for (ViewCountSpan span : builder.getSpans(0, builder.length(), ViewCountSpan.class)) {
+            builder.removeSpan(span);
+        }
+        builder.delete(start, end);
+        return new SpannableString(builder);
+    }
+
+    private static SpannableString withSpan(CharSequence text, ViewCountSpan span) {
+        SpannableString spannable = new SpannableString(text);
+        for (ViewCountSpan old : spannable.getSpans(0, spannable.length(), ViewCountSpan.class)) {
+            spannable.removeSpan(old);
+        }
+        spannable.setSpan(span, 0, spannable.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        return spannable;
+    }
+
+    /**
      * Injection point.
      * <p>
      * Called when the text below the title of a video is created, such as
-     * "Channel · 4.7M views · 2 days ago". The view count is attached to the text as a span,
-     * and removed from the text if the text is of a card that shows the badge.
-     *
-     * @param dimension Dimension of the text, which differs between layouts.
+     * "Channel · 4.7M views · 2 days ago". The view count is attached to the text as a span.
+     * The text still shows it, as the same text is used by lists that do not show the badge.
      */
-    public static SpannableString onFeedSubtitleCreated(SpannableString text, float dimension) {
+    public static SpannableString onFeedSubtitleCreated(SpannableString text) {
         if (!ENABLED || text == null) {
             return text;
         }
         try {
-            String string = text.toString();
-            if (string.length() > MAX_SUBTITLE_LENGTH) {
-                return text;
-            }
-            List<Segment> segments = splitSegments(string);
             ParsedViewCount[] result = new ParsedViewCount[1];
-            final int index = findViewCountSegment(segments, result, Locale.getDefault());
-            if (index < 0) {
+            if (removeViewCount(text, result) == null) {
                 return text;
             }
-
-            final String viewCount = result[0].count;
-            if (!cardDimensions.contains(dimension)) {
-                // Not a card that shows the badge, such as the videos of a playlist.
-                // The text keeps its view count.
-                SpannableString kept = new SpannableString(text);
-                kept.setSpan(new ViewCountSpan(viewCount, dimension, false), 0, kept.length(),
-                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                return kept;
-            }
-
-            // The view count is shown on the thumbnail instead, so it is removed from the text:
-            // the view count and the delimiter after it, or before it if it is the last text.
-            Segment segment = segments.get(index);
-            int start;
-            final int end;
-            if (index < segments.size() - 1) {
-                start = segment.start;
-                end = segments.get(index + 1).start;
-            } else {
-                start = segments.get(index - 1).end;
-                end = segment.end;
-            }
-            // Newer layouts show a play icon before the view count, which is removed with it.
-            final int iconStart = findIconBefore(text, segments, index);
-            if (iconStart >= 0) {
-                start = Math.min(start, iconStart);
-            }
-            SpannableStringBuilder builder = new SpannableStringBuilder(text);
-            builder.delete(start, end);
-            SpannableString replacement = new SpannableString(builder);
-
-            replacement.setSpan(new ViewCountSpan(viewCount, dimension, true), 0, replacement.length(),
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            return replacement;
+            return withSpan(text, new ViewCountSpan(result[0].count, null, false));
         } catch (Exception ex) {
             Logger.printException(() -> "onFeedSubtitleCreated failure", ex);
+        }
+        return text;
+    }
+
+    /**
+     * Injection point.
+     * <p>
+     * Called when a Litho text is created or reused. Usually called off the main thread.
+     * The view count is removed from the texts of the paths of the cards that show the badge.
+     */
+    public static CharSequence onLithoTextLoaded(ContextInterface contextInterface, CharSequence text) {
+        if (!ENABLED || !(text instanceof Spanned spanned)) {
+            return text;
+        }
+        try {
+            ViewCountSpan[] spans = spanned.getSpans(0, spanned.length(), ViewCountSpan.class);
+            if (spans.length == 0 || spans[0].removed) {
+                return text;
+            }
+            ViewCountSpan span = spans[0];
+            String path = getElementPath(contextInterface);
+            if (path == null) {
+                return text;
+            }
+            if (cardPaths.contains(path)) {
+                SpannableString removed = removeViewCount(text, null);
+                if (removed != null) {
+                    return withSpan(removed, new ViewCountSpan(span.viewCount, path, true));
+                }
+                return text;
+            }
+            if (path.equals(span.path)) {
+                return text;
+            }
+            // Not known yet. The text keeps its view count, and the path is learned
+            // if the badge is shown on its card.
+            return withSpan(text, new ViewCountSpan(span.viewCount, path, false));
+        } catch (Exception ex) {
+            Logger.printException(() -> "onLithoTextLoaded failure", ex);
         }
         return text;
     }
@@ -826,10 +897,10 @@ public final class FeedViewCountPatch {
         }
         badge.bind(host, viewCount, duration, thumbnailBottom);
 
-        if (span != null && !span.removed) {
+        if (span != null && !span.removed && span.path != null) {
             // The badge is shown, but the text below the title still shows the view count,
-            // as its dimension was not known yet. Texts created from now on do not show it.
-            addCardDimension(span.dimension);
+            // as its path was not known yet. Texts of this path do not show it from now on.
+            addCardPath(span.path);
         }
     }
 
