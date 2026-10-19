@@ -488,9 +488,14 @@ Reports are public and are reviewed before a channel is added to a list. Removal
     <!-- interaction.downloads.downloadsPatch -->
     <string name="morphe_external_downloader_screen_summary">Download videos, podcasts, or songs with third-party downloading apps</string>
     <string name="morphe_external_downloader_title">Show external download button</string>
-    <string name="morphe_external_downloader_summary">Shows an overlay button in video player that opens your external downloader. With YTDLnis or YTindr, tap and hold for a quick download menu</string>
-    <string name="morphe_external_downloader_quick_menu_title">Quick download</string>
-    <string name="morphe_external_downloader_quick_video">Best video</string>
+    <string name="morphe_external_downloader_summary">Shows an overlay button in video player that opens your external downloader</string>
+    <string name="morphe_external_downloader_quick_menu_title">Quick download on tap</string>
+    <string name="morphe_external_downloader_quick_menu_summary_on">Tapping the download button opens the quick download menu. Tap and hold opens all options of the downloader</string>
+    <string name="morphe_external_downloader_quick_menu_summary_off">Tapping the download button opens the downloader. Tap and hold opens the quick download menu (YTDLnis and YTindr)</string>
+    <string name="morphe_external_downloader_quick_video_quality">Full HD (1080p)</string>
+    <string name="morphe_external_downloader_quick_audio_quality">Medium (192 kbps)</string>
+    <string name="morphe_external_downloader_quick_menu_header">Quick download</string>
+    <string name="morphe_external_downloader_quick_video">Video</string>
     <string name="morphe_external_downloader_quick_audio">Audio</string>
     <string name="morphe_external_downloader_quick_options">All options</string>
     <!-- 'Download' should be translated using the same localized wording YouTube displays for the button. -->

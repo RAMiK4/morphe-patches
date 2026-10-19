@@ -107,6 +107,7 @@ public class SharedYouTubeSettings extends BaseSettings {
     public static final BooleanSetting EXTERNAL_DOWNLOADER = new BooleanSetting("morphe_external_downloader", FALSE);
     public static final BooleanSetting EXTERNAL_DOWNLOADER_ACTION_BUTTON = new BooleanSetting("morphe_external_downloader_action_button", FALSE);
     public static final BooleanSetting EXTERNAL_DOWNLOADER_FLYOUT_MENU = new BooleanSetting("morphe_external_downloader_flyout_menu", FALSE, parent(EXTERNAL_DOWNLOADER_ACTION_BUTTON));
+    public static final BooleanSetting EXTERNAL_DOWNLOADER_QUICK_MENU = new BooleanSetting("morphe_external_downloader_quick_menu", FALSE, parent(EXTERNAL_DOWNLOADER));
     public static final StringSetting EXTERNAL_DOWNLOADER_PACKAGE_NAME = new StringSetting("morphe_external_downloader_name", "com.deniscerri.ytdl" /* YTDLnis */, parentsAny(EXTERNAL_DOWNLOADER, EXTERNAL_DOWNLOADER_ACTION_BUTTON));
 
     // Spoof app version
