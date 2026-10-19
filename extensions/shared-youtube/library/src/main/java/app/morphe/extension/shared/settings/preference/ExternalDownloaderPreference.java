@@ -55,17 +55,34 @@ public class ExternalDownloaderPreference extends CustomDialogListPreference {
             "com.rl.ytindr"
     };
 
+    /** Maximum video height of a quick video download. */
+    public static final int QUICK_DOWNLOAD_VIDEO_HEIGHT = 1080;
+    /** Bitrate of a quick audio download. */
+    public static final int QUICK_DOWNLOAD_AUDIO_KBPS = 192;
+
     /**
      * @return If the chosen downloader can queue a download in the background.
      */
     public static boolean supportsQuickDownload() {
+        return getQuickDownloadPackageIndex() >= 0;
+    }
+
+    /**
+     * @return If the chosen downloader also applies the requested quality
+     *         ({@code VIDEO_QUALITY} height and {@code AUDIO_BITRATE} kbps).
+     */
+    public static boolean supportsQuickDownloadQuality() {
+        return "com.rl.ytindr".equals(SharedYouTubeSettings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim());
+    }
+
+    private static int getQuickDownloadPackageIndex() {
         String packageName = SharedYouTubeSettings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
-        for (String quickPackage : QUICK_DOWNLOAD_PACKAGES) {
-            if (quickPackage.equals(packageName)) {
-                return true;
+        for (int i = 0; i < QUICK_DOWNLOAD_PACKAGES.length; i++) {
+            if (QUICK_DOWNLOAD_PACKAGES[i].equals(packageName)) {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     public static void launchExternalDownloader(String videoId, @Nullable Context context, String url) {
@@ -74,7 +91,9 @@ public class ExternalDownloaderPreference extends CustomDialogListPreference {
 
     /**
      * @param quickDownloadType If not null, the downloader queues the download in the background
-     *                          as this type ("audio" or "video") using its default settings.
+     *                          as this type ("audio" or "video") using its default settings,
+     *                          capped at {@link #QUICK_DOWNLOAD_VIDEO_HEIGHT} / {@link #QUICK_DOWNLOAD_AUDIO_KBPS}
+     *                          if the downloader supports it.
      */
     public static void launchExternalDownloader(String videoId, @Nullable Context context, String url,
                                                 @Nullable String quickDownloadType) {
@@ -101,6 +120,8 @@ public class ExternalDownloaderPreference extends CustomDialogListPreference {
             if (quickDownloadType != null) {
                 intent.putExtra("TYPE", quickDownloadType);
                 intent.putExtra("BACKGROUND", true);
+                intent.putExtra("VIDEO_QUALITY", QUICK_DOWNLOAD_VIDEO_HEIGHT);
+                intent.putExtra("AUDIO_BITRATE", QUICK_DOWNLOAD_AUDIO_KBPS);
             }
             // Opening the downloader is not the user leaving the app.
             // Without this flag a playing video enters picture-in-picture,

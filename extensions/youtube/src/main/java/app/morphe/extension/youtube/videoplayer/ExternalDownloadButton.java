@@ -68,20 +68,37 @@ public class ExternalDownloadButton {
         return "https://youtu.be/" + videoId;
     }
 
-    private static void onDownloadClick(View view) {
+    private static boolean quickMenuOnTap() {
+        return SharedYouTubeSettings.EXTERNAL_DOWNLOADER_QUICK_MENU.get()
+                && ExternalDownloaderPreference.supportsQuickDownload();
+    }
+
+    private static void openDownloader(Context context) {
         final String videoId = VideoInformation.getVideoId();
-        ExternalDownloaderPreference.launchExternalDownloader(videoId, view.getContext(), getVideoUrl(videoId));
+        ExternalDownloaderPreference.launchExternalDownloader(videoId, context, getVideoUrl(videoId));
+    }
+
+    private static void onDownloadClick(View view) {
+        if (quickMenuOnTap()) {
+            showQuickDownloadMenu(view.getContext());
+        } else {
+            openDownloader(view.getContext());
+        }
     }
 
     /**
-     * Tap and hold opens a quick download menu,
-     * if the chosen downloader can queue downloads in the background.
+     * Tap and hold does what a tap does not:
+     * the quick download menu, or all options of the downloader if the menu opens on tap.
      */
     private static boolean onDownloadLongClick(View view) {
         if (!ExternalDownloaderPreference.supportsQuickDownload()) {
             return false;
         }
-        showQuickDownloadMenu(view.getContext());
+        if (quickMenuOnTap()) {
+            openDownloader(view.getContext());
+        } else {
+            showQuickDownloadMenu(view.getContext());
+        }
         return true;
     }
 
@@ -90,36 +107,53 @@ public class ExternalDownloadButton {
             // Capture the video now, the player may move on while the menu is open.
             final String videoId = VideoInformation.getVideoId();
             final String url = getVideoUrl(videoId);
+            final boolean showQuality = ExternalDownloaderPreference.supportsQuickDownloadQuality();
+            final int foregroundColor = ThemeUtils.getAppForegroundColor();
 
             SheetBottomDialog.DraggableLinearLayout mainLayout =
                     SheetBottomDialog.createMainLayout(context, LegacyPlayerControlButton.getDialogBackgroundColor());
+            mainLayout.setPadding(0, 0, 0, Dim.dp8);
 
-            TextView title = new TextView(context);
-            title.setText(str("morphe_external_downloader_quick_menu_title"));
-            title.setTextColor(ThemeUtils.getAppForegroundColor());
-            title.setTextSize(16);
-            title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            title.setPadding(Dim.dp12, Dim.dp16, Dim.dp12, Dim.dp8);
-            mainLayout.addView(title);
+            TextView header = new TextView(context);
+            header.setText(str("morphe_external_downloader_quick_menu_header"));
+            header.setTextColor(foregroundColor);
+            header.setTextSize(16);
+            header.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            header.setPadding(Dim.dp16, Dim.dp12, Dim.dp16, Dim.dp8);
+            mainLayout.addView(header);
 
             SheetBottomDialog.SlideDialog dialog =
                     SheetBottomDialog.createSlideDialog(context, mainLayout, LegacyPlayerControlButton.fadeInDuration);
 
             mainLayout.addView(createItem(context,
                     "morphe_external_downloader_quick_video",
-                    "morphe_external_downloader_quick_video", () -> {
+                    str("morphe_external_downloader_quick_video"),
+                    showQuality ? str("morphe_external_downloader_quick_video_quality") : null,
+                    () -> {
                         dialog.dismiss();
                         ExternalDownloaderPreference.launchExternalDownloader(videoId, context, url, "video");
                     }));
             mainLayout.addView(createItem(context,
                     "morphe_external_downloader_quick_audio",
-                    "morphe_external_downloader_quick_audio", () -> {
+                    str("morphe_external_downloader_quick_audio"),
+                    showQuality ? str("morphe_external_downloader_quick_audio_quality") : null,
+                    () -> {
                         dialog.dismiss();
                         ExternalDownloaderPreference.launchExternalDownloader(videoId, context, url, "audio");
                     }));
+
+            View divider = new View(context);
+            divider.setBackgroundColor((foregroundColor & 0x00FFFFFF) | 0x1F000000);
+            LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, Math.max(1, Dim.dp1));
+            dividerParams.setMargins(Dim.dp16, Dim.dp4, Dim.dp16, Dim.dp4);
+            mainLayout.addView(divider, dividerParams);
+
             mainLayout.addView(createItem(context,
                     "morphe_external_downloader_quick_options",
-                    "morphe_external_downloader_quick_options", () -> {
+                    str("morphe_external_downloader_quick_options"),
+                    null,
+                    () -> {
                         dialog.dismiss();
                         ExternalDownloaderPreference.launchExternalDownloader(videoId, context, url);
                     }));
@@ -131,14 +165,15 @@ public class ExternalDownloadButton {
         }
     }
 
-    private static View createItem(Context context, String iconName, String textKey, Runnable onClick) {
+    private static View createItem(Context context, String iconName, String title,
+                                   @Nullable String detail, Runnable onClick) {
         final int foregroundColor = ThemeUtils.getAppForegroundColor();
 
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setMinimumHeight(Dim.dp48);
-        row.setPadding(Dim.dp12, 0, Dim.dp12, 0);
+        row.setMinimumHeight(Dim.dp48 + Dim.dp4);
+        row.setPadding(Dim.dp16, 0, Dim.dp16, 0);
         row.setClickable(true);
         row.setFocusable(true);
         row.setBackground(new RippleDrawable(
@@ -153,15 +188,28 @@ public class ExternalDownloadButton {
             ImageView iconView = new ImageView(context);
             iconView.setImageDrawable(icon);
             LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(Dim.dp24, Dim.dp24);
-            iconParams.setMarginEnd(Dim.dp20);
+            iconParams.setMarginEnd(Dim.dp24);
             row.addView(iconView, iconParams);
         }
 
-        TextView text = new TextView(context);
-        text.setText(str(textKey));
-        text.setTextColor(foregroundColor);
-        text.setTextSize(16);
-        row.addView(text, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        TextView titleView = new TextView(context);
+        titleView.setText(title);
+        titleView.setTextColor(foregroundColor);
+        titleView.setTextSize(16);
+        titleView.setSingleLine(true);
+        row.addView(titleView, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+        if (detail != null) {
+            TextView detailView = new TextView(context);
+            detailView.setText(detail);
+            detailView.setTextColor((foregroundColor & 0x00FFFFFF) | 0xA6000000);
+            detailView.setTextSize(14);
+            detailView.setSingleLine(true);
+            LinearLayout.LayoutParams detailParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            detailParams.setMarginStart(Dim.dp12);
+            row.addView(detailView, detailParams);
+        }
 
         return row;
     }

@@ -443,9 +443,14 @@ Raporlar herkese açıktır ve bir kanal listeye eklenmeden önce incelenir. Kal
   <!-- interaction.downloads.downloadsPatch -->
   <string name="morphe_external_downloader_screen_summary">Üçüncü taraf indirme uygulamalarıyla videolar, podcast\'ler veya şarkılar indirin</string>
   <string name="morphe_external_downloader_title">Harici indirme düğmesini göster</string>
-  <string name="morphe_external_downloader_summary">Video oynatıcınızda harici indiricinizi açan bir katman düğmesi gösterir. YTDLnis veya YTindr ile hızlı indirme menüsü için basılı tutun</string>
-  <string name="morphe_external_downloader_quick_menu_title">Hızlı indirme</string>
-  <string name="morphe_external_downloader_quick_video">En iyi video</string>
+  <string name="morphe_external_downloader_summary">Video oynatıcınızda harici indiricinizi açan bir katman düğmesi gösterir</string>
+  <string name="morphe_external_downloader_quick_menu_title">Dokununca hızlı indirme</string>
+  <string name="morphe_external_downloader_quick_menu_summary_on">İndirme düğmesine dokunmak hızlı indirme menüsünü açar. Basılı tutmak indiricinin tüm seçeneklerini açar</string>
+  <string name="morphe_external_downloader_quick_menu_summary_off">İndirme düğmesine dokunmak indiriciyi açar. Basılı tutmak hızlı indirme menüsünü açar (YTDLnis ve YTindr)</string>
+  <string name="morphe_external_downloader_quick_video_quality">Full HD (1080p)</string>
+  <string name="morphe_external_downloader_quick_audio_quality">Orta (192 kbps)</string>
+  <string name="morphe_external_downloader_quick_menu_header">Hızlı indirme</string>
+  <string name="morphe_external_downloader_quick_video">Video</string>
   <string name="morphe_external_downloader_quick_audio">Ses</string>
   <string name="morphe_external_downloader_quick_options">Tüm seçenekler</string>
   <!-- 'Download' should be translated using the same localized wording YouTube displays for the button. -->

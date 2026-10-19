@@ -31,6 +31,7 @@ private val downloadsResourcePatch = resourcePatch {
                 sorting = Sorting.UNSORTED,
                 preferences = setOf(
                     SwitchPreference("morphe_external_downloader", summary = true),
+                    SwitchPreference("morphe_external_downloader_quick_menu", summary = true),
                     SwitchPreference("morphe_external_downloader_action_button", summary = true),
                     TextPreference(
                         "morphe_external_downloader_name",
