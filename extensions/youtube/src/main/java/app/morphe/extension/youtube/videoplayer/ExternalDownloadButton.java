@@ -68,7 +68,10 @@ public class ExternalDownloadButton {
         return "https://youtu.be/" + videoId;
     }
 
-    private static boolean quickMenuOnTap() {
+    /**
+     * @return If a tap on a download button opens the quick download menu.
+     */
+    public static boolean quickMenuOnTap() {
         return SharedYouTubeSettings.EXTERNAL_DOWNLOADER_QUICK_MENU.get()
                 && ExternalDownloaderPreference.supportsQuickDownload();
     }
@@ -80,7 +83,7 @@ public class ExternalDownloadButton {
 
     private static void onDownloadClick(View view) {
         if (quickMenuOnTap()) {
-            showQuickDownloadMenu(view.getContext());
+            showQuickDownloadMenu(view.getContext(), VideoInformation.getVideoId());
         } else {
             openDownloader(view.getContext());
         }
@@ -97,15 +100,20 @@ public class ExternalDownloadButton {
         if (quickMenuOnTap()) {
             openDownloader(view.getContext());
         } else {
-            showQuickDownloadMenu(view.getContext());
+            showQuickDownloadMenu(view.getContext(), VideoInformation.getVideoId());
         }
         return true;
     }
 
-    private static void showQuickDownloadMenu(Context context) {
+    /**
+     * Shows the quick download menu for a video.
+     * Also used by the YouTube download button and the feed 'Download' menu item.
+     *
+     * @param videoId The video to download. Captured by the caller, the player may move on
+     *                while the menu is open, and feed menus are not for the playing video.
+     */
+    public static void showQuickDownloadMenu(Context context, String videoId) {
         try {
-            // Capture the video now, the player may move on while the menu is open.
-            final String videoId = VideoInformation.getVideoId();
             final String url = getVideoUrl(videoId);
             final boolean showQuality = ExternalDownloaderPreference.supportsQuickDownloadQuality();
             final int foregroundColor = ThemeUtils.getAppForegroundColor();
