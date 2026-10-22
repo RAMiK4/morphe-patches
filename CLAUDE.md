@@ -25,6 +25,19 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
   (cherry-pick veya rebase), çakışmalar iki tarafı da koruyarak çözülür.
 - Upstream API'leri değişebilir. Taşımadan sonra kodun kullandığı metotların hâlâ var olduğu kontrol edilir.
 
+## Commit yazarı
+
+- Bulut oturumları git kimliği olarak varsayılan "Claude <noreply@anthropic.com>" ile başlar. Upstream PR'larda
+  kullanıcının profili görünmesi için commit'ler kullanıcı adına atılır. Oturum başında ayarla:
+
+  ```sh
+  git config user.name RAMiK4
+  git config user.email 60112744+RAMiK4@users.noreply.github.com
+  ```
+
+- Claude ortak yazar olarak commit mesajının sonundaki `Co-Authored-By` satırıyla kalır.
+- PR açıklamasının sonundaki "Generated with Claude Code" satırını kullanıcı istediği için korur, silme.
+
 ## Upstream'e PR
 
 - Yamalar Morphe'ye katkı içindir: PR'lar upstream `MorpheApp/morphe-patches` `dev` dalına açılır, fork'a değil.
@@ -55,7 +68,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 - **Durum:** Upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerinde. İki cihaz testi yapıldı, bulunan sorunlar düzeltildi.
   Son sürüm (`0b2bccb7`) henüz cihazda test edilmedi.
-- **Dal:** `ccr-511e3576-s4c9y4` (son commit `0b2bccb7`). PR açılmadı.
+- **Dal:** `ccr-511e3576-s4c9y4` (son commit `b09dbe81`; yazar RAMiK4 olarak yeniden yazıldı, kod `0b2bccb7` ile aynı).
 - **Derleme:** Son başarılı derleme run 39733975757 (artifact `patches-1.48.0-dev.18.mpp`):
   https://github.com/RAMiK4/morphe-patches/actions/runs/39733975757
   Kod değişmedikçe yeniden derlemeye gerek yok.
@@ -86,9 +99,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Yorum paneli, panel kimliğinde "comment" geçtiği varsayılarak tanınıyor.
 - **Test 3 (`0b2bccb7`):** Sorun yok. Nadir aramalar (tırnaklı ifade, 3+ kelime) yavaş: YouTube daha çok sayfa
   indirmek zorunda kalıyor; filtre maliyeti değil, normal kabul edildi.
-- **PR:** Hedef upstream `MorpheApp/morphe-patches` `dev` (katkı amaçlı; fork'a PR açılmaz). Başlık ve açıklama
-  hazırlandı, kullanıcı karşılaştırma bağlantısıyla açacak. Açıldıysa PR numarasını buraya ekle.
-- **Sıradaki adım:** Upstream PR'daki inceleme yorumlarına göre düzeltme.
+- **PR:** https://github.com/MorpheApp/morphe-patches/pull/3942 (upstream `dev`, kullanıcı açtı, 2026-10-22).
+  Experimental v21.42.241 üzerinde test edildi. Commit yazarları Claude'dan RAMiK4'e çevrilip force-push edildi.
+- **Sıradaki adım:** Upstream PR #3942'deki inceleme yorumları ve CI sonucuna göre düzeltme.
 
 ### Not: fork `dev` dalındaki fazladan commit'ler
 
