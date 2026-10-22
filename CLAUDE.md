@@ -32,7 +32,7 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
   bu yüzden PR GitHub MCP ile açılamaz. Upstream'in PR şablonuna (`.github/PULL_REQUEST_TEMPLATE.md`) göre başlık
   ve açıklama hazırlanır, kullanıcıya önceden doldurulmuş karşılaştırma bağlantısı verilir:
   `https://github.com/MorpheApp/morphe-patches/compare/dev...RAMiK4:morphe-patches:<dal>?expand=1&title=...&body=...`
-- Commit başlıkları upstream biçimini izler: `feat(YouTube): Add \`X\` patch`, `fix(YouTube - X): ...`.
+- Commit başlıkları upstream biçimini izler: `feat(YouTube): Add `X` patch`, `fix(YouTube - X): ...`.
 
 ## Derleme
 
