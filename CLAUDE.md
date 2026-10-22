@@ -72,6 +72,28 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-23: YouTube "Download post images" yaması
+
+- **Durum:** Upstream `dev` (`e8c520c`) üzerinde ilk sürüm yazıldı, derleme başarılı. Henüz cihazda test edilmedi.
+- **Dal:** `feat/post-image-download` (commit `d5a78c5`).
+- **Derleme:** run 39855337752 (artifact `patches-1.48.0.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39855337752
+- **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
+  (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
+  ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
+  dosya türü baytlardan bulunur (gif/webp/png/jpg). Ayar varsayılan açık (Feed ekranı).
+- **Nasıl buluyor:** Element ayrıştırılırken tanımlayıcısında "post" geçen (shelf olmayan) elementlerdeki
+  ggpht/googleusercontent görsel adresleri alınır; avatar/emoji (`-k-`, `no-rj`, <200 px) elenir.
+  Gönderinin metinleri görsellere eşlenir (FeedVideoCardsPatch ile aynı yöntem). Paylaş butonu içerik
+  açıklamasıyla bulunur (YouTube `share` string kaynağı + "Share").
+- **Dosyalar:** `extensions/.../patches/PostImageDownloadPatch.java`, `FlyoutUtils.java` (menü),
+  `FeedVideoCardsPatch.java` (kök host çağrısı), `Settings.java` (`POST_IMAGE_DOWNLOAD`), `strings.xml`,
+  `patches/.../interaction/postimages/PostImageDownloadPatch.kt`,
+  `patches/src/main/resources/postimagedownload/drawable/morphe_post_image_download.xml`.
+- **Belirsizlikler (test edilecek):** Gönderi elementinin görsel adreslerini içerip içermediği, Paylaş
+  butonunun açıklaması, butonun solunda boşluk olup olmadığı, `=s0`'ın GIF'i animasyonlu verip vermediği.
+  Sorunda debug log: "Post element", "Not a post element", "Share button not found" satırlarına bakılır.
+
 ### 2026-10-22: YouTube "Search comments" yaması
 
 - **Durum:** Upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerinde. İki cihaz testi yapıldı, bulunan sorunlar düzeltildi.
