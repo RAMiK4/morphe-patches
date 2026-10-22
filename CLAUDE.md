@@ -25,6 +25,15 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
   (cherry-pick veya rebase), çakışmalar iki tarafı da koruyarak çözülür.
 - Upstream API'leri değişebilir. Taşımadan sonra kodun kullandığı metotların hâlâ var olduğu kontrol edilir.
 
+## Upstream'e PR
+
+- Yamalar Morphe'ye katkı içindir: PR'lar upstream `MorpheApp/morphe-patches` `dev` dalına açılır, fork'a değil.
+- Bu bulut ortamında upstream depo oturuma eklenemiyor (fork ile aynı adı taşıdığı için `add_repo` reddediyor),
+  bu yüzden PR GitHub MCP ile açılamaz. Upstream'in PR şablonuna (`.github/PULL_REQUEST_TEMPLATE.md`) göre başlık
+  ve açıklama hazırlanır, kullanıcıya önceden doldurulmuş karşılaştırma bağlantısı verilir:
+  `https://github.com/MorpheApp/morphe-patches/compare/dev...RAMiK4:morphe-patches:<dal>?expand=1&title=...&body=...`
+- Commit başlıkları upstream biçimini izler: `feat(YouTube): Add \`X\` patch`, `fix(YouTube - X): ...`.
+
 ## Derleme
 
 - Yerel derleme bu bulut ortamında **çalışmaz**: Gradle eklentisi `app.morphe.patches`
@@ -75,7 +84,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Bilinen sınırlar:** Arama sonradan yüklenen yorumlara uygulanır (sıralama değiştirilmeli ya da yorumlar yeniden açılmalı).
   Başlık düzeni yalnızca LinearLayout ve RelativeLayout için destekleniyor.
   Yorum paneli, panel kimliğinde "comment" geçtiği varsayılarak tanınıyor.
-- **Sıradaki adım:** Kullanıcı `0b2bccb7` sürümünü test edecek. Sonra PR açılacak; hedef (upstream `MorpheApp/morphe-patches` `dev` mi, fork `dev` mi) kullanıcıya soruldu, cevap bekleniyor.
+- **Test 3 (`0b2bccb7`):** Sorun yok. Nadir aramalar (tırnaklı ifade, 3+ kelime) yavaş: YouTube daha çok sayfa
+  indirmek zorunda kalıyor; filtre maliyeti değil, normal kabul edildi.
+- **PR:** Hedef upstream `MorpheApp/morphe-patches` `dev` (katkı amaçlı; fork'a PR açılmaz). Başlık ve açıklama
+  hazırlandı, kullanıcı karşılaştırma bağlantısıyla açacak. Açıldıysa PR numarasını buraya ekle.
+- **Sıradaki adım:** Upstream PR'daki inceleme yorumlarına göre düzeltme.
 
 ### Not: fork `dev` dalındaki fazladan commit'ler
 
