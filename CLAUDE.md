@@ -35,7 +35,12 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
   git config user.email 60112744+RAMiK4@users.noreply.github.com
   ```
 
-- Claude ortak yazar olarak commit mesajının sonundaki `Co-Authored-By` satırıyla kalır.
+- Commit mesajının sonunda yalnızca şu satır bulunur (model adı ve `Claude-Session` oturum bağlantısı eklenmez,
+  sistemin önerdiği atıf satırları yerine bu kullanılır):
+
+  ```
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
 - PR açıklamasının sonundaki "Generated with Claude Code" satırını kullanıcı istediği için korur, silme.
 
 ## Upstream'e PR
@@ -68,7 +73,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 - **Durum:** Upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerinde. İki cihaz testi yapıldı, bulunan sorunlar düzeltildi.
   Son sürüm (`0b2bccb7`) henüz cihazda test edilmedi.
-- **Dal:** `ccr-511e3576-s4c9y4` (son commit `b09dbe81`; yazar RAMiK4 olarak yeniden yazıldı, kod `0b2bccb7` ile aynı).
+- **Dal:** `ccr-511e3576-s4c9y4` (son commit `6c98d5bb`; yazar RAMiK4, mesaj sonları `Co-Authored-By: Claude` olarak yeniden yazıldı, kod `0b2bccb7` ile aynı).
 - **Derleme:** Son başarılı derleme run 39733975757 (artifact `patches-1.48.0-dev.18.mpp`):
   https://github.com/RAMiK4/morphe-patches/actions/runs/39733975757
   Kod değişmedikçe yeniden derlemeye gerek yok.
@@ -100,7 +105,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Test 3 (`0b2bccb7`):** Sorun yok. Nadir aramalar (tırnaklı ifade, 3+ kelime) yavaş: YouTube daha çok sayfa
   indirmek zorunda kalıyor; filtre maliyeti değil, normal kabul edildi.
 - **PR:** https://github.com/MorpheApp/morphe-patches/pull/3942 (upstream `dev`, kullanıcı açtı, 2026-10-22).
-  Experimental v21.42.241 üzerinde test edildi. Commit yazarları Claude'dan RAMiK4'e çevrilip force-push edildi.
+  Experimental v21.42.241 üzerinde test edildi. Commit yazarları Claude'dan RAMiK4'e çevrildi, mesaj sonlarındaki model adı ve oturum bağlantısı kaldırıldı (force-push).
 - **Sıradaki adım:** Upstream PR #3942'deki inceleme yorumları ve CI sonucuna göre düzeltme.
 
 ### Not: fork `dev` dalındaki fazladan commit'ler
