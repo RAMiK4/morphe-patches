@@ -51,6 +51,7 @@ import app.morphe.extension.shared.ui.Dim;
 import app.morphe.extension.youtube.patches.VideoInformation;
 import app.morphe.extension.youtube.settings.Settings;
 import app.morphe.extension.youtube.shared.EngagementPanel;
+import kotlin.Unit;
 
 /**
  * Shows only the comments that contain the searched words.
@@ -59,6 +60,7 @@ import app.morphe.extension.youtube.shared.EngagementPanel;
  * Comments are filtered when they are loaded, so after a search the comments are reloaded,
  * as when the sort order is changed.
  * As the hidden comments do not fill the list, scrolling loads the next comments sooner.
+ * The search ends when the comments are closed.
  */
 @SuppressWarnings("unused")
 public final class CommentsSearchFilter extends Filter {
@@ -166,6 +168,23 @@ public final class CommentsSearchFilter extends Filter {
 
     public CommentsSearchFilter() {
         addPathCallbacks(commentThread, commentReplies);
+
+        EngagementPanel.onClose.addObserver((String panelId) -> {
+            onPanelClosed(panelId);
+            return Unit.INSTANCE;
+        });
+    }
+
+    /**
+     * Otherwise, the comments of the video are still searched when they are opened again,
+     * even after the video is closed and opened again.
+     */
+    private static void onPanelClosed(String panelId) {
+        // The replies of a comment can close while the comments stay open.
+        if (panelId.contains("comment") && !isCommentsPanelOpen() && !searchTerms.isEmpty()) {
+            Logger.printDebug(() -> "Comments closed, clearing the search");
+            setSearch("");
+        }
     }
 
     @Override

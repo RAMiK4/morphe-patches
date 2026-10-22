@@ -18,6 +18,11 @@ public final class EngagementPanel {
     private static final List<String> videoDescriptionPanelName = List.of("video-description-ep-identifier");
 
     /**
+     * Called with the id of a panel after it's closed.
+     */
+    public static final Event<String> onClose = new Event<>();
+
+    /**
      * Injection point.
      */
     public static void close(@Nullable String panelId) {
@@ -33,6 +38,7 @@ public final class EngagementPanel {
                         }
                     }
                 }
+                onClose.invoke(panelId);
             }
         }
     }
