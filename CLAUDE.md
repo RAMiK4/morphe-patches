@@ -106,6 +106,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   indirmek zorunda kalıyor; filtre maliyeti değil, normal kabul edildi.
 - **PR:** https://github.com/MorpheApp/morphe-patches/pull/3942 (upstream `dev`, kullanıcı açtı, 2026-10-22).
   Experimental v21.42.241 üzerinde test edildi. Commit yazarları Claude'dan RAMiK4'e çevrildi, mesaj sonlarındaki model adı ve oturum bağlantısı kaldırıldı (force-push).
+  Upstream CI (Build pull request) üç push'ta da başarılı (run #5942-#5944). İnceleme yorumu henüz yok.
 - **Sıradaki adım:** Upstream PR #3942'deki inceleme yorumları ve CI sonucuna göre düzeltme.
 
 ### Not: fork `dev` dalındaki fazladan commit'ler
