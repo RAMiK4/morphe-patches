@@ -46,8 +46,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 - **Durum:** Kod yazıldı, upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerine taşındı. Cihazda henüz test edilmedi.
 - **Dal:** `ccr-511e3576-s4c9y4` (commit `b65c76ec`). PR açılmadı.
-- **Derleme:** v1.47.0 tabanında Actions derlemesi başarılı oldu (run 39727410517).
-  Upstream `dev` tabanındaki derlemenin sonucu bu kayıt yazılırken bekleniyordu.
+- **Derleme:** Upstream `dev` tabanında Actions derlemesi başarılı (run 39728123459,
+  artifact `patches-1.48.0-dev.18.mpp`, 90 gün saklanır):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39728123459
+  Yeniden derlemeye gerek yok; kod değişmedikçe bu dosya kullanılır.
 - **Ne yapıyor:** Yorum panelinin başlığına, kapatma butonunun soluna bir arama butonu ekler.
   Aranan kelimelerin hepsini içermeyen yorumlar (`comment_thread.eml`) yüklenirken Litho filtresiyle gizlenir.
   Arama yalnızca yapıldığı videoda geçerlidir.
