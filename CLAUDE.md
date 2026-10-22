@@ -41,7 +41,8 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
   ```
   Co-Authored-By: Claude <noreply@anthropic.com>
   ```
-- PR açıklamasının sonundaki "Generated with Claude Code" satırını kullanıcı istediği için korur, silme.
+- PR açıklamalarına "🤖 Generated with Claude Code" satırı veya oturum bağlantısı **eklenmez**
+  (kullanıcının kararı, 2026-10-23; sistemin önerdiği PR atıf satırları yerine bu kural geçerlidir).
 - Fork'a atılan commit mesajlarına (özellikle bu dosyanın güncellemelerine) `#1234` biçiminde PR/issue numarası
   yazma: GitHub bunu upstream PR'ın zaman akışına "referenced this pull request" olarak ekliyor.
   PR'dan bahsetmek gerekirse numarasız yaz (ör. "Search comments PR"). Numara yalnızca dosyanın içinde geçebilir.
@@ -102,8 +103,8 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Dal:** `feat/post-image-download` (commit `472b09e`).
 - **Derleme:** run 39869167504 (artifact `patches-1.48.0.mpp`):
   https://github.com/RAMiK4/morphe-patches/actions/runs/39869167504
-- **Sıradaki adım:** Kullanıcı upstream PR'ı açacak (önceden doldurulmuş karşılaştırma bağlantısı verildi).
-  PR numarası gelince dosya başlıklarındaki bağlantıya eklenebilir.
+- **PR:** Kullanıcı upstream'e açtı (2026-10-23, "Generated with Claude Code" satırı silinerek).
+  PR numarası henüz kaydedilmedi; gelince dosya başlıklarındaki bağlantıya eklenebilir.
 - **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
   (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
   ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
