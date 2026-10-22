@@ -82,10 +82,14 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Test 2: görseller artık menüde bulunuyor ama menü öğesi görünmüyor (hata yok, FlyoutUtils muhtemelen -1);
   framework `share` string'i de bulunamadı. Paylaş butonu Litho'da `post_share_button.eml` (a11y id yok).
   Düzeltme `9ef840b`: Paylaş metni elementte `share_button` tanımlayıcısından sonraki metinlerden öğreniliyor;
-  menü öğesi eklenemezse menü görünüm ağacı loga yazılıyor. Test bekleniyor.
-- **Dal:** `feat/post-image-download` (son commit `9ef840b`).
-- **Derleme:** run 39861992299 (artifact `patches-1.48.0.mpp`):
-  https://github.com/RAMiK4/morphe-patches/actions/runs/39861992299
+  menü öğesi eklenemezse menü görünüm ağacı loga yazılıyor.
+  Test 3: elementte Paylaş metni yok (öğrenilen aday çıkmadı). Gönderi menüsü PopupWindow: içerik görünümü →
+  dikey LinearLayout → RecyclerView (video menüsünden bir katman az), FlyoutUtils kabı bulamıyordu.
+  Düzeltme `babbbe8`: FlyoutUtils bu düzeni de tanıyor; Paylaş metni, adında "share" geçen uygulama
+  string kaynakları taranarak bulunuyor (bir kez, arka planda). Test bekleniyor.
+- **Dal:** `feat/post-image-download` (son commit `babbbe8`).
+- **Derleme:** run 39863270391 (artifact `patches-1.48.0.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39863270391
 - **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
   (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
   ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
