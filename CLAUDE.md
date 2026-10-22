@@ -95,10 +95,15 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   başlangıçlarıyla eşleşiyor.
   Karar (kullanıcı): şimdilik yalnızca resim gönderileri; anketler ve gömülü videolu gönderiler hariç.
   Düzeltme `23ec182`: yalnızca `images_post*` elementleri; options/poll/videos/shared post ve `/vi/`
-  video kapağı içerenler eleniyor (raf parçalarında da). Test bekleniyor.
-- **Dal:** `feat/post-image-download` (son commit `23ec182`).
-- **Derleme:** run 39867152602 (artifact `patches-1.48.0.mpp`):
-  https://github.com/RAMiK4/morphe-patches/actions/runs/39867152602
+  video kapağı içerenler eleniyor (raf parçalarında da).
+  Test 5: kullanıcıya göre istediği gibi çalışıyor, yalnızca arada bazı gönderilerde çıkmıyor; hazır kabul etti.
+  Son hâl: tanılama logları kaldırıldı, eşleşmeyen Paylaş butonlu kökler yeniden deneniyor; tek commit'e
+  sıkıştırıldı (`472b09e`, upstream `dev` `e8c520c` üzerinde, force-push). Derleme run 39869167504 başarılı.
+- **Dal:** `feat/post-image-download` (commit `472b09e`).
+- **Derleme:** run 39869167504 (artifact `patches-1.48.0.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39869167504
+- **Sıradaki adım:** Kullanıcı upstream PR'ı açacak (önceden doldurulmuş karşılaştırma bağlantısı verildi).
+  PR numarası gelince dosya başlıklarındaki bağlantıya eklenebilir.
 - **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
   (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
   ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
