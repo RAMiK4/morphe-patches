@@ -92,10 +92,13 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   eşleşmiyordu). Gömülü video kapağı/anket görselleri konusunda kullanıcıya a/b/c seçeneği soruldu.
   Düzeltme `290bf9e`: buton karuseldeki en görünür öğeyi indiriyor (kaydırma ofseti / öğe aralığı);
   raflar avatar URL'lerinden gönderilere bölünüyor; metinler boşlukları normalize edilerek ve
-  başlangıçlarıyla eşleşiyor. Test bekleniyor.
-- **Dal:** `feat/post-image-download` (son commit `290bf9e`).
-- **Derleme:** run 39866138767 (artifact `patches-1.48.0.mpp`):
-  https://github.com/RAMiK4/morphe-patches/actions/runs/39866138767
+  başlangıçlarıyla eşleşiyor.
+  Karar (kullanıcı): şimdilik yalnızca resim gönderileri; anketler ve gömülü videolu gönderiler hariç.
+  Düzeltme `23ec182`: yalnızca `images_post*` elementleri; options/poll/videos/shared post ve `/vi/`
+  video kapağı içerenler eleniyor (raf parçalarında da). Test bekleniyor.
+- **Dal:** `feat/post-image-download` (son commit `23ec182`).
+- **Derleme:** run 39867152602 (artifact `patches-1.48.0.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39867152602
 - **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
   (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
   ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
