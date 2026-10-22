@@ -44,20 +44,24 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 ### 2026-10-22: YouTube "Search comments" yaması
 
-- **Durum:** Kod yazıldı, upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerinde. İlk cihaz testi yapıldı,
-  bulunan sorun düzeltildi (aşağıda). Düzeltilmiş sürüm henüz cihazda test edilmedi.
-- **Dal:** `ccr-511e3576-s4c9y4` (son commit `36158645`). PR açılmadı.
-- **Derleme:** Son başarılı derleme run 39730648962 (artifact `patches-1.48.0-dev.18.mpp`):
-  https://github.com/RAMiK4/morphe-patches/actions/runs/39730648962
+- **Durum:** Upstream `dev` (1.48.0-dev.18, `a6fdc2f1`) üzerinde. İki cihaz testi yapıldı, bulunan sorunlar düzeltildi.
+  Son sürüm (`0b2bccb7`) henüz cihazda test edilmedi.
+- **Dal:** `ccr-511e3576-s4c9y4` (son commit `0b2bccb7`). PR açılmadı.
+- **Derleme:** Son başarılı derleme run 39733975757 (artifact `patches-1.48.0-dev.18.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39733975757
   Kod değişmedikçe yeniden derlemeye gerek yok.
-- **İlk test sonucu (2026-10-22):** Arama çalıştı ama görünüm karışıktı. Eşleşen yorumlarda yalnızca metin kalıyor
-  (avatar, ad, butonlar gizleniyordu), eşleşmeyen yorumlarda "N yanıt" satırları kalıyordu.
-  Sebep: Litho her alt bileşeni kendi buffer'ıyla ayrı değerlendiriyor; "eşleşmeyeni gizle" filtresi küçük
-  buffer'lı iç bileşenleri de gizliyordu. "N yanıt" satırı `comment_thread.eml` yolunun dışında.
-- **Düzeltme (`36158645`):** Her yorum için karar en dıştaki bileşende bir kez veriliyor (ThreadLocal ile yol öneki
-  takibi), iç bileşenler aynı kararı izliyor. Gizlenen yorumdan sonra gelen ve yolunda "repl" geçen ilk öğe
-  (yanıt satırı) da gizleniyor. Bu kısım tahmine dayalı; çalışmazsa kullanıcıdan Morphe debug log'u
-  (Ayarlar → Debugging → Enable debug logging → Export debug logs) istenip gerçek yollar görülmeli.
+- **Test 1 → düzeltme `36158645`:** Eşleşen yorumlarda yalnızca metin kalıyordu, eşleşmeyenlerde "N yanıt" kalıyordu.
+  Sebep: Litho her iç bileşeni kendi buffer'ıyla değerlendiriyor. Karar artık yorumun en dıştaki bileşeninde
+  bir kez veriliyor (ThreadLocal yol öneki takibi), iç bileşenler aynı kararı izliyor.
+- **Test 2 → düzeltme `0b2bccb7`:** Yorumlar artık tam görünüyor ve eşleşmeyenler kayboluyor, ama bazen
+  "N yanıt" göstergesi kalıyordu (dokununca yalnızca eşleşen yanıtlar açılıyor, bu davranış kabul edildi).
+  Litho tek iş parçacığında çalışıyor; yanıt satırı yorumundan ayrı yerleşebiliyor. Yanıt satırı artık
+  yorumuna ortak uzun kimliklerle (yorum kimliği, yanıt belirteci, 24+ karakter) bağlanıyor; bağlı yorum
+  görünürse yanıt hep görünür; kimlik yoksa sıraya dayalı yedek yöntem. Ayrıca Türkçe I/ı/İ/i farkı yok
+  sayılıyor (Türkçe cihazda "IPHONE" bulunamıyordu) ve tırnaklı ifade araması eklendi. Saf mantık 17
+  senaryoluk yerel testle doğrulandı.
+- **Bilinen sınır:** Arama ham buffer'da yapıldığı için arayüz metinleriyle (ör. "yanıt") eşleşen kelimeler
+  her yorumla eşleşebilir. Debug log için: Ayarlar → Debugging → Enable debug logging → Export debug logs.
 - **Ne yapıyor:** Yorum panelinin başlığına, kapatma butonunun soluna bir arama butonu ekler.
   Aranan kelimelerin hepsini içermeyen yorumlar (`comment_thread.eml`) yüklenirken Litho filtresiyle gizlenir.
   Arama yalnızca yapıldığı videoda geçerlidir.
@@ -71,7 +75,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Bilinen sınırlar:** Arama sonradan yüklenen yorumlara uygulanır (sıralama değiştirilmeli ya da yorumlar yeniden açılmalı).
   Başlık düzeni yalnızca LinearLayout ve RelativeLayout için destekleniyor.
   Yorum paneli, panel kimliğinde "comment" geçtiği varsayılarak tanınıyor.
-- **Sıradaki adım:** Kullanıcı düzeltilmiş sürümü cihazda test edecek. Sorun kalırsa debug log istenecek. Sonra PR kararı.
+- **Sıradaki adım:** Kullanıcı `0b2bccb7` sürümünü test edecek. Sonra PR açılacak; hedef (upstream `MorpheApp/morphe-patches` `dev` mi, fork `dev` mi) kullanıcıya soruldu, cevap bekleniyor.
 
 ### Not: fork `dev` dalındaki fazladan commit'ler
 
