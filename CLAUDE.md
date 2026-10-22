@@ -74,10 +74,14 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 ### 2026-10-23: YouTube "Download post images" yaması
 
-- **Durum:** Upstream `dev` (`e8c520c`) üzerinde ilk sürüm yazıldı, derleme başarılı. Henüz cihazda test edilmedi.
-- **Dal:** `feat/post-image-download` (commit `d5a78c5`).
-- **Derleme:** run 39855337752 (artifact `patches-1.48.0.mpp`):
-  https://github.com/RAMiK4/morphe-patches/actions/runs/39855337752
+- **Durum:** Upstream `dev` (`e8c520c`) üzerinde. Test 1: buton ve menü hiç görünmedi. Debug log gösterdi:
+  görseller bulunuyor, ama kesik ("…Devamını okuyun") ve bağlantılı post metinleri eşleşmiyordu; Paylaş
+  açıklaması "Paylaş" iken yalnızca "Share" aranıyordu; Paylaş'ın solunda Beğenme butonu var.
+  Düzeltme `d246fa3`: kesik metin başlangıç eşleşmesi, görünüm açıklamaları da metin sayılıyor,
+  Paylaş etiketi framework `share` string'inden; yer yoksa buton satırın son butonundan sonra. Test bekleniyor.
+- **Dal:** `feat/post-image-download` (son commit `d246fa3`).
+- **Derleme:** run 39860129914 (artifact `patches-1.48.0.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/39860129914
 - **Ne yapıyor:** Resimli/GIF'li gönderilerde Paylaş butonunun hemen soluna bir indirme butonu çizer
   (kök host overlay'i, dokunma `dispatchTouchEvent` kancasıyla) ve gönderinin menüsüne "Download images"
   ekler. İkisi de gönderideki tüm görselleri `=s0` (orijinal boyut) ile Pictures/YouTube'a kaydeder;
