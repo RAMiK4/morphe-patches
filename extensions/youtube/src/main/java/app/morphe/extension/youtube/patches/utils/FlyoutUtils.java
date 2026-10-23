@@ -817,11 +817,11 @@ public final class FlyoutUtils {
                 // The contextual menu of tablets is wrapped in a view that places it next to its anchor.
                 menuContainer = checkedMenuContainer;
             }
-            // The menu of a post has one level less: the content view holds the menu container,
-            // whose list is the first child.
+            // The menu of a post has one level less: the content view, which can also be
+            // a FrameLayout, holds the menu container, whose list is the first child.
             if (menuContainer == null
-                    && checkedPopupWindow.getContentView() instanceof ViewGroup contentView
-                    && contentView.getChildAt(0) instanceof LinearLayout checkedMenuContainer
+                    && contentView instanceof ViewGroup contentGroup
+                    && contentGroup.getChildAt(0) instanceof LinearLayout checkedMenuContainer
                     && checkedMenuContainer.getOrientation() == LinearLayout.VERTICAL
                     && checkedMenuContainer.getChildAt(0) instanceof ViewGroup) {
                 menuContainer = checkedMenuContainer;
