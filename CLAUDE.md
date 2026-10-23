@@ -83,7 +83,12 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - Search comments (`ccr-511e3576-s4c9y4`, Liso'nun 2 commit'i dahil): `dev` birleştirildi (`71796e585`),
   AskFlyoutMenuPatch.kt import çakışması (Liso `addBridge`'i Bridge.kt'ye taşımıştı) çözüldü,
   SearchCommentsPatch.kt'deki `getReference` importu güncellendi.
-- Fork'ta GitHub Actions kapalı (2026-10-23): derleme tetiklenemiyor; upstream PR CI'ına bakılır.
+- Fork'ta Actions "Workflows on this fork have been disabled" ile kapanmıştı; kullanıcı Actions sekmesinden
+  yeniden açtı (2026-10-23). İki dal Patcher 2.0 ile derlendi: run 39901166108, 39901168271 (başarılı).
+- Download post images: upstream'in tablet menü düzeltmesi (`71275419c`) FlyoutUtils'e `contentView`
+  değişkeni ekledi, bizimkiyle çakışıp derlemeyi bozuyordu. Dala `dev` birleştirildi (`9a281af55`) ve
+  düzeltildi (`8cd67c019`); run 39901831610 başarılı.
+- Ortak test dalı `test/all-prs` (upstream dev + üç PR, yalnızca test): run 39901829079 başarılı.
 - Silinemeyen geçici dallar: `test/feat-external-downloader-quick-download-on-dev`, `test/ccr-511e3576-s4c9y4-on-dev`.
 
 ### 2026-10-23: YouTube "Download post images" yaması
