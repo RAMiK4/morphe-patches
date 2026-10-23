@@ -73,6 +73,19 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-23: Quick download menu ve Search comments PR'larının çakışmaları
+
+- Upstream `dev` (`71275419c`) Patcher 2.0'a geçti ve bazı yardımcı fonksiyonlar `app.morphe.util`'den
+  `app.morphe.patcher.util`'e taşındı (getReference, findFreeRegister, registersUsed, cloneParameters,
+  returnEarly, numberOfParameterRegisters vb.). Yeni dallarda bu importlar `app.morphe.patcher.util.*` olmalı.
+- Quick download (`feat/external-downloader-quick-download`): `dev` birleştirildi (`588c947bc`),
+  DownloadsPatch.kt import çakışması çözüldü.
+- Search comments (`ccr-511e3576-s4c9y4`, Liso'nun 2 commit'i dahil): `dev` birleştirildi (`71796e585`),
+  AskFlyoutMenuPatch.kt import çakışması (Liso `addBridge`'i Bridge.kt'ye taşımıştı) çözüldü,
+  SearchCommentsPatch.kt'deki `getReference` importu güncellendi.
+- Fork'ta GitHub Actions kapalı (2026-10-23): derleme tetiklenemiyor; upstream PR CI'ına bakılır.
+- Silinemeyen geçici dallar: `test/feat-external-downloader-quick-download-on-dev`, `test/ccr-511e3576-s4c9y4-on-dev`.
+
 ### 2026-10-23: YouTube "Download post images" yaması
 
 - **Durum:** Upstream `dev` (`e8c520c`) üzerinde. Test 1: buton ve menü hiç görünmedi. Debug log gösterdi:
