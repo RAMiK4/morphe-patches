@@ -53,6 +53,7 @@ import app.morphe.extension.youtube.patches.AddToQueuePatch;
 import app.morphe.extension.youtube.patches.FeedVideoActionsPatch;
 import app.morphe.extension.youtube.patches.LocalQueuePatch;
 import app.morphe.extension.youtube.patches.PictureinPictureButtonPatch;
+import app.morphe.extension.youtube.patches.PostImageDownloadPatch;
 import app.morphe.extension.youtube.patches.SaveToWatchLaterPatch;
 import app.morphe.extension.youtube.patches.VideoDelayPatch;
 import app.morphe.extension.youtube.patches.VideoInformation;
@@ -496,6 +497,15 @@ public final class FlyoutUtils {
 
         final String flyoutVideoId = getFlyoutVideoId();
 
+        // Only the menus of posts with images.
+        if (PostImageDownloadPatch.ENABLED) {
+            nextButtonIndex = PostImageDownloadPatch.addFlyoutButton(
+                    flyoutPanel,
+                    nextButtonIndex,
+                    senderViewRef.get()
+            );
+        }
+
         // region to show the following buttons only for specific flyout menus.
         final String allButtonsVideoId;
         if (!flyoutVideoId.isEmpty()) {
@@ -805,6 +815,15 @@ public final class FlyoutUtils {
             } else if (contentView instanceof ViewGroup viewGroup &&
                     viewGroup.getChildAt(0) instanceof LinearLayout checkedMenuContainer) {
                 // The contextual menu of tablets is wrapped in a view that places it next to its anchor.
+                menuContainer = checkedMenuContainer;
+            }
+            // The menu of a post has one level less: the content view, which can also be
+            // a FrameLayout, holds the menu container, whose list is the first child.
+            if (menuContainer == null
+                    && contentView instanceof ViewGroup contentGroup
+                    && contentGroup.getChildAt(0) instanceof LinearLayout checkedMenuContainer
+                    && checkedMenuContainer.getOrientation() == LinearLayout.VERTICAL
+                    && checkedMenuContainer.getChildAt(0) instanceof ViewGroup) {
                 menuContainer = checkedMenuContainer;
             }
         } else if (flyoutPanel instanceof Dialog checkedDialog) {
