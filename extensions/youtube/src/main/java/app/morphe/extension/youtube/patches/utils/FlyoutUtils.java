@@ -806,11 +806,16 @@ public final class FlyoutUtils {
 
         if (flyoutPanel instanceof PopupWindow checkedPopupWindow) {
             popupWindow = checkedPopupWindow;
-            if (checkedPopupWindow.getContentView() instanceof FrameLayout frameLayout) {
+            View contentView = checkedPopupWindow.getContentView();
+            if (contentView instanceof FrameLayout frameLayout) {
                 if (frameLayout.getChildAt(0) instanceof ViewGroup viewGroup &&
                         viewGroup.getChildAt(0) instanceof LinearLayout checkedMenuContainer) {
                     menuContainer = checkedMenuContainer;
                 }
+            } else if (contentView instanceof ViewGroup viewGroup &&
+                    viewGroup.getChildAt(0) instanceof LinearLayout checkedMenuContainer) {
+                // The contextual menu of tablets is wrapped in a view that places it next to its anchor.
+                menuContainer = checkedMenuContainer;
             }
             // The menu of a post has one level less: the content view holds the menu container,
             // whose list is the first child.
