@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.requests.Requester;
+import app.morphe.extension.shared.settings.BaseSettings;
 
 public final class ChannelSearchRequest {
 
@@ -60,10 +61,14 @@ public final class ChannelSearchRequest {
         /** Empty if the response does not name the channel. */
         public final String channelName;
         public final List<ChannelSearchResult> results;
+        /** Posts the search tab listed among its results, which do not all have the search. */
+        public final List<ChannelPostsSearchRequest.ChannelPostResult> posts;
 
-        private ChannelSearchResponse(String channelName, List<ChannelSearchResult> results) {
+        private ChannelSearchResponse(String channelName, List<ChannelSearchResult> results,
+                                      List<ChannelPostsSearchRequest.ChannelPostResult> posts) {
             this.channelName = channelName;
             this.results = results;
+            this.posts = posts;
         }
     }
 
@@ -181,7 +186,8 @@ public final class ChannelSearchRequest {
             ));
         }
 
-        return new ChannelSearchResponse(localized.channelName, mergedResults);
+        return new ChannelSearchResponse(localized.channelName, mergedResults,
+                localized.posts.isEmpty() ? english.posts : localized.posts);
     }
 
     @Nullable
@@ -193,6 +199,8 @@ public final class ChannelSearchRequest {
         final long startTime = System.currentTimeMillis();
         List<ChannelSearchResult> allResults = new ArrayList<>();
         Set<String> seenVideoIds = new HashSet<>();
+        List<ChannelPostsSearchRequest.ChannelPostResult> allPosts = new ArrayList<>();
+        Set<String> seenPostIds = new HashSet<>();
 
         try {
             JSONObject json = ChannelSearchRoutes.fetch(ChannelSearchRoutes.CHANNEL_SEARCH,
@@ -203,14 +211,21 @@ public final class ChannelSearchRequest {
             }
 
             String channelName = parseChannelName(json);
+            if (BaseSettings.DEBUG.get()) {
+                JSONObject firstPage = json;
+                Logger.printDebug(() -> "Channel search renderers (" + locale + "): "
+                        + ChannelPostsSearchRequest.rendererHistogram(firstPage));
+            }
             int[] indexRef = {0};
             for (int page = 1; ; page++) {
                 String browseToken = parseBrowseContents(json, allResults, seenVideoIds, indexRef, isEnglish);
                 String actionToken = parseContinuationActions(json, allResults, seenVideoIds, indexRef, isEnglish);
+                ChannelPostsSearchRequest.collectPosts(json, allPosts, seenPostIds);
                 String nextToken = browseToken != null ? browseToken : actionToken;
                 final boolean isLast = nextToken == null || nextToken.isEmpty()
                         || page >= MAX_CONTINUATION_PAGES || allResults.size() >= MAX_SEARCH_RESULTS;
-                ChannelSearchResponse response = new ChannelSearchResponse(channelName, new ArrayList<>(allResults));
+                ChannelSearchResponse response = new ChannelSearchResponse(channelName,
+                        new ArrayList<>(allResults), new ArrayList<>(allPosts));
                 callback.onResponsePage(response, isLast);
                 if (isLast) {
                     return response;
@@ -233,6 +248,7 @@ public final class ChannelSearchRequest {
             callback.onResponsePage(null, true);
         } finally {
             Logger.printDebug(() -> "Fetched channel search (" + locale + "), items=" + allResults.size()
+                    + " posts=" + allPosts.size()
                     + " took: " + (System.currentTimeMillis() - startTime) + "ms");
         }
         return null;
