@@ -185,10 +185,18 @@ public final class ChannelSearchPatch {
         VIDEOS("morphe_channel_search_videos"),
         POSTS("morphe_channel_search_posts");
 
-        final String modeName;
+        /**
+         * This class is loaded when the app starts, before strings can be read,
+         * so the name is read only when it is shown.
+         */
+        private final String modeNameKey;
 
-        ResultMode(String modeName) {
-            this.modeName = sf(modeName).toString();
+        ResultMode(String modeNameKey) {
+            this.modeNameKey = modeNameKey;
+        }
+
+        String getModeName() {
+            return str(modeNameKey);
         }
     }
 
@@ -860,7 +868,7 @@ public final class ChannelSearchPatch {
         List<TextView> modeChips = new ArrayList<>();
         for (ResultMode mode : ResultMode.values()) {
             TextView chip = new TextView(activity);
-            chip.setText(mode.modeName);
+            chip.setText(mode.getModeName());
             chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             chip.setSingleLine();
             chip.setGravity(Gravity.CENTER);
