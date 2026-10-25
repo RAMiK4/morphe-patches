@@ -85,6 +85,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Kart: görsel (çoklu görselde sayı rozeti), eşleşmeden kısa önceden başlayan metin, aranan kelimeler kalın,
   tarih ve beğeni. Dokununca `youtube.com/post/<id>` uygulama içinde açılır. Seçilen mod sonraki aramada korunur.
   Türkçe I/ı/İ/i farkı yok sayılıyor.
+- **Test 1:** Uygulama açılışta çöküyordu. Sebep: `ChannelSearchPatch` açılışta yükleniyor ve yeni `ResultMode`
+  enum'u sınıf yüklenirken `sf(..).toString()` ile string okuyordu. Düzeltme: mod adı gösterilirken okunuyor.
+  Yeni derleme run 40235264010.
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
