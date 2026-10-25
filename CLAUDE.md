@@ -73,6 +73,25 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-26: YouTube "Channel search" yamasına gönderi araması
+
+- **Durum:** Upstream `dev` (`f4c1f84`, 1.49.0-dev.6) üzerinde ilk test derlemesi hazır, cihazda henüz test edilmedi.
+- **Dal:** `feat/channel-search-posts`. **Derleme:** run 40233263047 (artifact `patches-1.49.0-dev.6.mpp`):
+  https://github.com/RAMiK4/morphe-patches/actions/runs/40233263047
+- **Ne yapıyor:** Kanal araması panelinde sıralama butonunun soluna "Videos | Posts" seçicisi. Gönderiler
+  modunda iki kaynak birleşir: (1) kanal arama sekmesi yanıtındaki gönderiler (`backstagePostRenderer` /
+  `postRenderer`, video aramasıyla aynı istekten toplanıyor, aranan kelimeleri içerenler gösteriliyor);
+  (2) Gönderiler sekmesi (WEB istemcisi, oturumsuz) en fazla 60 sayfa taranıp metinde arama yapılıyor.
+  Kart: görsel (çoklu görselde sayı rozeti), eşleşmeden kısa önceden başlayan metin, aranan kelimeler kalın,
+  tarih ve beğeni. Dokununca `youtube.com/post/<id>` uygulama içinde açılır. Seçilen mod sonraki aramada korunur.
+  Türkçe I/ı/İ/i farkı yok sayılıyor.
+- **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
+  (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
+- **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
+  "Searched posts tab", "Post results: search tab=.. posts tab=..".
+- **Dosyalar:** `ChannelSearchPatch.java`, `utils/requests/ChannelPostsSearchRequest.java` (yeni),
+  `ChannelSearchRequest.java`, `ChannelSearchRoutes.java`, `strings.xml`.
+
 ### 2026-10-23: Quick download menu ve Search comments PR'larının çakışmaları
 
 - Upstream `dev` (`71275419c`) Patcher 2.0'a geçti ve bazı yardımcı fonksiyonlar `app.morphe.util`'den
