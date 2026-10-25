@@ -88,6 +88,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Test 1:** Uygulama açılışta çöküyordu. Sebep: `ChannelSearchPatch` açılışta yükleniyor ve yeni `ResultMode`
   enum'u sınıf yüklenirken `sf(..).toString()` ile string okuyordu. Düzeltme: mod adı gösterilirken okunuyor.
   Yeni derleme run 40235264010.
+- **Test 2:** Düzeltmeye rağmen açılışta çökme sürüyor. Kullanıcı olmazsa geri alınmasını istedi (2026-10-26).
+  Kontrol için değişikliksiz upstream `dev` derlendi: dal `test/upstream-dev-control`, run 40239204971.
+  O da çökerse sorun upstream 1.49.0-dev.6'da; çökmezse bizim değişiklikte (crash log gerekli).
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
