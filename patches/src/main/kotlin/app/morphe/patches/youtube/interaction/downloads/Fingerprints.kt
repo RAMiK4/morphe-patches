@@ -155,3 +155,52 @@ internal fun playerResponseGetterFingerprint(playerResponseModelClass: String, p
     returnType = playerResponse,
     parameters = listOf()
 )
+
+// region Device downloader.
+
+/**
+ * A lifecycle method of a stock service. The service class names are kept,
+ * because the manifest references them.
+ */
+internal class ServiceMethodFingerprint(classSuffix: String, methodName: String) : Fingerprint(
+    custom = { method, classDef ->
+        classDef.type.endsWith(classSuffix) && method.name == methodName
+    }
+)
+
+private const val BACKGROUND_PLAYER_SERVICE_SUFFIX = "/BackgroundPlayerService;"
+private const val OFFLINE_KEEP_ALIVE_SERVICE_SUFFIX = "/OfflineKeepAliveService;"
+
+internal val BackgroundPlayerServiceOnCreateFingerprint =
+    ServiceMethodFingerprint(BACKGROUND_PLAYER_SERVICE_SUFFIX, "onCreate")
+internal val BackgroundPlayerServiceOnStartCommandFingerprint =
+    ServiceMethodFingerprint(BACKGROUND_PLAYER_SERVICE_SUFFIX, "onStartCommand")
+internal val BackgroundPlayerServiceOnBindFingerprint =
+    ServiceMethodFingerprint(BACKGROUND_PLAYER_SERVICE_SUFFIX, "onBind")
+internal val BackgroundPlayerServiceOnTaskRemovedFingerprint =
+    ServiceMethodFingerprint(BACKGROUND_PLAYER_SERVICE_SUFFIX, "onTaskRemoved")
+internal val BackgroundPlayerServiceOnDestroyFingerprint =
+    ServiceMethodFingerprint(BACKGROUND_PLAYER_SERVICE_SUFFIX, "onDestroy")
+
+internal val OfflineKeepAliveServiceOnCreateFingerprint =
+    ServiceMethodFingerprint(OFFLINE_KEEP_ALIVE_SERVICE_SUFFIX, "onCreate")
+internal val OfflineKeepAliveServiceOnStartCommandFingerprint =
+    ServiceMethodFingerprint(OFFLINE_KEEP_ALIVE_SERVICE_SUFFIX, "onStartCommand")
+internal val OfflineKeepAliveServiceOnDestroyFingerprint =
+    ServiceMethodFingerprint(OFFLINE_KEEP_ALIVE_SERVICE_SUFFIX, "onDestroy")
+internal val OfflineKeepAliveServiceOnTimeoutFingerprint =
+    ServiceMethodFingerprint(OFFLINE_KEEP_ALIVE_SERVICE_SUFFIX, "onTimeout")
+
+/**
+ * The command handler of browse endpoints, such as the navigation to the "FEdownloads" page.
+ */
+internal object BrowseEndpointCommandFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf("L", "Ljava/util/Map;"),
+    filters = listOf(
+        string("FEsfv_channel_pivot"),
+        string("replace_pane_predicate")
+    )
+)
+
+// endregion

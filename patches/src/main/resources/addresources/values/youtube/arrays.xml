@@ -1,4 +1,18 @@
 <resources>
+    <!-- interaction.downloads.downloadsPatch -->
+    <string-array name="morphe_download_mode_youtube_entries">
+        <item>@string/morphe_download_mode_entry_default</item>
+        <item>@string/morphe_download_mode_entry_in_app</item>
+        <item>@string/morphe_download_mode_entry_device</item>
+        <item>@string/morphe_download_mode_entry_external</item>
+    </string-array>
+    <string-array name="morphe_download_mode_youtube_entry_values" translatable="false">
+        <item>DEFAULT</item>
+        <item>IN_APP</item>
+        <item>DEVICE</item>
+        <item>EXTERNAL</item>
+    </string-array>
+
     <!-- misc.backgroundplayback.backgroundPlaybackPatch -->
     <string-array name="morphe_auto_pause_on_screen_lock_entries">
         <item>@string/morphe_auto_pause_on_screen_lock_off</item>

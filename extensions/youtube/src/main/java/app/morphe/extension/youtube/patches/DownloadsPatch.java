@@ -14,6 +14,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.patches.DownloadMode;
 import app.morphe.extension.shared.settings.preference.ExternalDownloaderPreference;
+import app.morphe.extension.youtube.patches.offline.OfflineDownloader;
 import app.morphe.extension.youtube.settings.Settings;
 import app.morphe.extension.youtube.videoplayer.ExternalDownloadButton;
 
@@ -43,7 +44,8 @@ public final class DownloadsPatch {
      *         so download buttons can be added where the app has none, such as the Shorts player.
      */
     public static boolean isDownloadModeHandledByMorphe() {
-        return Settings.DOWNLOAD_MODE.get() == DownloadMode.EXTERNAL;
+        final DownloadMode mode = Settings.DOWNLOAD_MODE.get();
+        return mode == DownloadMode.EXTERNAL || mode == DownloadMode.DEVICE;
     }
 
     /**
@@ -53,7 +55,13 @@ public final class DownloadsPatch {
      */
     public static boolean downloadVideo(String videoId) {
         try {
-            if (!isDownloadModeHandledByMorphe()) {
+            final DownloadMode mode = Settings.DOWNLOAD_MODE.get();
+            if (mode == DownloadMode.DEVICE) {
+                OfflineDownloader.download(videoId);
+                return true;
+            }
+
+            if (mode != DownloadMode.EXTERNAL) {
                 return false;
             }
 

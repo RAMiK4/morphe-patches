@@ -19,5 +19,9 @@ public enum DownloadMode {
     /**
      * Videos are downloaded with an external downloader app.
      */
-    EXTERNAL
+    EXTERNAL,
+    /**
+     * Videos are downloaded by the app and saved as video files in the device storage.
+     */
+    DEVICE
 }

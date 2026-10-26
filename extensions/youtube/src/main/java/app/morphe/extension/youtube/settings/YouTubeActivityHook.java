@@ -27,6 +27,7 @@ import app.morphe.extension.shared.settings.SharedYouTubeSettings;
 import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment;
 import app.morphe.extension.shared.spoof.SpoofAppVersionPatch;
 import app.morphe.extension.youtube.patches.VersionCheckPatch;
+import app.morphe.extension.youtube.patches.offline.OfflineScreens;
 import app.morphe.extension.youtube.settings.preference.YouTubePreferenceFragment;
 import app.morphe.extension.youtube.settings.search.YouTubeSearchViewController;
 
@@ -59,6 +60,9 @@ public class YouTubeActivityHook extends BaseActivityHook {
      */
     @SuppressWarnings("unused")
     public static void initialize(Activity parentActivity) {
+        // The same activity also hosts the offline library and player of the device downloader.
+        if (OfflineScreens.initialize(parentActivity)) return;
+
         BaseActivityHook.initialize(new YouTubeActivityHook(), parentActivity);
     }
 
@@ -184,6 +188,10 @@ public class YouTubeActivityHook extends BaseActivityHook {
      */
     @SuppressWarnings("unused")
     public static boolean handleBackPress(Activity activity) {
+        // Offline screens handle their own back presses.
+        if (OfflineScreens.hostsScreen(activity)) {
+            return OfflineScreens.handleBackPress(activity);
+        }
         if (searchViewController != null && searchViewController.isSearchActive()) {
             return searchViewController.handleBackPress();
         }
