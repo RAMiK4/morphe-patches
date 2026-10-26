@@ -2,10 +2,18 @@ name: Probe posts
 on:
   push:
     branches: [ci/probe-posts]
+    paths: [.github/probe/**, .github/workflows/probe_posts.yml]
+permissions:
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: python3 -I .github/probe/probe.py "@beINSPORTSTurkiye" "Fenerbahçe"
-      - run: python3 -I .github/probe/probe.py "@MrBeast" "chocolate"
+      - run: |
+          { python3 -I .github/probe/probe.py "@beINSPORTSTurkiye" "Fenerbahçe"; echo; python3 -I .github/probe/probe.py "@MrBeast" "chocolate"; } > probe-output.txt 2>&1 || true
+          git config user.name RAMiK4
+          git config user.email 60112744+RAMiK4@users.noreply.github.com
+          git add probe-output.txt
+          git commit -m "ci: Probe output"
+          git push
