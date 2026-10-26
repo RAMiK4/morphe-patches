@@ -103,6 +103,15 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   iş akışında Morphe CLI ile derleniyor; Manager değil. Muhtemel sebep Manager + 1.49 (Patcher 2.0) uyumsuzluğu.
   `youtube-morphe` release.yml'e isteğe bağlı `patches_source` (owner/repo@dal, yalnız test, yayınlamaz) eklendi;
   `test/channel-search-posts-dev6` ile test APK'sı: run 40266898459 (artifact `test-build`, iki varyant, kullanıcının anahtarıyla imzalı).
+- **Test 3 (youtube-morphe CLI derlemesi):** Açıldı, çalışıyor; karta dokununca gönderi açılıyor. Sorun: en fazla 3-4
+  gönderi. Actions'ta prob (çıktı dala commit edilerek okundu; Actions log blob'u bu ortamdan 403): MWEB arama sekmesi
+  hiç gönderi döndürmüyor; Gönderiler sekmesinde son `continuationItemRenderer` başlıktaki "Hakkında" paneline ait,
+  bu yüzden tarama 1. sayfada bitiyordu. Doğru token ile beIN SPORTS'ta 40 sayfa/398 gönderi, ~7 sn.
+  Düzeltme: sonraki sayfa yalnızca `contents`/`onResponseReceived*` içinden (header, engagementPanel, gönderi
+  thread'leri hariç); arama sekmesi kaynağı kaldırıldı (ChannelSearchRequest upstream hâline döndü);
+  gönderiler için En yeni/En eski sıralaması. Test APK: youtube-morphe run 40270404802.
+- **Not:** Kullanıcının sorunsuz derlemeleri `youtube-morphe` iş akışında (Morphe CLI). Test için bundan sonra
+  `patches_source=RAMiK4/morphe-patches@<dal>`, publish kapalı. Manager ile yamalanan Actions `.mpp`'leri çöküyordu.
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
