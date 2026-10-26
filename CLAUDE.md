@@ -95,6 +95,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   bizim kodda değil. Muhtemel sebep: 1.49 dev'leri Patcher 2.0'a geçti (`0d5663d38`), kullanıcının Manager'ı uyumsuz olabilir.
   Test için özellik `v1.48.0` üzerine taşındı: dal `test/channel-search-posts-1.48`, run 40260173537
   (artifact `patches-1.48.0.mpp`). PR için yine upstream `dev` dalı (`feat/channel-search-posts`) kullanılacak.
+- **Düzeltme (teşhis):** Kullanıcı resmi v1.49.0-dev.6 ile sorunsuz; yalnızca bu oturumdaki derlemeler çöküyor. Sebep:
+  derlemeler upstream `dev` ucundan (`f4c1f84`) alınmıştı, bu uç dev.6'dan sonra gelen 11 yayınlanmamış commit içeriyor;
+  çökme muhtemelen onlardan. Özellik `v1.49.0-dev.6` etiketine taşındı: dal `test/channel-search-posts-dev6`,
+  run 40264042853. (1.48 tabanlı `test/channel-search-posts-1.48` da duruyor.)
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
