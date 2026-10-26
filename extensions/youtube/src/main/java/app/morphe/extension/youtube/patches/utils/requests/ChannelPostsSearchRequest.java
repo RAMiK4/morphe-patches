@@ -6,6 +6,8 @@
 
 package app.morphe.extension.youtube.patches.utils.requests;
 
+import android.net.Uri;
+
 import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
@@ -19,20 +21,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.requests.Requester;
-import app.morphe.extension.shared.settings.BaseSettings;
 
 /**
  * Posts of a channel that have the search.
  * <p>
- * The posts come from two sources. The search tab of the channel can list posts among its
- * results, and these are taken as they come with the video search. The posts tab of the channel
- * lists every post, newest first, and its posts that have the search are shown after them.
+ * The search tab of a channel lists no posts, so the posts tab is listed page by page,
+ * newest first, and the text of each post is searched here.
  */
 public final class ChannelPostsSearchRequest {
 
@@ -76,9 +75,23 @@ public final class ChannelPostsSearchRequest {
     }
 
     /**
-     * Each page of the posts tab lists about 10 posts.
+     * Each page of the posts tab lists 10 posts. The tab itself ends after about 40 pages.
      */
     private static final int MAX_POSTS_TAB_PAGES = 60;
+
+    /**
+     * Parts of a response that list the posts of the tab and the next page of it.
+     * The header lists other pages too, such as the about panel of the channel.
+     */
+    private static final String[] POST_LIST_KEYS = {
+            "contents", "onResponseReceivedEndpoints", "onResponseReceivedActions"};
+
+    /**
+     * Parts of a post list that have continuations, which are not the next page of the list.
+     */
+    private static final String[] NOT_POST_LIST_KEYS = {
+            "backstagePostThreadRenderer", "backstagePostRenderer", "postRenderer",
+            "header", "engagementPanel"};
 
     private static final String[] POST_RENDERER_KEYS = {"backstagePostRenderer", "postRenderer"};
 
@@ -121,11 +134,17 @@ public final class ChannelPostsSearchRequest {
     }
 
     /**
-     * Adds the posts of a response to the list, in the order they are listed.
+     * Adds the posts of a page of the posts tab to the list, in the order they are listed.
      *
      * @param seenPostIds Ids of the posts already in the list.
      */
-    static void collectPosts(@Nullable Object json, List<ChannelPostResult> posts, Set<String> seenPostIds) {
+    private static void collectPagePosts(JSONObject json, List<ChannelPostResult> posts, Set<String> seenPostIds) {
+        for (String key : POST_LIST_KEYS) {
+            collectPosts(json.opt(key), posts, seenPostIds);
+        }
+    }
+
+    private static void collectPosts(@Nullable Object json, List<ChannelPostResult> posts, Set<String> seenPostIds) {
         if (json instanceof JSONObject object) {
             Iterator<String> keys = object.keys();
             while (keys.hasNext()) {
@@ -323,14 +342,10 @@ public final class ChannelPostsSearchRequest {
             }
 
             String channelName = parseChannelName(json);
-            if (BaseSettings.DEBUG.get()) {
-                JSONObject firstPage = json;
-                Logger.printDebug(() -> "Posts tab renderers: " + rendererHistogram(firstPage));
-            }
 
             for (page = 1; ; page++) {
                 pagePosts.clear();
-                collectPosts(json, pagePosts, seenPostIds);
+                collectPagePosts(json, pagePosts, seenPostIds);
                 scannedPosts += pagePosts.size();
                 for (ChannelPostResult post : pagePosts) {
                     if (matches(post, query)) {
@@ -338,7 +353,7 @@ public final class ChannelPostsSearchRequest {
                     }
                 }
 
-                String nextToken = findContinuationToken(json);
+                String nextToken = findNextPageToken(json);
                 final boolean isLast = nextToken == null || page >= MAX_POSTS_TAB_PAGES
                         // A page without new posts would only repeat.
                         || (page > 1 && pagePosts.isEmpty());
@@ -389,7 +404,8 @@ public final class ChannelPostsSearchRequest {
 
             JSONObject endpoint = tabRenderer.optJSONObject("endpoint");
             JSONObject browse = endpoint == null ? null : endpoint.optJSONObject("browseEndpoint");
-            return browse == null ? "" : browse.optString("params");
+            // The params of a tab are url encoded, such as "%3D" for "=".
+            return browse == null ? "" : Uri.decode(browse.optString("params"));
         }
         return null;
     }
@@ -430,8 +446,18 @@ public final class ChannelPostsSearchRequest {
     }
 
     /**
-     * @return Token of the next page, which is listed after the posts of the page.
+     * @return Token of the next page of the posts tab, which is listed after the posts of the page.
      */
+    @Nullable
+    private static String findNextPageToken(JSONObject json) {
+        String token = null;
+        for (String key : POST_LIST_KEYS) {
+            String found = findContinuationToken(json.opt(key));
+            if (found != null) token = found;
+        }
+        return token;
+    }
+
     @Nullable
     private static String findContinuationToken(@Nullable Object json) {
         String token = null;
@@ -444,8 +470,7 @@ public final class ChannelPostsSearchRequest {
             Iterator<String> keys = object.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                // Replies of a post are not pages of the tab.
-                if ("continuationItemRenderer".equals(key) || isPostRendererKey(key)) continue;
+                if ("continuationItemRenderer".equals(key) || isNotPostListKey(key)) continue;
                 String found = findContinuationToken(object.opt(key));
                 if (found != null) token = found;
             }
@@ -456,6 +481,13 @@ public final class ChannelPostsSearchRequest {
             }
         }
         return token;
+    }
+
+    private static boolean isNotPostListKey(String key) {
+        for (String notPostListKey : NOT_POST_LIST_KEYS) {
+            if (notPostListKey.equals(key)) return true;
+        }
+        return false;
     }
 
     @Nullable
@@ -472,35 +504,6 @@ public final class ChannelPostsSearchRequest {
         JSONObject metadata = json.optJSONObject("metadata");
         JSONObject channel = metadata == null ? null : metadata.optJSONObject("channelMetadataRenderer");
         return channel == null ? "" : channel.optString("title");
-    }
-
-    /**
-     * Names of the renderers of a response and how often each is listed, for the debug log,
-     * as the posts of other clients can be listed by renderers that are not parsed.
-     */
-    public static String rendererHistogram(JSONObject json) {
-        Map<String, Integer> counts = new TreeMap<>();
-        countRenderers(json, counts, 0);
-        return counts.toString();
-    }
-
-    private static void countRenderers(@Nullable Object json, Map<String, Integer> counts, int depth) {
-        if (depth > 40) return;
-        if (json instanceof JSONObject object) {
-            Iterator<String> keys = object.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if (key.endsWith("Renderer") || key.endsWith("ViewModel")) {
-                    Integer count = counts.get(key);
-                    counts.put(key, count == null ? 1 : count + 1);
-                }
-                countRenderers(object.opt(key), counts, depth + 1);
-            }
-        } else if (json instanceof JSONArray array) {
-            for (int i = 0, length = array.length(); i < length; i++) {
-                countRenderers(array.opt(i), counts, depth + 1);
-            }
-        }
     }
 
     private static String accessibilityLabel(@Nullable JSONObject text) {

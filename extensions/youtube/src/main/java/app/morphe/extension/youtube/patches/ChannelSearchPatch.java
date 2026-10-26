@@ -187,6 +187,31 @@ public final class ChannelSearchPatch {
     }
 
     /**
+     * The posts tab lists posts newest first, and tells their age only rounded.
+     */
+    private enum PostSortOption {
+        NEWEST("morphe_channel_search_sort_newest"),
+        OLDEST("morphe_channel_search_sort_oldest");
+
+        private final String sortNameKey;
+
+        PostSortOption(String sortNameKey) {
+            this.sortNameKey = sortNameKey;
+        }
+
+        String getSortName() {
+            return str(sortNameKey);
+        }
+
+        List<ChannelPostResult> sort(List<ChannelPostResult> posts) {
+            if (this == OLDEST) {
+                Collections.reverse(posts);
+            }
+            return posts;
+        }
+    }
+
+    /**
      * Kept for the next search, so that searching posts again needs no extra tap.
      */
     private static ResultMode lastResultMode = ResultMode.VIDEOS;
@@ -405,15 +430,15 @@ public final class ChannelSearchPatch {
         private boolean isSearchComplete;
         private SortOption activeSort = SortOption.RELEVANCE;
         private ResultMode resultMode = lastResultMode;
+        private PostSortOption activePostSort = PostSortOption.NEWEST;
         private volatile boolean isCancelled;
         private boolean isSearchFailed;
         private boolean isScopeSet;
         @Nullable
-        private View sortButton;
+        private TextView sortButton;
 
         /**
-         * Posts of the posts tab that have the search, which come after
-         * the posts the search tab listed.
+         * Posts of the posts tab that have the search, newest first.
          */
         private List<ChannelPostResult> postsTabMatches = new ArrayList<>();
         private boolean postsTabRequested;
@@ -486,7 +511,7 @@ public final class ChannelSearchPatch {
                 if (isCancelled()) {
                     return;
                 }
-                if (response != null && (!response.results.isEmpty() || !response.posts.isEmpty())) {
+                if (response != null && !response.results.isEmpty()) {
                     setScope(response.channelName);
                     lastResponse = response;
                 } else if (!isComplete) {
@@ -667,9 +692,7 @@ public final class ChannelSearchPatch {
             }
             resultMode = mode;
             lastResultMode = mode;
-            if (sortButton != null) {
-                sortButton.setVisibility(mode == ResultMode.VIDEOS ? View.VISIBLE : View.GONE);
-            }
+            updateSortButtonText();
             scrollView.scrollTo(0, 0);
             listContainer.removeAllViews();
             if (mode == ResultMode.POSTS) {
@@ -705,51 +728,68 @@ public final class ChannelSearchPatch {
             );
         }
 
-        /**
-         * Posts of the search tab that have the search, then those of the posts tab.
-         * The search tab also lists posts that only have similar words, which are left out.
-         */
-        private List<ChannelPostResult> allPosts() {
-            List<ChannelPostResult> posts = new ArrayList<>();
-            Set<String> postIds = new HashSet<>();
-            int searchTabPosts = 0;
-            if (lastResponse != null) {
-                for (ChannelPostResult post : lastResponse.posts) {
-                    if (ChannelPostsSearchRequest.matches(post, query) && postIds.add(post.postId)) {
-                        posts.add(post);
-                        searchTabPosts++;
-                    }
-                }
-            }
-            for (ChannelPostResult post : postsTabMatches) {
-                if (postIds.add(post.postId)) {
-                    posts.add(post);
-                }
-            }
-            if (isSearchComplete && postsTabComplete) {
-                final int fromSearchTab = searchTabPosts;
-                final int listed = lastResponse == null ? 0 : lastResponse.posts.size();
-                Logger.printDebug(() -> "Post results: search tab=" + fromSearchTab + " (of " + listed
-                        + " listed), posts tab=" + postsTabMatches.size() + ", shown=" + posts.size());
-            }
-            return posts;
-        }
-
         private void refreshPosts() {
-            final boolean loading = !isSearchComplete || !postsTabComplete;
+            final boolean loading = !postsTabComplete;
             sortLoadingView.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
 
-            List<ChannelPostResult> posts = allPosts();
-            if (posts.isEmpty()) {
+            if (postsTabMatches.isEmpty()) {
                 showState(loading ? null : str("morphe_channel_search_no_posts"));
                 return;
             }
 
             final int scrollY = scrollView.getScrollY();
+            List<ChannelPostResult> posts = activePostSort.sort(new ArrayList<>(postsTabMatches));
             populatePostList(activity, posts, query, listContainer, dialog);
             if (scrollY > 0) {
                 scrollView.scrollTo(0, scrollY);
             }
+        }
+
+        @SuppressLint("SetTextI18n")
+        private void updateSortButtonText() {
+            if (sortButton == null) return;
+            String sortName = resultMode == ResultMode.POSTS
+                    ? activePostSort.getSortName()
+                    : activeSort.sortName;
+            sortButton.setText(sortName + "  ▼");
+        }
+
+        /**
+         * Sorts of the results the active mode lists.
+         */
+        private void showSortMenu() {
+            if (sortButton == null) return;
+            PopupMenu popupMenu = new PopupMenu(activity, sortButton);
+            Menu menu = popupMenu.getMenu();
+            final boolean isPosts = resultMode == ResultMode.POSTS;
+            final int length = isPosts ? PostSortOption.values().length : SortOption.values().length;
+            for (int i = 0; i < length; i++) {
+                menu.add(0, i, i, isPosts
+                        ? PostSortOption.values()[i].getSortName()
+                        : SortOption.values()[i].sortName);
+            }
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                final int index = item.getItemId();
+                if (index < 0 || index >= length) {
+                    return false;
+                }
+                if (isPosts) {
+                    PostSortOption selected = PostSortOption.values()[index];
+                    if (selected == activePostSort) return true;
+                    activePostSort = selected;
+                } else {
+                    SortOption selected = SortOption.values()[index];
+                    if (selected == activeSort) return true;
+                    activeSort = selected;
+                    completeResults();
+                }
+                scrollView.scrollTo(0, 0);
+                refreshResults();
+                updateSortButtonText();
+                return true;
+            });
+            popupMenu.show();
         }
 
         /**
@@ -881,47 +921,10 @@ public final class ChannelSearchPatch {
                 Dim.roundedCorners(16), null, null));
         background.getPaint().setColor(buttonBgColor);
         sortButton.setBackground(background);
-        sortButton.setOnClickListener(new View.OnClickListener() {
-            {
-                updateButtonText();
-            }
-
-            @SuppressLint("SetTextI18n")
-            private void updateButtonText() {
-                sortButton.setText(controller.getActiveSort().sortName + "  ▼");
-            }
-
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(activity, sortButton);
-                SortOption[] options = SortOption.values();
-                Menu menu = popupMenu.getMenu();
-                for (int i = 0, length = options.length; i < length; i++) {
-                    menu.add(0, i, i, options[i].sortName);
-                }
-
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    int index = item.getItemId();
-                    if (index < 0 || index >= options.length) {
-                        return false;
-                    }
-                    SortOption selectedOption = options[index];
-                    if (controller.getActiveSort() == selectedOption) {
-                        return true;
-                    }
-                    controller.activeSort = selectedOption;
-                    controller.scrollView.scrollTo(0, 0);
-                    controller.completeResults();
-                    controller.refreshResults();
-                    updateButtonText();
-                    return true;
-                });
-                popupMenu.show();
-            }
-        });
+        sortButton.setOnClickListener(view -> controller.showSortMenu());
         sortBarLayout.addView(sortButton);
         controller.sortButton = sortButton;
-        sortButton.setVisibility(controller.resultMode == ResultMode.VIDEOS ? View.VISIBLE : View.GONE);
+        controller.updateSortButtonText();
 
         LinearLayout.LayoutParams loadingParams = new LinearLayout.LayoutParams(Dim.dp20, Dim.dp20);
         loadingParams.setMarginStart(Dim.dp4);
