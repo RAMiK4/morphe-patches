@@ -97,59 +97,40 @@ for page in range(1, 6):
     r = post("browse", {"context": ctx("MWEB"), "continuation": [t for t in tokens(r, "", []) if "continuationCommand" in t[0]][-1][1] if False else None})
     break
 
-print("\n=== WEB posts tab ===")
+import time
+def list_token(r):
+    """Continuation of the post list only: tab content and appended items, not the header."""
+    found = []
+    def w(o):
+        if isinstance(o, dict):
+            cir = o.get("continuationItemRenderer")
+            if isinstance(cir, dict):
+                try: found.append(cir["continuationEndpoint"]["continuationCommand"]["token"])
+                except Exception: pass
+            for k, v in o.items():
+                if k in ("backstagePostThreadRenderer", "header", "engagementPanel"): continue
+                w(v)
+        elif isinstance(o, list):
+            for v in o: w(v)
+    for key in ("contents", "onResponseReceivedEndpoints", "onResponseReceivedActions"):
+        w(r.get(key))
+    return found[-1] if found else None
+
+print("\n=== WEB posts tab (fixed token) ===")
+t0 = time.time()
 r = post("browse", {"context": ctx("WEB"), "browseId": cid, "params": "Egljb21tdW5pdHnyBgQKAkoA"})
-if r:
-    tabs = r.get("contents", {}).get("twoColumnBrowseResultsRenderer", {}).get("tabs", [])
-    for t in tabs:
-        tr = t.get("tabRenderer", {})
-        url = tr.get("endpoint", {}).get("commandMetadata", {}).get("webCommandMetadata", {}).get("url")
-        print("  tab", url, "selected" if tr.get("selected") else "", tr.get("endpoint", {}).get("browseEndpoint", {}).get("params"))
-for page in range(1, 8):
-    if not r: break
+total = 0; matches = 0; page = 0
+q = query.lower()
+while r and page < 60:
+    page += 1
     ps = posts(r, [])
-    print(f" page {page}: posts={len(ps)} topkeys={list(r.keys())} hist={dict(hist(r).most_common(10))}")
-    show_posts(ps[:3])
-    def find_cont(o):
-        found = []
-        def walk(o, path):
-            if isinstance(o, dict):
-                if "continuationItemRenderer" in o:
-                    c = o["continuationItemRenderer"]
-                    found.append((path, json.dumps(c)[:400]))
-                for k, v in o.items():
-                    walk(v, path + "/" + k)
-            elif isinstance(o, list):
-                for v in o: walk(v, path + "[]")
-        walk(o, "")
-        return found
-    conts = find_cont(r)
-    for p_, c in conts[-2:]:
-        print("  continuationItemRenderer at", p_[-120:])
-        print("   ", c)
-    tok = None
-    for p_, c in conts:
-        try:
-            tok = json.loads(c + "" if c.endswith("}") else "{}")["continuationEndpoint"]["continuationCommand"]["token"]
-        except Exception:
-            pass
-    if not tok:
-        # full parse
-        def walk2(o):
-            nonlocal_tok = []
-            def w(o):
-                if isinstance(o, dict):
-                    cir = o.get("continuationItemRenderer")
-                    if isinstance(cir, dict):
-                        try: nonlocal_tok.append(cir["continuationEndpoint"]["continuationCommand"]["token"])
-                        except Exception: pass
-                    for v in o.values(): w(v)
-                elif isinstance(o, list):
-                    for v in o: w(v)
-            w(o); return nonlocal_tok
-        tl = walk2(r)
-        print("  command tokens:", len(tl))
-        tok = tl[-1] if tl else None
-    if not tok:
-        print("  NO CONTINUATION TOKEN"); break
+    total += len(ps)
+    for p_ in ps:
+        if q in text(p_.get("contentText")).lower(): matches += 1
+    if page in (1, 2, 3, 10, 30, 60) or not ps:
+        print(f" page {page}: posts={len(ps)} total={total} matches={matches} oldest={text(ps[-1].get('publishedTimeText')) if ps else '-'} t={time.time()-t0:.1f}s")
+    tok = list_token(r)
+    if not tok or not ps:
+        print("  end: token" , bool(tok)); break
     r = post("browse", {"context": ctx("WEB"), "continuation": tok})
+print(f" DONE pages={page} posts={total} matches={matches} t={time.time()-t0:.1f}s")
