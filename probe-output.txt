@@ -1,0 +1,29 @@
+CHANNEL @beINSPORTSTurkiye UCPe9vNjHF1kEExT5kHwc7aw
+
+=== MWEB search tab ===
+ page 1: posts=0 hist={'itemSectionRenderer': 33, 'compactVideoRenderer': 30, 'metadataBadgeRenderer': 30, 'menuRenderer': 30, 'menuNavigationItemRenderer': 30, 'thumbnailOverlayTimeStatusRenderer': 30, 'reelPlayerOverlayRenderer': 22, 'sectionListRenderer': 9, 'tabRenderer': 7, 'buttonRenderer': 5, 'continuationItemRenderer': 3, 'buttonViewModel': 2}
+  tokens: [('/contents/singleColumnBrowseResultsRenderer/tabs[]/tabRenderer/content/sectionListRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJ7EhhVQ1BlOXZOakhGMWtFRX'), ('/header/pageHeaderRenderer/content/pageHeaderViewModel/description/descriptionPreviewViewModel/rendererContext/commandContext/onTap/innertubeCommand/showEngagementPanelEndpoint/engagementPanel/engagementPanelSectionListRenderer/content/sectionListRenderer/contents[]/itemSectionRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJtEhhVQ1BlOXZOakhGMWtFRX'), ('/header/pageHeaderRenderer/content/pageHeaderViewModel/attribution/attributionViewModel/suffix/commandRuns[]/onTap/innertubeCommand/showEngagementPanelEndpoint/engagementPanel/engagementPanelSectionListRenderer/content/sectionListRenderer/contents[]/itemSectionRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJtEhhVQ1BlOXZOakhGMWtFRX')]
+  REQUEST FAILED browse HTTP Error 400: Bad Request
+
+=== WEB posts tab (fixed token) ===
+ page 1: posts=10 total=10 matches=4 oldest=3 gün önce t=0.3s
+ page 2: posts=10 total=20 matches=6 oldest=6 gün önce (düzenlendi) t=0.4s
+ page 3: posts=10 total=30 matches=8 oldest=8 gün önce t=0.6s
+ page 10: posts=10 total=100 matches=17 oldest=1 ay önce t=1.7s
+ page 30: posts=10 total=300 matches=62 oldest=3 ay önce t=5.2s
+  end: token False
+ DONE pages=40 posts=398 matches=81 t=6.8s
+
+CHANNEL @MrBeast UCX6OQ3DkcsbYNE6H8uQQuVA
+
+=== MWEB search tab ===
+ page 1: posts=0 hist={'itemSectionRenderer': 33, 'metadataBadgeRenderer': 32, 'compactVideoRenderer': 30, 'menuRenderer': 30, 'menuNavigationItemRenderer': 30, 'thumbnailOverlayTimeStatusRenderer': 30, 'reelPlayerOverlayRenderer': 26, 'sectionListRenderer': 8, 'tabRenderer': 6, 'avatarViewModel': 5, 'buttonRenderer': 5, 'listItemViewModel': 4}
+  tokens: [('/contents/singleColumnBrowseResultsRenderer/tabs[]/tabRenderer/content/sectionListRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJ5EhhVQ1g2T1EzRGtjc2JZTk'), ('/header/pageHeaderRenderer/content/pageHeaderViewModel/description/descriptionPreviewViewModel/rendererContext/commandContext/onTap/innertubeCommand/showEngagementPanelEndpoint/engagementPanel/engagementPanelSectionListRenderer/content/sectionListRenderer/contents[]/itemSectionRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJrEhhVQ1g2T1EzRGtjc2JZTk'), ('/header/pageHeaderRenderer/content/pageHeaderViewModel/attribution/attributionViewModel/suffix/commandRuns[]/onTap/innertubeCommand/showEngagementPanelEndpoint/engagementPanel/engagementPanelSectionListRenderer/content/sectionListRenderer/contents[]/itemSectionRenderer/contents[]/continuationItemRenderer/continuationEndpoint/continuationCommand', '4qmFsgJrEhhVQ1g2T1EzRGtjc2JZTk')]
+  REQUEST FAILED browse HTTP Error 400: Bad Request
+
+=== WEB posts tab (fixed token) ===
+ page 1: posts=10 total=10 matches=0 oldest=4 ay önce (düzenlendi) t=0.2s
+ page 2: posts=10 total=20 matches=0 oldest=8 ay önce t=0.3s
+ page 3: posts=10 total=30 matches=0 oldest=10 ay önce (düzenlendi) t=0.5s
+  end: token False
+ DONE pages=9 posts=86 matches=3 t=1.5s
