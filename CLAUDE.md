@@ -112,6 +112,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   gönderiler için En yeni/En eski sıralaması. Test APK: youtube-morphe run 40270404802.
 - **Not:** Kullanıcının sorunsuz derlemeleri `youtube-morphe` iş akışında (Morphe CLI). Test için bundan sonra
   `patches_source=RAMiK4/morphe-patches@<dal>`, publish kapalı. Manager ile yamalanan Actions `.mpp`'leri çöküyordu.
+- **Test 4 (2026-10-26):** Kullanıcı onayladı: çok sayıda sonuç, En yeni/En eski çalışıyor, son ~3-4 ayın gönderileri
+  (sekme ~400 gönderide bitiyor). PR için hazır: `feat/channel-search-posts` upstream `dev` (`e32b05c66`) üzerinde tek
+  commit `ea883c862`, derleme run 40272086656 başarılı. Kullanıcı PR'ı kendisi açacak.
+- **youtube-morphe:** `patches_source` ile yapılan test derlemeleri artık yalnızca BBK Clone (hiby) varyantını derliyor.
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
