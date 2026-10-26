@@ -91,6 +91,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Test 2:** Düzeltmeye rağmen açılışta çökme sürüyor. Kullanıcı olmazsa geri alınmasını istedi (2026-10-26).
   Kontrol için değişikliksiz upstream `dev` derlendi: dal `test/upstream-dev-control`, run 40239204971.
   O da çökerse sorun upstream 1.49.0-dev.6'da; çökmezse bizim değişiklikte (crash log gerekli).
+- **Kontrol sonucu:** Değişikliksiz upstream `dev` (1.49.0-dev.6) de kullanıcının cihazında açılışta çöküyor; sorun
+  bizim kodda değil. Muhtemel sebep: 1.49 dev'leri Patcher 2.0'a geçti (`0d5663d38`), kullanıcının Manager'ı uyumsuz olabilir.
+  Test için özellik `v1.48.0` üzerine taşındı: dal `test/channel-search-posts-1.48`, run 40260173537
+  (artifact `patches-1.48.0.mpp`). PR için yine upstream `dev` dalı (`feat/channel-search-posts`) kullanılacak.
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
