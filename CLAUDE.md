@@ -99,6 +99,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   derlemeler upstream `dev` ucundan (`f4c1f84`) alınmıştı, bu uç dev.6'dan sonra gelen 11 yayınlanmamış commit içeriyor;
   çökme muhtemelen onlardan. Özellik `v1.49.0-dev.6` etiketine taşındı: dal `test/channel-search-posts-dev6`,
   run 40264042853. (1.48 tabanlı `test/channel-search-posts-1.48` da duruyor.)
+- **dev.6 tabanlı derleme de (Manager ile yamalanınca) çöktü.** Kullanıcının sorunsuz release'leri `RAMiK4/youtube-morphe`
+  iş akışında Morphe CLI ile derleniyor; Manager değil. Muhtemel sebep Manager + 1.49 (Patcher 2.0) uyumsuzluğu.
+  `youtube-morphe` release.yml'e isteğe bağlı `patches_source` (owner/repo@dal, yalnız test, yayınlamaz) eklendi;
+  `test/channel-search-posts-dev6` ile test APK'sı: run 40266898459 (artifact `test-build`, iki varyant, kullanıcının anahtarıyla imzalı).
 - **Belirsizlikler:** MWEB arama sekmesinin gönderi döndürüp döndürmediği; Gönderiler sekmesi parametresi
   (yanıttaki sekmelerden yedek okuma var); `/post/` bağlantısının uygulama içinde açılması.
 - **Debug log satırları:** "Channel search renderers", "Fetched channel search ... posts=", "Posts tab renderers",
