@@ -83,6 +83,15 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   yoksa (canlı) menü butonu küçük resmin ≤64dp altındaysa 0, değilse buton gösterilmiyor. Süre rozeti mount edilmemişse
   aynı menü butonu için önceki değer kullanılıyor. Test: `test/post-fixes-dev11` + bu commit, youtube-morphe run 40922117770.
   Derleme kontrolü run 40922112366.
+- **Test 1 (run 40922117770):** Gönderi menüsüne binme düzeldi. Yeni sorun: kare küçük resimlerde (müzik) buton sağ
+  ortadaydı (16:9 varsayımı). Log (İngilizce): `Learned feed menu button pattern: Action menu` ilk menü açılışında;
+  öncesinde Türkçe öğrenilmiş kalıp eşleşmediği için hiçbir kartta buton yoktu (Sorun 2'nin kök nedeni).
+  Düzeltme `3366aa72`: kalıp dille saklanıyor (`dil|kalıp`, dil = view kaynaklarının ilk locale'i; eski değer/başka dil
+  = öğrenilmemiş, şekil + süre rozeti ile çalışır); küçük resim yalnızca üstünde harfli metin varsa (gönderi) aşağıda
+  sayılıyor, yoksa üstte (kare de olsa). Test: youtube-morphe run 40931504323, derleme kontrolü run 40931498980.
+- **Upstream kaynaklı olabilecekler:** Ana sayfa filtre çipleri (Tümü/Müzik) kayboldu; Abonelikler'de kartlar
+  arası boşluk kapanıyor. Logda `FeedCardLayoutPatch` ("Feed card layout") ve `ClassicSubscriptionsLayoutPatch`
+  var; bizim yamalar yalnızca overlay çiziyor. Kullanıcıdan ilgili ayarları kapatıp denemesi istendi.
 - **Sorun 2 (araştırılacak, log gerekli):** İngilizce/Rusça uygulama dilinde açılışta Daha sonra izle butonu ve RYD
   beğeni rozeti bazen hiç görünmüyor, birkaç kez çıkıp girince düzeliyor; Türkçede yok. Şüphe: öğrenilmiş menü butonu
   açıklama kalıbı (`morphe_feed_menu_button_description`) dile bağlı; dil değişince eşleşmiyor olabilir.
