@@ -91,7 +91,14 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Text drawable'lar ComponentHost alanlarında yansıma ile (BFS, derinlik 5, en çok 2000 nesne) aranır.
 - **Belirsizlikler:** Text drawable'ın alanları (Layout/CharSequence) bulunabiliyor mu; başlık sezgisi doğru mu
   (yalnızca görselli gönderide öğe çıkmamalı); yerinde çevirinin kaydırınca korunması.
-- **Debug log satırları:** "Post text:", "Other post text:" (yol bilgisiyle), "Text drawable ... layout: ... text: ...",
+- **Test dalı:** upstream `dev` ucundaki yayınlanmamış "Series tracking" değişikliği youtube-morphe'de yamalamayı
+  bozuyor (run 40867787486, `HistoryPatch.kt:112` ClassCastException; bizim yamayla ilgisi yok). Test için commit'ler
+  `v1.49.0-dev.11` üzerine taşındı: dal `test/post-translate-dev11`.
+- **Test 1 (run 40869591813):** Menüde "Translate" çıkıyor, ama İngilizce/Türkçe/Rusça her gönderide "The post is
+  already in the translation language". Muhtemel sebep: başlığın ikinci satırındaki tarih ("1 gün önce", uygulama dilinde)
+  gönderi metni sanılıyordu. Düzeltme `b039ec9f` (feat dalında; test dalında da): rakam içeren ≤30 karakterlik metinler
+  (tarih, sayaç) aday değil. Test APK: youtube-morphe run 40871795768.
+- **Debug log satırları:** "Post text:", "Other post text:" (yol bilgisiyle), "Translation to .. is the same text", "Text drawable ... layout: ... text: ...",
   "The translation can not be shown in place", "Replaced post text with its translation".
 - **Dosyalar:** `PostTranslatePatch.java` (yeni), `FlyoutUtils.java`, `FeedVideoCardsPatch.java`, `Settings.java`,
   `patches/.../interaction/posttranslate/PostTranslatePatch.kt` (yeni), `strings.xml`, `arrays.xml`.
