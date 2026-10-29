@@ -89,6 +89,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Düzeltme `3366aa72`: kalıp dille saklanıyor (`dil|kalıp`, dil = view kaynaklarının ilk locale'i; eski değer/başka dil
   = öğrenilmemiş, şekil + süre rozeti ile çalışır); küçük resim yalnızca üstünde harfli metin varsa (gönderi) aşağıda
   sayılıyor, yoksa üstte (kare de olsa). Test: youtube-morphe run 40931504323, derleme kontrolü run 40931498980.
+- **Test 2 + PR (2026-10-29):** Kullanıcı onayladı (her dilde buton hemen görünüyor, kare ve gömülü doğru). Upstream
+  `dev` `82103d36` üzerinde tek commit `a647f8ae`, `fix/feed-video-actions` force-push; karşılaştırma bağlantısı verildi.
+- **Filtre çipleri:** Kullanıcı buldu: YouTube hesabı yeni üst sekme düzenine (Ana Sayfa/Abonelikler/Müzik/Canlı)
+  almış, "Disable toolbar navigation tabs" ayarı açıkken filtreler gizleniyordu; kapatınca düzeldi (upstream ayarı).
 - **Upstream kaynaklı olabilecekler:** Ana sayfa filtre çipleri (Tümü/Müzik) kayboldu; Abonelikler'de kartlar
   arası boşluk kapanıyor. Logda `FeedCardLayoutPatch` ("Feed card layout") ve `ClassicSubscriptionsLayoutPatch`
   var; bizim yamalar yalnızca overlay çiziyor. Kullanıcıdan ilgili ayarları kapatıp denemesi istendi.
