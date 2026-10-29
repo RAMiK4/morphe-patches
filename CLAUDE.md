@@ -73,6 +73,29 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-29: YouTube "Translate posts" yaması (gönderi çevirisi)
+
+- **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi. PR metni kullanıcı "her şey tamam" diyene kadar verilmeyecek.
+- **Dal:** `feat/post-translate`, upstream `dev` (`2b92ceb2`) üzerinde, commit `d3d41312`.
+- **Test derlemesi:** youtube-morphe run 40867787486 (`patches_source=RAMiK4/morphe-patches@feat/post-translate`,
+  publish kapalı, artifact `test-build`). Derleme kontrolü: morphe-patches run 40867761359.
+- **Ne yapıyor:** Metinli gönderilerin ⋮ menüsüne "Translate" ekler; çeviri (paylaşılan `TextTranslator`, gtx)
+  metnin Litho text drawable'ına yeni bir StaticLayout verilerek yerinde gösterilir (aynı satır sayısı, sığmazsa "…").
+  Tekrar menüde "Show original". Litho drawable'ı yeniden bağlarsa `FeedVideoCardsPatch.onRootLaidOut` üzerinden
+  çeviri yeniden uygulanır; Litho metni yeniden oluşturursa `hookLithoSpannableString` ile çeviri döner.
+  Çeviri alınamazsa metin Google Translate'e (ACTION_PROCESS_TEXT), yoksa paylaşım menüsüne gönderilir.
+  Drawable bulunamazsa çeviri diyalogda gösterilir. Ayarlar: Feed ekranı, aç/kapat + hedef dil (varsayılan uygulama dili).
+- **Nasıl buluyor:** Gönderi elemanının (identifier'da "post") tüm metinleri (satır sonlu olanlar dahil, ProtoNode
+  bunları metin saymıyor) saklanır; kesik metin başlangıcıyla eşleştirilir. Gönderi metni = başlık satırının
+  (en üstteki metin: kanal adı/tarih) altındaki ilk eşleşen metin. Menü butonundan yukarı doğru host'lar taranır (raflar için).
+  Text drawable'lar ComponentHost alanlarında yansıma ile (BFS, derinlik 5, en çok 2000 nesne) aranır.
+- **Belirsizlikler:** Text drawable'ın alanları (Layout/CharSequence) bulunabiliyor mu; başlık sezgisi doğru mu
+  (yalnızca görselli gönderide öğe çıkmamalı); yerinde çevirinin kaydırınca korunması.
+- **Debug log satırları:** "Post text:", "Other post text:" (yol bilgisiyle), "Text drawable ... layout: ... text: ...",
+  "The translation can not be shown in place", "Replaced post text with its translation".
+- **Dosyalar:** `PostTranslatePatch.java` (yeni), `FlyoutUtils.java`, `FeedVideoCardsPatch.java`, `Settings.java`,
+  `patches/.../interaction/posttranslate/PostTranslatePatch.kt` (yeni), `strings.xml`, `arrays.xml`.
+
 ### 2026-10-26: YouTube "Channel search" yamasına gönderi araması
 
 - **Durum:** Upstream `dev` (`f4c1f84`, 1.49.0-dev.6) üzerinde ilk test derlemesi hazır, cihazda henüz test edilmedi.
