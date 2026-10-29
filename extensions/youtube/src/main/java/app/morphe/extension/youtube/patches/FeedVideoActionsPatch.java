@@ -116,6 +116,14 @@ public final class FeedVideoActionsPatch {
     private static final int BADGE_PRESSED_ALPHA = 0xFF;
     private static final int BADGE_ICON_COLOR = 0xFFFFFFFF;
 
+    /** Space between the duration badge and the bottom of the thumbnail. */
+    private static final int DURATION_BOTTOM_MARGIN_DP = 8;
+    /**
+     * The menu button of a video with the thumbnail at the top is at most this far below the
+     * thumbnail. The menu button of a video in a post, below the text of the post, is further.
+     */
+    private static final int MAX_MENU_BUTTON_BELOW_THUMBNAIL_DP = 64;
+
     /** Movement of the video on the screen that cancels a long press. */
     private static final int HOST_MOVE_TOLERANCE_DP = 2;
 
@@ -200,6 +208,8 @@ public final class FeedVideoActionsPatch {
         WeakReference<View> menuButtonRef = new WeakReference<>(null);
         final WatchLaterBadge badge = new WatchLaterBadge();
         boolean badgeAdded;
+        /** Top of the thumbnail in the host, or -1 if it is not known. */
+        int thumbnailTop = -1;
 
         @Nullable
         View getMenuButton() {
@@ -209,9 +219,9 @@ public final class FeedVideoActionsPatch {
 
         void placeBadge(ComponentHost host) {
             final int size = dp(host, BADGE_SIZE_DP);
-            final int margin = dp(host, BADGE_MARGIN_DP);
+            final int top = thumbnailTop + dp(host, BADGE_MARGIN_DP);
             final int right = host.getWidth() - dp(host, BADGE_RIGHT_MARGIN_DP);
-            badge.setBounds(right - size, margin, right, margin + size);
+            badge.setBounds(right - size, top, right, top + size);
             badge.hostRef = new WeakReference<>(host);
             if (!badgeAdded) {
                 host.getOverlay().add(badge);
@@ -402,6 +412,67 @@ public final class FeedVideoActionsPatch {
     }
 
     /**
+     * @return The bottom of the lowest duration badge in the host, or -1 if none is shown.
+     */
+    private static int findDurationBottom(ComponentHost root, View view, Rect rect) {
+        int bottom = -1;
+        List<CharSequence> texts = null;
+        if (view instanceof ComponentHost host) {
+            TextContent textContent = host.getTextContent();
+            if (textContent != null) {
+                texts = textContent.getTextItems();
+            }
+        } else if (view instanceof TextView textView) {
+            texts = List.of(textView.getText());
+        }
+
+        if (texts != null) {
+            for (CharSequence text : texts) {
+                if (text != null && DURATION_PATTERN.matcher(text.toString().trim()).matches()) {
+                    rect.set(0, 0, view.getWidth(), view.getHeight());
+                    if (view != root) {
+                        root.offsetDescendantRectToMyCoords(view, rect);
+                    }
+                    bottom = Math.max(bottom, rect.bottom);
+                    break;
+                }
+            }
+        }
+
+        if (view instanceof ViewGroup group) {
+            for (int i = 0, count = group.getChildCount(); i < count; i++) {
+                View child = group.getChildAt(i);
+                if (child.getVisibility() == View.VISIBLE) {
+                    bottom = Math.max(bottom, findDurationBottom(root, child, rect));
+                }
+            }
+        }
+        return bottom;
+    }
+
+    /**
+     * The thumbnail of a video card is at the top, but the video of a post is below the
+     * header and the text of the post. The duration badge is at the bottom of the thumbnail.
+     *
+     * @return The top of the thumbnail in the host, or -1 if it is not known.
+     */
+    private static int findThumbnailTop(ComponentHost host, View menuButton) {
+        final int thumbnailHeight = Math.round(host.getWidth() * THUMBNAIL_RATIO);
+        Rect rect = new Rect();
+        final int durationBottom = findDurationBottom(host, host, rect);
+        if (durationBottom >= 0) {
+            final int top = durationBottom + dp(host, DURATION_BOTTOM_MARGIN_DP) - thumbnailHeight;
+            // A thumbnail at the top, which can be inset from the edges of the card.
+            return top < thumbnailHeight / 2 ? 0 : top;
+        }
+
+        // Live videos have no duration.
+        rect.set(0, 0, menuButton.getWidth(), menuButton.getHeight());
+        host.offsetDescendantRectToMyCoords(menuButton, rect);
+        return rect.top <= thumbnailHeight + dp(host, MAX_MENU_BUTTON_BELOW_THUMBNAIL_DP) ? 0 : -1;
+    }
+
+    /**
      * The description of the menu button contains the title of its video, such as
      * "Action menu: [title]", so it differs on every video. The texts of the video are
      * removed from it, and what remains is the same on every video.
@@ -557,9 +628,21 @@ public final class FeedVideoActionsPatch {
             card = new VideoCard();
             cards.put(host, card);
         }
+        final boolean sameMenuButton = card.menuButtonRef.get() == menuButton;
         card.menuButtonRef = new WeakReference<>(menuButton);
         if (WATCH_LATER_BUTTON) {
-            card.placeBadge(host);
+            final int thumbnailTop = findThumbnailTop(host, menuButton);
+            // Litho mounts only the part of a card that is shown, so the duration badge
+            // may not be mounted. The thumbnail of the same video does not move.
+            if (thumbnailTop >= 0 || card.thumbnailTop < 0 || !sameMenuButton) {
+                card.thumbnailTop = thumbnailTop;
+            }
+            if (card.thumbnailTop >= 0) {
+                card.placeBadge(host);
+            } else if (card.badgeAdded) {
+                host.getOverlay().remove(card.badge);
+                card.badgeAdded = false;
+            }
         }
         return card;
     }
