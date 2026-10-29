@@ -85,6 +85,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `ProtoNode.texts()` (metin alanları + satır sonlu metinler, sırayla); `PostImageDownloadPatch` artık bu listeyi kullanıyor.
 - **Dal:** `fix/post-image-download` (upstream `dev` `de2d7e94` üzerinde, commit `93029b31`). Derleme kontrolü run 40906549850.
 - **Test:** dal `test/post-fixes-dev11` (= `test/post-translate-dev11` + bu düzeltme), youtube-morphe run 40906555399.
+- **Test 1 (2026-10-29):** Kullanıcı onayladı: BBC, Netflix, TRT1 vb. yüzlerce gönderide akışta ve kanal sayfasında
+  buton ve menü var, indirilen resimler doğru. Tek istisna: yalnızca tek emoji metinli resimli gönderi (emoji 2-3
+  karakter, MIN_TEXT_LENGTH=4 altında; eşleşme için skor ≥2 gerekiyor). Düzeltme `7f7db1ea`: yalnızca emoji/sembol
+  (harf/rakam yok, en az bir So karakteri) içeren kısa metinler de sayılıyor. Test APK: youtube-morphe run 40911435183.
+  Kullanıcı: mevcut hâli bozmadan çözülemiyorsa olduğu gibi kalabilir. PR'da iki commit tek commit'e sıkıştırılacak.
 
 ### 2026-10-29: YouTube "Translate posts" yaması (gönderi çevirisi)
 
