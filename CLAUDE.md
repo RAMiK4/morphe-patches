@@ -73,6 +73,21 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-29: Return YouTube Dislike akış beğeni rozeti kararlılığı
+
+- **PR durumu:** Çeviri ve Download post images PR'ları bakımcı tarafından birleştirildi; Feed video actions PR'ı açıldı.
+- **Kod:** `FeedEngagementCountsPatch.java` (upstream'de; bizim `de420c27`/fork `28efd7a4` yerleşim eklememiz dahil).
+- **Gözlem:** Logda ~600 "Duration badge not found ... thumbnail: Rect" (FeedViewCountPatch.findThumbnailFrame); süre
+  çoğu kez tüm küçük resmin host'unda çiziliyor. Rozet süre varsa onun üstüne, yoksa küçük resimden tahminle
+  konuyor; iki yol arasında gidip gelince zıplıyor. Ayrıca kart yeniden yerleşirken video bir an bulunamazsa
+  rozet kaldırılıp yeniden ekleniyor (yanıp sönme).
+- **Düzeltme `009d6f8d`** (dal `fix/feed-engagement-counts`, upstream `dev` `82103d36`): video bir an bulunamazsa,
+  kart ayrılmadıysa ve yeniden kontrol bekliyorsa (`FeedVideoCardsPatch.isRetryPending`) rozet korunuyor; aynı video
+  ve aynı genişlikte süreye göre bulunan yer saklanıp süre bulunamadığında kullanılıyor.
+  Test: youtube-morphe run 40943783037, derleme kontrolü run 40943777993.
+- **Açık:** Kare müzik videosunda (INNA) rozet hiç yoktu; sebep bilinmiyor (log gerekli).
+- **Abonelikler yapışma:** "Disable toolbar navigation tabs" kapalıyken de oluyor; kaynak hâlâ belli değil.
+
 ### 2026-10-29: Feed video actions düzeltmeleri
 
 - **Download post images PR'ı:** Kullanıcı upstream'e açtı (2026-10-29). Çeviri PR'ı da açılmıştı.
