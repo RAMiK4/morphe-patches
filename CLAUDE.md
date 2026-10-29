@@ -85,8 +85,16 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   kart ayrılmadıysa ve yeniden kontrol bekliyorsa (`FeedVideoCardsPatch.isRetryPending`) rozet korunuyor; aynı video
   ve aynı genişlikte süreye göre bulunan yer saklanıp süre bulunamadığında kullanılıyor.
   Test: youtube-morphe run 40943783037, derleme kontrolü run 40943777993.
-- **Açık:** Kare müzik videosunda (INNA) rozet hiç yoktu; sebep bilinmiyor (log gerekli).
-- **Abonelikler yapışma:** "Disable toolbar navigation tabs" kapalıyken de oluyor; kaynak hâlâ belli değil.
+- **Test 1 (run 40943783037):** Taze açılışta aramada ve gönderi videolarında (KanalD) rozet hızlıca yanıp sönüyordu,
+  yeniden açılışta yok. Kare müzik videolarında artık çıkıyor. Başka sayfalarda gezinip ana sayfaya dönünce rozet
+  kayboluyor. Sebep (tahmin): `FeedVideoCardsPatch.textVideoIds` (4000 metin, LRU) başka sayfaların metinleriyle
+  doluyor, akış öğeleri yeniden ayrıştırılmadan gösterilince kartlar eşleşmiyor. Düzeltme `d7b1da32`: bulunan kartların
+  ≥20 karakterlik metinleri ayrı bir haritada (1000, çakışmada AMBIGUOUS) tutuluyor; ana haritada hiç eşleşme yoksa
+  bu haritadan en az iki metin aynı videoyu göstermeli. Test: youtube-morphe run 40950420057, kontrol run 40950414491.
+- **Tasarım gereği:** Yana kaydırmalı raflarda (Yeniden dinleyin, En alakalı vb.) rozet ve Daha sonra izle yok
+  (`hasHorizontalList`). Eklenmesi yeni özellik; kullanıcıya soruldu.
+- **Abonelikler yapışma:** Video kartından sonra gelen gönderide boşluk kayboluyor (gezinip dönünce). "Feed card
+  layout" (upstream, 0xrxL) kart şablonlarını değiştiriyor; bizim yamalar yalnızca overlay çiziyor. Upstream'e bildirilebilir.
 
 ### 2026-10-29: Feed video actions düzeltmeleri
 
