@@ -209,9 +209,28 @@ public final class PostImageDownloadPatch {
     // region Elements
 
     private static boolean isPostText(String text) {
-        return text.length() >= MIN_TEXT_LENGTH
+        return (text.length() >= MIN_TEXT_LENGTH || isEmojiText(text))
                 && !text.contains(".eml")
                 && !text.startsWith("http");
+    }
+
+    /**
+     * @return If the text has only emojis or symbols, such as the text of a post that is a single emoji.
+     *         Short texts with letters or numbers, such as counts, are shown by many posts.
+     */
+    private static boolean isEmojiText(String text) {
+        boolean hasSymbol = false;
+        for (int i = 0, length = text.length(); i < length; ) {
+            final int codePoint = text.codePointAt(i);
+            if (Character.isLetterOrDigit(codePoint)) {
+                return false;
+            }
+            if (Character.getType(codePoint) == Character.OTHER_SYMBOL) {
+                hasSymbol = true;
+            }
+            i += Character.charCount(codePoint);
+        }
+        return hasSymbol;
     }
 
     private static String normalize(String text) {
