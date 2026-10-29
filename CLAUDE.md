@@ -98,6 +98,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   already in the translation language". Muhtemel sebep: başlığın ikinci satırındaki tarih ("1 gün önce", uygulama dilinde)
   gönderi metni sanılıyordu. Düzeltme `b039ec9f` (feat dalında; test dalında da): rakam içeren ≤30 karakterlik metinler
   (tarih, sayaç) aday değil. Test APK: youtube-morphe run 40871795768.
+- **Test 2 (run 40871795768):** Çeviri çalışıyor, metin yerinde değişiyor. Sorun: çeviri koyu/siyah renkte çiziliyordu
+  (YouTube rengi paint'e değil ForegroundColorSpan'e veriyor). Düzeltme `7a1eb089` (feat dalı; test dalında da):
+  orijinal metnin tümünü kaplayan stil span'ları (link/görsel hariç) çeviriye kopyalanıyor, yoksa ilk harfin rengi.
+  Test APK: youtube-morphe run 40874188309.
 - **Debug log satırları:** "Post text:", "Other post text:" (yol bilgisiyle), "Translation to .. is the same text", "Text drawable ... layout: ... text: ...",
   "The translation can not be shown in place", "Replaced post text with its translation".
 - **Dosyalar:** `PostTranslatePatch.java` (yeni), `FlyoutUtils.java`, `FeedVideoCardsPatch.java`, `Settings.java`,
