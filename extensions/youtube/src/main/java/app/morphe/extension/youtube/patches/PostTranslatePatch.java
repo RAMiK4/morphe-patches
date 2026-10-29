@@ -18,11 +18,15 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextDirectionHeuristics;
 import android.text.TextUtils;
+import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.text.style.ReplacementSpan;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
@@ -367,12 +371,54 @@ public final class PostTranslatePatch {
             }
             if (translation != null) {
                 Logger.printDebug(() -> "Replaced post text with its translation");
-                return new SpannableString(translation);
+                return createTranslationText(text, translation);
             }
         } catch (Exception ex) {
             Logger.printException(() -> "onLithoTextLoaded failure", ex);
         }
         return text;
+    }
+
+    /**
+     * @return The translation with the styles of the original text, such as its color,
+     *         which the app gives to the text as spans and not to the paint.
+     *         Links and images are not used, as they are not in the translation.
+     */
+    private static SpannableString createTranslationText(CharSequence original, String translation) {
+        SpannableString text = new SpannableString(translation);
+        if (!(original instanceof Spanned spanned) || translation.isEmpty()) {
+            return text;
+        }
+        final int length = spanned.length();
+        final int end = translation.length();
+        boolean hasColor = false;
+        for (CharacterStyle span : spanned.getSpans(0, length, CharacterStyle.class)) {
+            if (isLinkOrImage(span) || spanned.getSpanStart(span) > 0 || spanned.getSpanEnd(span) < length) {
+                continue;
+            }
+            text.setSpan(span, 0, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            hasColor |= span instanceof ForegroundColorSpan;
+        }
+        if (!hasColor) {
+            // The color of the first letter, if the text has many colors, such as the color of links.
+            for (int i = 0; i < length; i++) {
+                if (!Character.isLetter(spanned.charAt(i))) {
+                    continue;
+                }
+                for (ForegroundColorSpan span : spanned.getSpans(i, i + 1, ForegroundColorSpan.class)) {
+                    if (!isLinkOrImage(span)) {
+                        text.setSpan(span, 0, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return text;
+    }
+
+    private static boolean isLinkOrImage(Object span) {
+        return span instanceof ClickableSpan || span instanceof ImageSpan || span instanceof ReplacementSpan;
     }
 
     @Nullable
@@ -605,7 +651,7 @@ public final class PostTranslatePatch {
                 return false;
             }
 
-            SpannableString translationText = new SpannableString(translation);
+            SpannableString translationText = createTranslationText(text, translation);
             Layout translatedLayout = createLayout(layout, translationText);
             translated = new TranslatedDrawable(layout, text, translatedLayout, key);
             for (Field spanField : fields.spans()) {
@@ -646,7 +692,8 @@ public final class PostTranslatePatch {
                 }
             } else {
                 // The translation was created by Litho.
-                SpannableString originalText = new SpannableString(original);
+                SpannableString originalText = createTranslationText(
+                        (CharSequence) fields.text().get(drawable), original);
                 fields.layout().set(drawable, createLayout(layout, originalText));
                 fields.text().set(drawable, originalText);
             }
