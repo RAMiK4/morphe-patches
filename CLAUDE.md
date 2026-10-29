@@ -75,7 +75,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 ### 2026-10-29: Download post images: kararsız eşleşme düzeltmesi
 
-- **Durum:** Düzeltme yazıldı, cihazda test bekleniyor. Kullanıcı: bozma riski varsa olduğu gibi bırak.
+- **Durum:** Tamamlandı, PR hazır (kullanıcı açacak).
 - **Belirti:** Birçok resimli gönderide buton/menü öğesi çıkmıyor (BBC Mundo: uzun metin + birkaç 4:5 resim, onlarca
   gönderiden birkaçında; Netflix Korea; akışta çıkan buton gönderi açılınca (1:1 resimler) yok).
 - **Kök neden (tahmin):** `ProtoNode` satır sonu içeren metinleri metin saymıyor; çok paragraflı gönderilerin asıl metni
@@ -90,6 +90,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   karakter, MIN_TEXT_LENGTH=4 altında; eşleşme için skor ≥2 gerekiyor). Düzeltme `7f7db1ea`: yalnızca emoji/sembol
   (harf/rakam yok, en az bir So karakteri) içeren kısa metinler de sayılıyor. Test APK: youtube-morphe run 40911435183.
   Kullanıcı: mevcut hâli bozmadan çözülemiyorsa olduğu gibi kalabilir. PR'da iki commit tek commit'e sıkıştırılacak.
+- **Test 2 + PR (2026-10-29):** Kullanıcı onayladı (emojili gönderi dahil hepsi çalışıyor). Upstream `dev` `de2d7e94`
+  üzerinde tek commit `01b648cf`, `fix/post-image-download` force-push. Kullanıcıya karşılaştırma bağlantısı verildi,
+  PR'ı kendisi açacak. Sıradaki: Feed video actions (gömülü videoda Daha sonra izle butonunun yukarı kayması), sonra RYD.
 
 ### 2026-10-29: YouTube "Translate posts" yaması (gönderi çevirisi)
 
