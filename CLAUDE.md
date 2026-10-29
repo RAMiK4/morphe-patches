@@ -102,6 +102,13 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   (YouTube rengi paint'e değil ForegroundColorSpan'e veriyor). Düzeltme `7a1eb089` (feat dalı; test dalında da):
   orijinal metnin tümünü kaplayan stil span'ları (link/görsel hariç) çeviriye kopyalanıyor, yoksa ilk harfin rengi.
   Test APK: youtube-morphe run 40874188309.
+- **Test 3 (run 40874188309, 2026-10-29):** Kullanıcı onayladı: renk doğru, kaydırınca çeviri kalıyor, metinsiz/yalnız
+  emojili gönderilerde öğe çıkmıyor. PR dalı `feat/post-translate` (`d3d41312`, `b039ec9f`, `7a1eb089`). PR metni için
+  kullanıcının "her şey tamam" demesi bekleniyor.
+- **Kullanıcının bildirdiği başka yamalardaki sorunlar (bu PR'ın konusu değil):** (1) Download post images: birçok resimli
+  gönderide buton/menü öğesi bazen çıkmıyor, sonraki kontrolde çıkıyor (eşleşme kararsız). (2) Gömülü videolu gönderilerde
+  video kartındaki Daha sonra izle butonu (Feed video actions) yukarı kayıp gönderinin ⋮ menüsünün üstüne biniyor
+  (Yandex, Honor kanalları). (3) Aynı kartlarda beğeni rozeti nadiren titriyor (Feed engagement counts / RYD).
 - **Debug log satırları:** "Post text:", "Other post text:" (yol bilgisiyle), "Translation to .. is the same text", "Text drawable ... layout: ... text: ...",
   "The translation can not be shown in place", "Replaced post text with its translation".
 - **Dosyalar:** `PostTranslatePatch.java` (yeni), `FlyoutUtils.java`, `FeedVideoCardsPatch.java`, `Settings.java`,
