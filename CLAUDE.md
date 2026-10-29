@@ -73,6 +73,23 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-29: Feed video actions düzeltmeleri
+
+- **Download post images PR'ı:** Kullanıcı upstream'e açtı (2026-10-29). Çeviri PR'ı da açılmıştı.
+- **Sorun 1 (düzeltme yazıldı):** Gömülü videolu gönderilerde (Honor, Yandex) Daha sonra izle butonu gönderinin ⋮
+  menüsünün üstünde. Sebep: buton hep kök host'un üst sağına konuyordu; gönderide video başlık+metnin altında.
+  Düzeltme `cba5fb5d` (dal `fix/feed-video-actions`, upstream `dev` `a3b34d75` üzerinde): küçük resmin üstü süre
+  rozetinin altından hesaplanıyor (alt boşluk 8dp, yükseklik genişlik×9/16; üst yarıdaysa 0 = eski davranış); süre
+  yoksa (canlı) menü butonu küçük resmin ≤64dp altındaysa 0, değilse buton gösterilmiyor. Süre rozeti mount edilmemişse
+  aynı menü butonu için önceki değer kullanılıyor. Test: `test/post-fixes-dev11` + bu commit, youtube-morphe run 40922117770.
+  Derleme kontrolü run 40922112366.
+- **Sorun 2 (araştırılacak, log gerekli):** İngilizce/Rusça uygulama dilinde açılışta Daha sonra izle butonu ve RYD
+  beğeni rozeti bazen hiç görünmüyor, birkaç kez çıkıp girince düzeliyor; Türkçede yok. Şüphe: öğrenilmiş menü butonu
+  açıklama kalıbı (`morphe_feed_menu_button_description`) dile bağlı; dil değişince eşleşmiyor olabilir.
+- **Sorun 3 (araştırılacak):** Abonelikler akışında uygulamada uzun kalınca iki içerik arası boşluk kapanıyor,
+  yeniden başlatınca düzeliyor. Kaynağı belli değil.
+- **Sorun 4:** RYD beğeni rozetinde nadiren titreme (bizim RYD eklememiz, fork `dev` `28efd7a4`).
+
 ### 2026-10-29: Download post images: kararsız eşleşme düzeltmesi
 
 - **Durum:** Tamamlandı, PR hazır (kullanıcı açacak).
