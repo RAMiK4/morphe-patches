@@ -73,6 +73,19 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-10-29: Download post images: kararsız eşleşme düzeltmesi
+
+- **Durum:** Düzeltme yazıldı, cihazda test bekleniyor. Kullanıcı: bozma riski varsa olduğu gibi bırak.
+- **Belirti:** Birçok resimli gönderide buton/menü öğesi çıkmıyor (BBC Mundo: uzun metin + birkaç 4:5 resim, onlarca
+  gönderiden birkaçında; Netflix Korea; akışta çıkan buton gönderi açılınca (1:1 resimler) yok).
+- **Kök neden (tahmin):** `ProtoNode` satır sonu içeren metinleri metin saymıyor; çok paragraflı gönderilerin asıl metni
+  kaydedilmiyordu. Eşleşme kısa metinlere (kanal adı vb.) kalıyor, kanal sayfasında/açık gönderide kanal adı birden çok
+  gönderide geçtiği için AMBIGUOUS oluyor.
+- **Düzeltme:** `ProtoNode.getMultiLineText()` (yerinde bayt taraması, mesaj etiketiyle başlayanlar hariç) ve
+  `ProtoNode.texts()` (metin alanları + satır sonlu metinler, sırayla); `PostImageDownloadPatch` artık bu listeyi kullanıyor.
+- **Dal:** `fix/post-image-download` (upstream `dev` `de2d7e94` üzerinde, commit `93029b31`). Derleme kontrolü run 40906549850.
+- **Test:** dal `test/post-fixes-dev11` (= `test/post-translate-dev11` + bu düzeltme), youtube-morphe run 40906555399.
+
 ### 2026-10-29: YouTube "Translate posts" yaması (gönderi çevirisi)
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi. PR metni kullanıcı "her şey tamam" diyene kadar verilmeyecek.
