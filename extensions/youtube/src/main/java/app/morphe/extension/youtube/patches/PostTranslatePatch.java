@@ -100,6 +100,8 @@ public final class PostTranslatePatch {
     private static final int MIN_TEXT_LENGTH = 2;
     /** A shown text cut off this far or further is the start of a post text. */
     private static final int MIN_CUT_OFF_LENGTH = 20;
+    /** Dates and counts of a post, such as "2 days ago", are not longer than this. */
+    private static final int MAX_METADATA_LENGTH = 30;
     private static final int MAX_TEXTS = 3000;
     private static final int MAX_TRANSLATIONS = 100;
     /** Depth of the fields of a host that are searched for its text drawables. */
@@ -114,6 +116,7 @@ public final class PostTranslatePatch {
     /** The shown text can join the lines of the post text, or show invisible format characters. */
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\\s\\p{Cf}]+");
     private static final Pattern LETTER_PATTERN = Pattern.compile("\\p{L}");
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("\\p{Nd}");
 
     /** Normalized text of a post element -> the text with its line breaks. Oldest texts are removed first. */
     @GuardedBy("itself")
@@ -196,6 +199,14 @@ public final class PostTranslatePatch {
                 && !text.contains(".eml")
                 && !text.startsWith("http")
                 && LETTER_PATTERN.matcher(text).find();
+    }
+
+    /**
+     * @return If the text is a short text with a number, such as the date of the post
+     *         or the count of its likes, which is shown in the language of the app.
+     */
+    private static boolean isMetadataText(String text) {
+        return text.length() <= MAX_METADATA_LENGTH && DIGIT_PATTERN.matcher(text).find();
     }
 
     /**
@@ -695,7 +706,7 @@ public final class PostTranslatePatch {
                     continue;
                 }
                 original = findPostText(text);
-                if (original == null) {
+                if (original == null || isMetadataText(original)) {
                     continue;
                 }
                 key = normalize(original);
@@ -946,6 +957,7 @@ public final class PostTranslatePatch {
                     return;
                 }
                 if (normalize(translated).equals(key)) {
+                    Logger.printDebug(() -> "Translation to " + language + " is the same text: " + key);
                     Utils.showToastShort(str("morphe_post_translate_same_language"));
                     return;
                 }
