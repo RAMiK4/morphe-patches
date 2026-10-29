@@ -790,6 +790,8 @@ public final class FeedVideoCardsPatch {
 
     /** Root host -> number of checks since its last layout. Used only on the main thread. */
     private static final Map<ComponentHost, Integer> retries = new WeakHashMap<>();
+    /** Cards that are checked again after a delay. Used only on the main thread. */
+    private static final Map<ComponentHost, Boolean> pendingRetries = new WeakHashMap<>();
 
     /**
      * Root hosts that are checked again when the list scrolls. Litho mounts only the part of a card
@@ -847,6 +849,14 @@ public final class FeedVideoCardsPatch {
     }
 
     /**
+     * @return If the card is checked again later, such as while its video is not found yet.
+     *         Must be called on the main thread.
+     */
+    public static boolean isRetryPending(ComponentHost root) {
+        return pendingRetries.containsKey(root);
+    }
+
+    /**
      * Checks the card again a little later, such as when what is drawn on it was not found yet,
      * and when the list scrolls while the card is partly shown.
      * Must be called on the main thread.
@@ -862,7 +872,9 @@ public final class FeedVideoCardsPatch {
             return partlyShown;
         }
         retries.put(root, attempt + 1);
+        pendingRetries.put(root, Boolean.TRUE);
         root.postDelayed(() -> {
+            pendingRetries.remove(root);
             if (root.isAttachedToWindow()) {
                 scheduleUpdate(root);
             }
