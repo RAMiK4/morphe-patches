@@ -91,6 +91,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   doluyor, akış öğeleri yeniden ayrıştırılmadan gösterilince kartlar eşleşmiyor. Düzeltme `d7b1da32`: bulunan kartların
   ≥20 karakterlik metinleri ayrı bir haritada (1000, çakışmada AMBIGUOUS) tutuluyor; ana haritada hiç eşleşme yoksa
   bu haritadan en az iki metin aynı videoyu göstermeli. Test: youtube-morphe run 40950420057, kontrol run 40950414491.
+- **Test 2 + PR (2026-10-29):** Kullanıcı: yanıp sönme yok, genel olarak daha stabil; çok gezinip dönünce bazı
+  rozetler hâlâ kayboluyor, kaydırınca geri geliyor (kabul edildi; "ana sayfa yeniden yüklenmesin" ayarı açık).
+  Raflara eklenmeyecek (kullanıcı kararı). Upstream `dev` `ba1ac737` üzerinde tek commit `dd9240f0`,
+  `fix/feed-engagement-counts` force-push; karşılaştırma bağlantısı verildi.
 - **Tasarım gereği:** Yana kaydırmalı raflarda (Yeniden dinleyin, En alakalı vb.) rozet ve Daha sonra izle yok
   (`hasHorizontalList`). Eklenmesi yeni özellik; kullanıcıya soruldu.
 - **Abonelikler yapışma:** Video kartından sonra gelen gönderide boşluk kayboluyor (gezinip dönünce). "Feed card
