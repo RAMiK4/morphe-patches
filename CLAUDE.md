@@ -105,6 +105,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Test 3 (run 40874188309, 2026-10-29):** Kullanıcı onayladı: renk doğru, kaydırınca çeviri kalıyor, metinsiz/yalnız
   emojili gönderilerde öğe çıkmıyor. PR dalı `feat/post-translate` (`d3d41312`, `b039ec9f`, `7a1eb089`). PR metni için
   kullanıcının "her şey tamam" demesi bekleniyor.
+- **PR hazır (2026-10-29):** Kullanıcı "her şey tamam" dedi. Upstream `dev` force-push ile yeniden yazılmıştı; değişiklikler
+  yeni `dev` (`f049c91c`) üzerine tek commit `c97cc4ef` olarak taşındı (teşhis için eklenen debug yol kaydı çıkarıldı),
+  `feat/post-translate` force-push. Kullanıcıya karşılaştırma bağlantısı verildi, PR'ı kendisi açacak.
+- **Sıradaki işler (kullanıcının kararı):** aşağıdaki üç sorun bizim yamalarımızda düzeltilecek: Download post images,
+  Feed video actions ve Return YouTube Dislike'a bizim eklediğimiz özellik (fork `dev`'deki `28efd7a4`).
 - **Kullanıcının bildirdiği başka yamalardaki sorunlar (bu PR'ın konusu değil):** (1) Download post images: birçok resimli
   gönderide buton/menü öğesi bazen çıkmıyor, sonraki kontrolde çıkıyor (eşleşme kararsız). (2) Gömülü videolu gönderilerde
   video kartındaki Daha sonra izle butonu (Feed video actions) yukarı kayıp gönderinin ⋮ menüsünün üstüne biniyor
