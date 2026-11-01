@@ -73,6 +73,18 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-01: Patches update notice: dev sürümleri ayarı (PR 4178 açık)
+
+- **PR:** https://github.com/MorpheApp/morphe-patches/pull/4178 (dal `feat/patch-update-notification`, ilk commit `88e9ce6b`).
+- **Yorumlar (Stark-0505, prat89, MarcaDian):** dev sürümleri neredeyse her gün çıktığı için bildirim yalnızca kararlı
+  sürümlerde olmalı; dev isteyen ayardan seçebilmeli; hiç istemeyen kapatabilmeli (ana ayar zaten varsayılan kapalı).
+- **Değişiklik `a2f4b76f`:** "Include dev releases" alt ayarı (`morphe_patches_update_notice_dev_releases`, varsayılan
+  kapalı, ana ayara bağlı). Eskiden dev yamalarında dev sürümleri otomatik dahildi (`Utils.isPreReleasePatches`).
+  Önbellek ayarı da saklıyor; ayar değişince veya yamalar değişince saatlik bekleme olmadan yeniden kontrol.
+- **Test:** `test/patch-update-notice-preview` (1.49.0-dev.10 bildiriyor; v2.0.0 kararlı olduğu için varsayılanla
+  bildirim çıkmalı, ayar açılınca 2.1.0-dev.x), youtube-morphe run 41303615067, derleme kontrolü run 41303617047.
+  Kullanıcı testi bekleniyor; sonra PR'a yorumculara yanıt yazılabilir.
+
 ### 2026-10-29: Return YouTube Dislike akış beğeni rozeti kararlılığı
 
 - **PR durumu:** Çeviri ve Download post images PR'ları bakımcı tarafından birleştirildi; Feed video actions PR'ı açıldı.
