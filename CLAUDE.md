@@ -88,6 +88,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   görünsün. Düzeltme `000590df`: ayarlar `noTitleUnsortedPreferenceCategory` içinde; bölüm başlıkları kalın, 1.15x ve altında
   ince çizgi (`RuleSpan`), maddeler tam boyutta, alt satırlar "• " genişliğine hizalı. Test: youtube-morphe run 41307447901,
   derleme kontrolü run 41307450058. Onaydan sonra PR'a yorumculara yanıt notu yazılacak.
+- **Test 2 (2026-11-01):** Kullanıcı onayladı. PR yorumu (3 ekran görüntülü tablo) metni verildi, kullanıcı ekleyecek.
 
 ### 2026-10-29: Return YouTube Dislike akış beğeni rozeti kararlılığı
 
