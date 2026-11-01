@@ -83,7 +83,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Önbellek ayarı da saklıyor; ayar değişince veya yamalar değişince saatlik bekleme olmadan yeniden kontrol.
 - **Test:** `test/patch-update-notice-preview` (1.49.0-dev.10 bildiriyor; v2.0.0 kararlı olduğu için varsayılanla
   bildirim çıkmalı, ayar açılınca 2.1.0-dev.x), youtube-morphe run 41303615067, derleme kontrolü run 41303617047.
-  Kullanıcı testi bekleniyor; sonra PR'a yorumculara yanıt yazılabilir.
+- **Test 1 (run 41303615067):** Kullanıcı onayladı: varsayılanla 2.0.0, dev ayarı açıkken 2.1.0-dev.5 gösteriliyor.
+  İstekler: iki ayar ayarlar ekranında alt alta olsun; değişiklik listesi youtube-morphe'deki güncelleme penceresi gibi
+  görünsün. Düzeltme `000590df`: ayarlar `noTitleUnsortedPreferenceCategory` içinde; bölüm başlıkları kalın, 1.15x ve altında
+  ince çizgi (`RuleSpan`), maddeler tam boyutta, alt satırlar "• " genişliğine hizalı. Test: youtube-morphe run 41307447901,
+  derleme kontrolü run 41307450058. Onaydan sonra PR'a yorumculara yanıt notu yazılacak.
 
 ### 2026-10-29: Return YouTube Dislike akış beğeni rozeti kararlılığı
 
