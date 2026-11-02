@@ -83,7 +83,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `hookLithoSpannableString` ile kaydediliyor; uzun basınca seçilebilir metinli pencere (CustomDialog,
   `setTextIsSelectable`) + "Copy all". Karşılaştırma boşluklar normalize edilerek, kesik metin başlangıçla.
   Tıklanabilir üst yoksa (açıklama) uzun basma metni çizen host'a konuyor.
-- **Test:** youtube-morphe run 41396885932, derleme kontrolü run 41396861644. Cihazda henüz denenmedi.
+- **Test 1 (run 41396885932):** Kullanıcı onayladı (akış, kanal Gönderiler, açıklama; seçim ve kopyalama çalışıyor).
+  Sorun: bağlantılar gönderide göründüğü gibi kısaltılmış ("site.com/ab...") geliyordu. Düzeltme `a0ee3f1d`:
+  `hookElement` ile post/açıklama elementlerindeki bağlantılar (YouTube `/redirect?q=` ise hedef) saklanıyor; pencerede
+  "..."/"…" ile biten kelime, şemasız başlangıcı eşleşen tam bağlantıyla değiştiriliyor (Copy all dahil).
+  Test: youtube-morphe run 41399215805, derleme kontrolü run 41399212631.
 
 ### 2026-11-01: Patches update notice: dev sürümleri ayarı (PR 4178 açık)
 
