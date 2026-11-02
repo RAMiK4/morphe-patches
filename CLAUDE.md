@@ -87,6 +87,13 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   bulanıklığı (`useNavigationBarBlur`) kapalı.
 - **Upstream değişikliği:** `DISABLE_TRANSLUCENT_NAVIGATION` artık yok (deprecated → `NAVIGATION_BAR_STYLE` enum:
   Default/Translucent/Transparent/Opaque). Ayar Opaque stilde kullanılamıyor (`GlassAvailability`), ikisi açıksa opak kazanıyor.
+- **Test 1 (run 41453301121):** Kapsül dışı saydam (YouTube'un çubuk arka planı `pivot_bar` arka plan drawable'ıymış),
+  ama kapsül dar: ikonlar üstten, etiketler alttan ve kenarlardan taşıyor; bulanıklık yok. Düzeltme `1e985afe`: kapsül
+  butonların tüm yüksekliği (üst 0, alt buton alanı + en çok 4dp), yatay 10dp; `pivot_bar`'a yatay padding 20dp (PreDraw
+  ile korunuyor, ray düzeninde geri veriliyor); YouTube'un arka planı (renk/opak değilse) kapsüle kırpılıp altta çiziliyor,
+  `useNavigationBarBlur` artık camı kapatmıyor → Yarı saydam stilde (Android 12+) gerçek bulanıklık. Dolgu bunun üstünde 1/3.
+  Hata olursa ("app background failure") YouTube arka planı bırakılıyor. Test: youtube-morphe run 41458468427,
+  derleme kontrolü run 41458461269.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
