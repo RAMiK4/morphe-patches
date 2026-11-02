@@ -93,6 +93,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   (BFS, derinlik 6, 400 nesne) URL/`/redirect?q=` aranıyor, gösterilen metin → bağlantı saklanıyor. Debug log:
   "Select text element links:", "Select text link:", "Select text link not found:", "Select text shortened link not found:".
   Test: youtube-morphe run 41404217677, derleme kontrolü run 41404214358.
+- **Test 3 + PR (2026-11-02):** Span yöntemi de çalışmadı; kullanıcı kararı: bağlantılar YouTube'da göründüğü gibi
+  kalsın, bağlantı kodları çıkarılsın. İlk sürüm upstream `dev` `b031d640` (v2.1.0-dev.6) üzerinde tek commit `2cbdb39e`,
+  `ccr-88e9ea31-1yc38m` force-push, derleme kontrolü run 41413681481 başarılı. Karşılaştırma bağlantısı verildi,
+  PR'ı kullanıcı açacak.
 
 ### 2026-11-01: Patches update notice: dev sürümleri ayarı (PR 4178 açık)
 
