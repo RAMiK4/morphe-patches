@@ -98,6 +98,12 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   bulanıklıksız. Yatay ekran ve sekme göstergesi çalışıyor. Logda hata yok ("Glass navigation bar applied", sekme
   değişimleri). Kapsül karanlık temada oldukça koyu (YouTube'un kendi tonu + bizim 1/3 dolgu); daha saydam olsun mu
   kullanıcıya soruldu. Aydınlık tema, mini oynatıcı, kaydırınca gizlenme, 3 tuşlu gezinme henüz test edilmedi.
+- **Test 3 (aydınlık, 3 tuş, Shorts):** Hata yok, yalnızca tasarım. Kullanıcı: daha saydam, dolgu kaldırılsın (liquid
+  glass'a en yakın). Düzeltme `b5849e58`: bulanık YouTube arka planı üstünde dolgu yok (Şeffaf stilde dolgu kalıyor),
+  karanlıkta parlaklık/kenar biraz güçlü. Soru: kapsül alta yapışık görünüyor, havada durabilir mi? Düzen değişmeden
+  yukarı taşınamaz (butonlar çubuğun tüm yüksekliğini dolduruyor; daha yukarısı çubuğu uzatmak = akış alt boşluğu/mini
+  oynatıcı riski). Teşhis için "Glass navigation bar applied" satırına yükseklik/alt padding/alt boşluk eklendi.
+  Test: youtube-morphe run 41464087817, derleme kontrolü run 41464082281.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
