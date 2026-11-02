@@ -135,6 +135,13 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `bfc10b0a`: PreDraw'da padding ≤ 10dp iken LayoutParams yüksekliği son ayarladığımızdan farklıysa oda yeniden veriliyor
   (döngü yok: sonuç aynıysa tekrar çağrılmaz). Debug: "Glass navigation bar height: a -> b". Test: youtube-morphe run
   41509136605, kontrol run 41509130682.
+- **Test 9 (run 41509136605):** Butonlar kapsülün içinde. Ama log: "bar height: X -> 203" 699 kez, X 168'den 1'e kadar →
+  YouTube otomatik gizlemede çubuğun LayoutParams yüksekliğini 168→0 canlandırıyor, biz her karede 203'e çekiyorduk.
+  Düzeltme `f091cef6`: yükseklik PreDraw'da değil, `PivotBar.onMeasure(II)` override'ında (addBridge, PROTECTED) ekleniyor:
+  EXACTLY yükseklik h için ek = alt padding − YouTube'un kendi odası (`appRoom`, `getNavigationBarBottomPadding` yolundan);
+  h < taban ise orantılı (animasyon bozulmuyor). Taban = apply anında LayoutParams yüksekliği − appRoom. Debug:
+  "Glass navigation bar base height:". Test: youtube-morphe run 41512912017, kontrol run 41512905810. Kullanıcı PR istedi,
+  bu testten sonra tek commit'e sıkıştırılıp karşılaştırma bağlantısı verilecek.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
