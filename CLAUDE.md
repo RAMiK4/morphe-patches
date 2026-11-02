@@ -94,6 +94,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `useNavigationBarBlur` artık camı kapatmıyor → Yarı saydam stilde (Android 12+) gerçek bulanıklık. Dolgu bunun üstünde 1/3.
   Hata olursa ("app background failure") YouTube arka planı bırakılıyor. Test: youtube-morphe run 41458468427,
   derleme kontrolü run 41458461269.
+- **Test 2 (run 41458468427):** Butonlar kapsülün içinde; Yarı saydam ve Varsayılan stilde gerçek bulanıklık var, Şeffafta
+  bulanıklıksız. Yatay ekran ve sekme göstergesi çalışıyor. Logda hata yok ("Glass navigation bar applied", sekme
+  değişimleri). Kapsül karanlık temada oldukça koyu (YouTube'un kendi tonu + bizim 1/3 dolgu); daha saydam olsun mu
+  kullanıcıya soruldu. Aydınlık tema, mini oynatıcı, kaydırınca gizlenme, 3 tuşlu gezinme henüz test edilmedi.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
