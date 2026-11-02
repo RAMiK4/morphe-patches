@@ -130,6 +130,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `setPadding`/`setPaddingRelative(IIII)` override'ı (addBridge, invoke-super üst sınıf `avni`), alt değer
   `NavigationBarPatch.getNavigationBarPadding` → `GlassNavigationBar.getFloatingRoom`; padding artık sıfırlanmıyor,
   PreDraw yolu yalnızca yedek. Test: youtube-morphe run 41506122855, kontrol run 41506118141.
+- **Test 8 (run 41506122855):** Akıcı oldu, ama butonlar üstten/yanlardan taşıyor. Log: "height: 168 bottom padding: 35":
+  override padding'i en baştan 35 yaptığı için yüksekliği artıran `patch_setSystemButtonsRoom` hiç çağrılmadı. Düzeltme
+  `bfc10b0a`: PreDraw'da padding ≤ 10dp iken LayoutParams yüksekliği son ayarladığımızdan farklıysa oda yeniden veriliyor
+  (döngü yok: sonuç aynıysa tekrar çağrılmaz). Debug: "Glass navigation bar height: a -> b". Test: youtube-morphe run
+  41509136605, kontrol run 41509130682.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
