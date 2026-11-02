@@ -73,7 +73,9 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
-### 2026-11-02: Copy text: açıklama ve gönderilerde metin seçme
+### 2026-11-02: Copy text: açıklama ve gönderilerde metin seçme (PR 4317 açık)
+
+- **PR:** https://github.com/MorpheApp/morphe-patches/pull/4317 (kullanıcı açtı, 4 ekran görüntüsü Additional context'te).
 
 - **İstek:** Gönderilerde ve video açıklamalarında istenen kelime/cümleyi seçip kopyalama. Upstream "Copy text"
   yalnızca başlığı ve yorumları bütün olarak kopyalıyordu (uzun basma).
