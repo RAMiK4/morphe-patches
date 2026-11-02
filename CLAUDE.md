@@ -117,6 +117,14 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Düzeltme `c7c58c27`: PreDraw'da alt padding < 10dp ise `PivotBarAccess.patch_setSystemButtonsRoom(10dp)` + setPadding
   (post ile, slim status bar yöntemi gibi). Debug: "Glass navigation bar floating room set:". Test: youtube-morphe
   run 41484339276, derleme kontrolü run 41484333884.
+- **Test 6 (run 41484339276):** Kapsül havada, görünüm iyi. Sorunlar: kaydırınca gizlenip gelirken titreme, hızlı
+  kaydırmada çubuk parçalanıyor/üst üste biniyor, sekme değişince 1-2px inip çıkıyor. Log: "floating room set: 0 -> 35"
+  94 kez (bir şey alt padding'i sık sık 0'a çekiyor, biz post ile geri koyuyorduk → arada hatalı kare). YouTube APK
+  (youtube-morphe draft release "source", 21.44.528) androguard ile incelendi: `PivotBar` bir `HorizontalScrollView`
+  (`avni`); oda alanı `s`, yükseklik `i()` = `t + s`; padding'i yalnızca `Lrxc.L` (insets) ve `Lrwx.accept` yazıyor
+  (ikisi de bizim kancalı yolumuz, ama "floating room:" logu yok → çağrılmıyor; bayrak 45649805 açıkken `L` atlanıyor).
+  Sıfırlayan kaynak bulunamadı. Düzeltme `6603c08b`: padding/oda PreDraw içinde aynı karede geri konuyor ve o kare
+  atlanıyor (en çok 2 ardışık kare); kapsül yan boşluğu 12dp. Test: youtube-morphe run 41501442214, kontrol run 41501437245.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
