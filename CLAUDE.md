@@ -73,7 +73,7 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
-### 2026-11-02: Navigation bar: cam (glass) stili
+### 2026-11-02: Navigation bar: cam (glass) stili (PR hazır)
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
@@ -142,6 +142,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   h < taban ise orantılı (animasyon bozulmuyor). Taban = apply anında LayoutParams yüksekliği − appRoom. Debug:
   "Glass navigation bar base height:". Test: youtube-morphe run 41512912017, kontrol run 41512905810. Kullanıcı PR istedi,
   bu testten sonra tek commit'e sıkıştırılıp karşılaştırma bağlantısı verilecek.
+- **Test 10 + PR (2026-11-03, run 41512912017):** Kullanıcı onayladı ("her şey tamam, daha stabil"). Log temiz: taban 168,
+  çubuk 203, "height: X -> 203" yok. Upstream `dev` `f3a64b6c` üzerinde tek commit `b1eb28ec`, `ccr-039f9d55-3ljch4`
+  force-push, derleme kontrolü run 41516593339 başarılı. Karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
+  Eski ara commit'ler yerel `backup/glass-before-squash` dalında.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
