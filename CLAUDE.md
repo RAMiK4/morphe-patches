@@ -73,6 +73,18 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-02: Copy text: açıklama ve gönderilerde metin seçme
+
+- **İstek:** Gönderilerde ve video açıklamalarında istenen kelime/cümleyi seçip kopyalama. Upstream "Copy text"
+  yalnızca başlığı ve yorumları bütün olarak kopyalıyordu (uzun basma).
+- **Değişiklik `11153c5c`** (dal `ccr-88e9ea31-1yc38m`, upstream `dev` `86cd3501` üzerinde): yeni ayar
+  `morphe_copy_select_text` (varsayılan açık, General). Açıklama (`description_rich_text_list`, Shorts
+  `cell_description_body`) ve gönderi (identifier'da "post", yorumlar hariç, ≥8 karakter) metinleri
+  `hookLithoSpannableString` ile kaydediliyor; uzun basınca seçilebilir metinli pencere (CustomDialog,
+  `setTextIsSelectable`) + "Copy all". Karşılaştırma boşluklar normalize edilerek, kesik metin başlangıçla.
+  Tıklanabilir üst yoksa (açıklama) uzun basma metni çizen host'a konuyor.
+- **Test:** youtube-morphe run 41396885932, derleme kontrolü run 41396861644. Cihazda henüz denenmedi.
+
 ### 2026-11-01: Patches update notice: dev sürümleri ayarı (PR 4178 açık)
 
 - **PR:** https://github.com/MorpheApp/morphe-patches/pull/4178 (dal `feat/patch-update-notification`, ilk commit `88e9ce6b`).
