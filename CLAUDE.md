@@ -73,7 +73,18 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
-### 2026-11-02: Navigation bar: cam (glass) stili (PR hazır)
+### 2026-11-02: Navigation bar: cam (glass) stili (PR 4338 açık)
+
+- **PR:** https://github.com/MorpheApp/morphe-patches/pull/4338 (kullanıcı açtı, 4 ekran görüntüsü tabloda).
+- **Bakımcı değişiklikleri (dalımıza push):** `b364857f` (Liso): renk tonu yansıma yerine YouTube'un Paint'i oluşturduğu
+  yerde kancayla düşürülüyor (`GlassNavigationBar.lightenBlurTint`, Fingerprints.kt'de yeni parmak izi), köprüler hep
+  ekleniyor, `PIVOT_BAR` NavigationBarPatch'ten, boyutlar sabit. `e164fc8a` (0xrxL): yalnızca `dev` birleştirmesi.
+  Bu dalda artık yerel commit atmadan önce `origin/ccr-039f9d55-3ljch4` çekilmeli (force-push yapılmamalı).
+- **Açık istek (0xrxL, ekran kaydıyla):** "Increase the reposition offset, otherwise the animation end will not hide the
+  navigation bar." Video bu ortamdan açılamıyor (upstream web/API proxy'de kapalı). YouTube kodu: `Lrxc.p(ZZ)` gizleme
+  ya translationY (gösterirken başlangıç `lp.height`=168, gizlerken hedef `getHeight()`=203) ya da LayoutParams yüksekliği
+  animasyonu; `Lrxc.X(FZ)` kaydırmaya bağlı `translationY = f * getHeight()`. Kök neden henüz belli değil, kullanıcıdan
+  videonun tarifi/indirilmesi istendi.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
