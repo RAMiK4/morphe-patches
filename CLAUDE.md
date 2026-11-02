@@ -88,6 +88,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `hookElement` ile post/açıklama elementlerindeki bağlantılar (YouTube `/redirect?q=` ise hedef) saklanıyor; pencerede
   "..."/"…" ile biten kelime, şemasız başlangıcı eşleşen tam bağlantıyla değiştiriliyor (Copy all dahil).
   Test: youtube-morphe run 41399215805, derleme kontrolü run 41399212631.
+- **Test 2 (run 41399215805):** Bağlantılar hâlâ kısaltılmış (patreon "pos...", youtu.be "?si=xEpzH..."); element
+  verisinden bulunamadı. Düzeltme `b20caf88`: metnin link span'larında (ClickableSpan/özel span, URLSpan) yansıma ile
+  (BFS, derinlik 6, 400 nesne) URL/`/redirect?q=` aranıyor, gösterilen metin → bağlantı saklanıyor. Debug log:
+  "Select text element links:", "Select text link:", "Select text link not found:", "Select text shortened link not found:".
+  Test: youtube-morphe run 41404217677, derleme kontrolü run 41404214358.
 
 ### 2026-11-01: Patches update notice: dev sürümleri ayarı (PR 4178 açık)
 
