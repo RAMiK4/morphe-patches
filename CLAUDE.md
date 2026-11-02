@@ -104,6 +104,14 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   yukarı taşınamaz (butonlar çubuğun tüm yüksekliğini dolduruyor; daha yukarısı çubuğu uzatmak = akış alt boşluğu/mini
   oynatıcı riski). Teşhis için "Glass navigation bar applied" satırına yükseklik/alt padding/alt boşluk eklendi.
   Test: youtube-morphe run 41464087817, derleme kontrolü run 41464082281.
+- **Test 4 (run 41464087817):** Log: `pivot_bar` yükseklik 168, alt padding 0, altında boşluk 0 (kullanıcının cihazında
+  sistem alanı yok, kapsül ekranın en altına değiyor); YouTube arka planı sınıfı `auyq` (frosted). Kullanıcı: bulanıklık
+  fazla koyu, ~%30 olsun; havada durması sorun çıkarmazsa iyi olur. Düzeltme `ed2f3854`: (1) `getNavigationBarBottomPadding`
+  ve slim status bar yolunda alt oda en az 10dp (`GlassNavigationBar.getFloatingRoom`; YouTube'un sistem butonları
+  odası gibi yüksekliğe ekleniyor, akış bunu izliyor); kapsül bu 10dp'nin üstünde biter. (2) `auyq` alanları yansıma ile
+  taranıyor: yarı saydam Paint/ColorDrawable rengi karanlıkta %35, aydınlıkta %55'e düşürülüyor; aynı değerli int alanlar
+  da. Debug: "Glass navigation bar floating room:", "Glass app background paint/color/int:". Test: youtube-morphe run
+  41469305013, derleme kontrolü run 41469298297. Riskler: mini oynatıcı/akış alt boşluğu 10dp kayabilir.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
