@@ -112,6 +112,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   taranıyor: yarı saydam Paint/ColorDrawable rengi karanlıkta %35, aydınlıkta %55'e düşürülüyor; aynı değerli int alanlar
   da. Debug: "Glass navigation bar floating room:", "Glass app background paint/color/int:". Test: youtube-morphe run
   41469305013, derleme kontrolü run 41469298297. Riskler: mini oynatıcı/akış alt boşluğu 10dp kayabilir.
+- **Test 5 (run 41469305013):** Bulanıklık tonu çalıştı (log: `auyq.h` Paint `ce0f0f0f` → `590f0f0f`), kullanıcı beğendi.
+  Kapsül havada değil: sistem alanı yokken YouTube alt padding'i hiç ayarlamıyor, `getNavigationBarBottomPadding` çağrılmıyor.
+  Düzeltme `c7c58c27`: PreDraw'da alt padding < 10dp ise `PivotBarAccess.patch_setSystemButtonsRoom(10dp)` + setPadding
+  (post ile, slim status bar yöntemi gibi). Debug: "Glass navigation bar floating room set:". Test: youtube-morphe
+  run 41484339276, derleme kontrolü run 41484333884.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
