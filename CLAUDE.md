@@ -125,6 +125,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   (ikisi de bizim kancalı yolumuz, ama "floating room:" logu yok → çağrılmıyor; bayrak 45649805 açıkken `L` atlanıyor).
   Sıfırlayan kaynak bulunamadı. Düzeltme `6603c08b`: padding/oda PreDraw içinde aynı karede geri konuyor ve o kare
   atlanıyor (en çok 2 ardışık kare); kapsül yan boşluğu 12dp. Test: youtube-morphe run 41501442214, kontrol run 41501437245.
+- **Test 7 (run 41501442214):** Titreme, sekme geçişinde inip çıkma düzeldi. Kalan: otomatik gizleme açıkken çubuk
+  gelip giderken düşük fps hissi (sıfırlamada kare atlıyorduk). Düzeltme `6f9529d3`: Kotlin'de `PivotBar`'a
+  `setPadding`/`setPaddingRelative(IIII)` override'ı (addBridge, invoke-super üst sınıf `avni`), alt değer
+  `NavigationBarPatch.getNavigationBarPadding` → `GlassNavigationBar.getFloatingRoom`; padding artık sıfırlanmıyor,
+  PreDraw yolu yalnızca yedek. Test: youtube-morphe run 41506122855, kontrol run 41506118141.
 - **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
   saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
   arka planı görünür (Translucent/Transparent önerilir).
