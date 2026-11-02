@@ -73,6 +73,24 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-02: Navigation bar: cam (glass) stili
+
+- **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
+- **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
+  Derleme kontrolü run 41453276056, test APK youtube-morphe run 41453301121 (`patches_source`, publish kapalı).
+- **Ne yapıyor:** Yeni ayar `morphe_navigation_bar_glass` (varsayılan kapalı, "Navigation bar" ekranında, stil listesinin
+  altında). `GlassNavigationBar.java`: `pivot_bar`'ın arka planı tek bir özel Drawable (gölge, yarı saydam dolgu,
+  üstten alta parlaklık, geçişli 1dp kenar, seçili sekme kapsülü 200ms kayarak). Kapsül yatay 12dp, üst 6dp, alt 8dp +
+  `pivot_bar` alt padding'i (sistem butonları/jest alanı). Düzen ve yükseklik değişmiyor, yatay padding verilmedi
+  (gösterge kapsül içine kırpılıyor, en fazla 96dp). Arka plan PreDraw ile korunuyor; Shorts'ta her zaman koyu cam;
+  çubuk yatay alt bar değilse (genişlik ≤ 2×yükseklik) YouTube'un arka planı geri veriliyor. Cam açıkken YouTube'un
+  bulanıklığı (`useNavigationBarBlur`) kapalı.
+- **Upstream değişikliği:** `DISABLE_TRANSLUCENT_NAVIGATION` artık yok (deprecated → `NAVIGATION_BAR_STYLE` enum:
+  Default/Translucent/Transparent/Opaque). Ayar Opaque stilde kullanılamıyor (`GlassAvailability`), ikisi açıksa opak kazanıyor.
+- **Belirsizlikler:** YouTube'un bulanık arka planı `pivot_bar`'ın arka planı mı yoksa ayrı bir view mı (kapsül dışı
+  saydam görünmezse buna bakılacak); Default stilde hesap saydam düzende değilse kapsül dışında içerik değil uygulama
+  arka planı görünür (Translucent/Transparent önerilir).
+
 ### 2026-11-02: Copy text: açıklama ve gönderilerde metin seçme (PR 4317 açık)
 
 - **PR:** https://github.com/MorpheApp/morphe-patches/pull/4317 (kullanıcı açtı, 4 ekran görüntüsü Additional context'te).
