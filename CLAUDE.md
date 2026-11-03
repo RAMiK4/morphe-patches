@@ -85,6 +85,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   ya translationY (gösterirken başlangıç `lp.height`=168, gizlerken hedef `getHeight()`=203) ya da LayoutParams yüksekliği
   animasyonu; `Lrxc.X(FZ)` kaydırmaya bağlı `translationY = f * getHeight()`. Kök neden henüz belli değil, kullanıcıdan
   videonun tarifi/indirilmesi istendi.
+- **Reposition sonucu (2026-11-03):** Kullanıcı açıkladı: 0xrxL minimal / minimal 2 mini oynatıcı + "Yukarı kaydırarak
+  genişlet" kullanıyor; mini oynatıcıyı yukarı sınıra sürükleyip tutarken altta kapsülün üst kısmı (~35px, eklediğimiz oda)
+  görünüyor, parmak kalkınca çubuk tamamen gizleniyor. YouTube o sürüklemede çubuğu eski yüksekliğe (168) göre kaydırıyor
+  olmalı. Kod değiştirilmedi (kullanıcı kararı: mevcut hâl iyi, az veriyle çalışan yöntemi bozma); 0xrxL'e açıklama yanıtı
+  yazıldı, istenirse ofseti ölçekleme sonraki adım. Açık soru (bir kullanıcı): Şeffaf/Yarı saydam yoğunluğu için kaydırıcı.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
