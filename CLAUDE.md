@@ -95,6 +95,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Yarı saydam bulanıklık tonu koyu %30, açık %40 (50'de), Şeffaf dolgu her iki temada %50, Shorts %45; 0 = hiç ton/dolgu
   (yalnızca kenar, parlaklık, gölge), 100 = iki katı (en çok %100). Test: youtube-morphe run 41579198443, derleme
   kontrolü run 41579195193. PR'a mı ayrı PR'a mı eklenecek: kullanıcı karar verecek.
+- **Kaydırıcı test 1 (run 41579198443):** Ayarlar çalışıyor, logda hata yok (ton 206 -> 77). Kullanıcı: Yarı saydam
+  varsayılanı koyu %40, açık %50 olsun. Düzeltme `62360920` (test dalı), test APK youtube-morphe run 41582123102.
+  Öneri: PR 4338'e ayrı commit olarak eklemek (varsayılan ton değişikliği zaten PR'a girmeli); karar kullanıcıda.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
