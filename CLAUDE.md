@@ -90,6 +90,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   görünüyor, parmak kalkınca çubuk tamamen gizleniyor. YouTube o sürüklemede çubuğu eski yüksekliğe (168) göre kaydırıyor
   olmalı. Kod değiştirilmedi (kullanıcı kararı: mevcut hâl iyi, az veriyle çalışan yöntemi bozma); 0xrxL'e açıklama yanıtı
   yazıldı, istenirse ofseti ölçekleme sonraki adım. Açık soru (bir kullanıcı): Şeffaf/Yarı saydam yoğunluğu için kaydırıcı.
+- **Opaklık kaydırıcısı (test, PR'a eklenmedi):** Dal `test/glass-opacity` (= PR dalı `e164fc8a` + `33cec069`). Ayar
+  `morphe_navigation_bar_glass_opacity` (SeekBarPreference 0-100, varsayılan 50, cam ayarına bağlı). Ölçek = değer/50:
+  Yarı saydam bulanıklık tonu koyu %30, açık %40 (50'de), Şeffaf dolgu her iki temada %50, Shorts %45; 0 = hiç ton/dolgu
+  (yalnızca kenar, parlaklık, gölge), 100 = iki katı (en çok %100). Test: youtube-morphe run 41579198443, derleme
+  kontrolü run 41579195193. PR'a mı ayrı PR'a mı eklenecek: kullanıcı karar verecek.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
