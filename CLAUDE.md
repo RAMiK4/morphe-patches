@@ -98,6 +98,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Kaydırıcı test 1 (run 41579198443):** Ayarlar çalışıyor, logda hata yok (ton 206 -> 77). Kullanıcı: Yarı saydam
   varsayılanı koyu %40, açık %50 olsun. Düzeltme `62360920` (test dalı), test APK youtube-morphe run 41582123102.
   Öneri: PR 4338'e ayrı commit olarak eklemek (varsayılan ton değişikliği zaten PR'a girmeli); karar kullanıcıda.
+- **Kaydırıcı PR'a eklendi (2026-11-03):** Kullanıcı onayladı. PR dalına (bakımcı commit'lerinin üstüne, force-push yok)
+  tek commit `df80d60a` "feat(YouTube - Navigation bar): Add `Glass opacity` slider" (kod `test/glass-opacity` ile aynı).
+  Derleme kontrolü run 41583382711 başarılı. Soruyu soran kullanıcıya PR yorumu metni verildi.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
