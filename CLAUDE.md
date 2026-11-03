@@ -101,6 +101,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Kaydırıcı PR'a eklendi (2026-11-03):** Kullanıcı onayladı. PR dalına (bakımcı commit'lerinin üstüne, force-push yok)
   tek commit `df80d60a` "feat(YouTube - Navigation bar): Add `Glass opacity` slider" (kod `test/glass-opacity` ile aynı).
   Derleme kontrolü run 41583382711 başarılı. Soruyu soran kullanıcıya PR yorumu metni verildi.
+- **0xrxL düzeltmesi `88ba5382` (2026-11-03):** Reposition sorununu kendisi çözdü: `PivotBar.setTranslationY(F)` override'ı
+  (addBridge) → `GlassNavigationBar.getTranslationY`: YouTube çubuğu verdiği yükseklik kadar kaydırınca (sürükleme
+  translation'ı, kaydırmada negatif alt margin) eklenen oda da aynı oranda ekleniyor; ortak `getAddedRoom`. Mantıklı,
+  bizim yöntemle uyumlu. Test APK: youtube-morphe run 41596409164. Üstteki Home/Subs sekme çubuğundaki hap biçimli
+  seçim göstergesi bizden değil (yalnızca `pivot_bar`'a dokunuyoruz), YouTube'un tasarımı/denemesi.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
