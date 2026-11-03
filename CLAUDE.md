@@ -106,6 +106,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   translation'ı, kaydırmada negatif alt margin) eklenen oda da aynı oranda ekleniyor; ortak `getAddedRoom`. Mantıklı,
   bizim yöntemle uyumlu. Test APK: youtube-morphe run 41596409164. Üstteki Home/Subs sekme çubuğundaki hap biçimli
   seçim göstergesi bizden değil (yalnızca `pivot_bar`'a dokunuyoruz), YouTube'un tasarımı/denemesi.
+- **Son durum (2026-11-03):** Kullanıcı test etti: çubuk sürüklemede tamamen gizleniyor. 0xrxL dalı yeni `dev` üzerine
+  yeniden yazdı (commit hash'leri değişti: `922ad346` ana, `87899ecf` Liso, `da341e22` kaydırıcı, `1987cafa` gizleme) ve
+  `d6f04ca6` ekledi: snackbar'lar cam çubuğun eklenen odası kadar yukarı (`GlassNavigationBar.getAddedRoomOnScreen`,
+  `NativeSnackbarPatch.removeExtraBottomRoom`). 0xrxL birleştirmek için onay istedi. Son dal test APK: youtube-morphe run
+  41602315504. Dal artık yerelde değiştirilmeyecek; gerekirse önce `origin`'den çekilecek.
 
 - **Durum:** İlk sürüm yazıldı, cihazda henüz test edilmedi.
 - **Dal:** `ccr-039f9d55-3ljch4`, upstream `dev` `67b7f769` üzerinde, commit `3a9f1494`.
