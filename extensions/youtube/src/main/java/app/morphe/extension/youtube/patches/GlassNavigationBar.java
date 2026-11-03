@@ -114,8 +114,8 @@ public final class GlassNavigationBar {
     /**
      * The most alpha of the tint the app draws over its blurred background.
      */
-    private static final float LIGHT_BLUR_TINT_ALPHA = 0.40f;
-    private static final float DARK_BLUR_TINT_ALPHA = 0.30f;
+    private static final float LIGHT_BLUR_TINT_ALPHA = 0.50f;
+    private static final float DARK_BLUR_TINT_ALPHA = 0.40f;
 
     /**
      * How opaque the glass is, from the opacity slider. The slider is at 50 by default, which
