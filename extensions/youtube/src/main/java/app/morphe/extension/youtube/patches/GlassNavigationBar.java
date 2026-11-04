@@ -133,18 +133,19 @@ public final class GlassNavigationBar {
     private static boolean floatingRoomLogged;
 
     /**
-     * The room below the buttons the app last added to the height of the bar itself,
-     * the room for the system navigation buttons.
-     */
-    private static volatile int appRoom;
-
-    /**
      * The full height the app gives the bar, without the room below the buttons.
      */
     private static volatile int baseHeight;
 
-    static void setAppRoom(int room) {
-        appRoom = room;
+    /**
+     * The room below the buttons the app added to the height of the bar itself,
+     * the room for the system navigation buttons. Read from the bar, which adds it to its height,
+     * so it is right whichever way the app set it.
+     */
+    private static int getAppRoom(View navigationBar) {
+        return navigationBar instanceof NavigationBarPatch.PivotBarAccess access
+                ? Math.max(0, access.patch_getSystemButtonsRoom())
+                : 0;
     }
 
     /**
@@ -209,6 +210,7 @@ public final class GlassNavigationBar {
      *         proportion to that height, as the app also animates the height of the bar to hide it.
      */
     private static int getAddedRoom(View navigationBar, int height) {
+        final int appRoom = getAppRoom(navigationBar);
         final int base = baseHeight;
         final int extra = navigationBar.getPaddingBottom() - appRoom;
         if (base <= 0 || extra <= 0 || height <= 0) return 0;
@@ -324,6 +326,7 @@ public final class GlassNavigationBar {
 
         // The height the app gives the bar, without the room below the buttons.
         ViewGroup.LayoutParams params = pivotBar.getLayoutParams();
+        final int appRoom = getAppRoom(pivotBar);
         baseHeight = params != null && params.height > 0 ? params.height - appRoom : 0;
         Logger.printDebug(() -> "Glass navigation bar base height: " + baseHeight + " app room: " + appRoom);
 

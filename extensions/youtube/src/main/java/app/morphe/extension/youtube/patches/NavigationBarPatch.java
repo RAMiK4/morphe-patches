@@ -483,8 +483,6 @@ public final class NavigationBarPatch {
 
             padding = setSlimStatusBarRoom(navigationBar, padding);
             padding = GlassNavigationBar.getFloatingRoom(navigationBar, padding);
-            // The value is also stored as the room the bar adds to its height.
-            GlassNavigationBar.setAppRoom(padding);
         } catch (Exception ex) {
             Logger.printException(() -> "getNavigationBarBottomPadding failure", ex);
         }
@@ -510,6 +508,12 @@ public final class NavigationBarPatch {
          * which is added to its height.
          */
         void patch_setSystemButtonsRoom(int room);
+
+        /**
+         * @return The room the navigation bar leaves below itself for the system navigation buttons,
+         *         which is added to its height.
+         */
+        int patch_getSystemButtonsRoom();
     }
 
     /**
@@ -579,7 +583,6 @@ public final class NavigationBarPatch {
                             final int navigationBarRoom = GlassNavigationBar.getFloatingRoom(
                                     navigationBar, setSlimStatusBarRoom(navigationBar, room));
                             access.patch_setSystemButtonsRoom(navigationBarRoom);
-                            GlassNavigationBar.setAppRoom(navigationBarRoom);
                             navigationBar.setPadding(navigationBar.getPaddingLeft(), navigationBar.getPaddingTop(),
                                     navigationBar.getPaddingRight(), navigationBarRoom);
                         });

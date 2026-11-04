@@ -357,6 +357,7 @@ val navigationBarPatch = bytecodePatch(
         // The room for the system navigation buttons is stored in a field of the bar, which the
         // method called right after adds to its height. The extension moves that room below
         // the slim status bar while it is shown, so the bar is given a method that sets it.
+        // The glass style reads it to add only the room the app did not add to the height.
         navigationBarBottomPaddingMatches.first().instructionMatches.let { matches ->
             val roomField = matches[0].fieldReference
             val updateHeightMethod = matches[1].getMethodCalled()
@@ -369,6 +370,13 @@ val navigationBarPatch = bytecodePatch(
                         iput p1, p0, $roomField
                         invoke-virtual { p0 }, $updateHeightMethod
                         return-void
+                    """
+                )
+                addBridge(
+                    "patch_getSystemButtonsRoom", listOf(), "I", 2,
+                    """
+                        iget v0, p0, $roomField
+                        return v0
                     """
                 )
 
