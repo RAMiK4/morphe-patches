@@ -122,7 +122,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   **Çözüldü (2026-11-05):** Sorunu yaşayan kullanıcı test APK'sıyla onayladı. PR için yalnızca "görülen oda" kısmı
   (alan köprüsü ve teşhis logu yok) upstream `dev` `0295f21b` (cam boyutu ayarı #4424 dahil, `heightDelta` var) üzerine
   tek commit `125ece5a`, dal `fix/glass-navigation-bar-height`, derleme kontrolü run 41920459202. Karşılaştırma
-  bağlantısı verildi, PR'ı kullanıcı açacak. `test/glass-room-field` yalnızca test.
+  bağlantısı verildi. **PR:** https://github.com/MorpheApp/morphe-patches/pull/4426 (kullanıcı açtı, açıklama kısaltıldı).
+  0xrxL uyarısı: cam boyutu ayarı (#4424) değişikliklerine dikkat. Dalımız zaten #4424 (`0295f21b`) üzerinde; o tarihten
+  sonra `GlassNavigationBar.java`'ya upstream commit'i yok, çakışma yok. `test/glass-room-field` yalnızca test.
   Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
   kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
