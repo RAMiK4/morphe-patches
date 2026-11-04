@@ -119,6 +119,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   ise oda "uygulamanın eklediği" olarak hatırlanıyor (padding değişene kadar), app room = max(alan, görülen). Debug:
   "Glass navigation bar room added by the app: 137". Test: youtube-morphe run 41907052069, kontrol run 41907058434.
   Kullanıcının cihazında ayar açıkken de sorun çıkmıyor; test sorunu yaşayan kullanıcıda.
+  **Çözüldü (2026-11-05):** Sorunu yaşayan kullanıcı test APK'sıyla onayladı. PR için yalnızca "görülen oda" kısmı
+  (alan köprüsü ve teşhis logu yok) upstream `dev` `0295f21b` (cam boyutu ayarı #4424 dahil, `heightDelta` var) üzerine
+  tek commit `125ece5a`, dal `fix/glass-navigation-bar-height`, derleme kontrolü run 41920459202. Karşılaştırma
+  bağlantısı verildi, PR'ı kullanıcı açacak. `test/glass-room-field` yalnızca test.
   Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
   kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
