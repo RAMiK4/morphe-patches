@@ -109,7 +109,8 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Uzamış kapsül hatası (2026-11-04):** Bazı kullanıcılar (3 tuşlu/jest, çubuk sistem tuşlarının üstünde) yeniden
   başlatınca kapsülün ~1,7 kat uzadığını, ikonların ortada kaldığını bildirdi. Tahmin: YouTube'un yüksekliğe zaten
   eklediği sistem odası (statik `appRoom`, kancalardan öğreniliyordu) yanlış/eski kalınca oda iki kez ekleniyor.
-  Kullanıcı sorunu dev.8'de 3 tuşlu gezinmede kendisi de görüyor. PR 4338 upstream'e birleştirildi (`6d740979`),
+  Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
+  kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
   `v2.1.0-dev.8` üzerinde): oda çubuğun kendi alanından (`patch_getSystemButtonsRoom` köprüsü) okunuyor, `setAppRoom`
   kaldırıldı. Test: youtube-morphe run 41840007305, derleme kontrolü run 41840012334. Doğrulanınca upstream `dev`
