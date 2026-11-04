@@ -137,6 +137,8 @@ public final class GlassNavigationBar {
      */
     private static volatile int baseHeight;
 
+    private static String lastMeasureLog;
+
     /**
      * The room below the buttons the app added to the height of the bar itself,
      * the room for the system navigation buttons. Read from the bar, which adds it to its height,
@@ -166,6 +168,14 @@ public final class GlassNavigationBar {
 
             final int height = View.MeasureSpec.getSize(heightMeasureSpec);
             final int added = getAddedRoom(navigationBar, height);
+            if (height >= baseHeight) {
+                final String measure = height + " padding: " + navigationBar.getPaddingBottom()
+                        + " app room: " + getAppRoom(navigationBar) + " added: " + added;
+                if (!measure.equals(lastMeasureLog)) {
+                    lastMeasureLog = measure;
+                    Logger.printDebug(() -> "Glass navigation bar measure, height: " + measure);
+                }
+            }
             if (added <= 0) return heightMeasureSpec;
 
             return View.MeasureSpec.makeMeasureSpec(height + added, View.MeasureSpec.EXACTLY);
