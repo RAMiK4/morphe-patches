@@ -114,6 +114,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   (`getNavigationBarBottomPadding`) geçmeyen bir yolla eklemiş, `appRoom` 0 kalmış. Düzeltme (alanı okumak) bu durumu
   çözmeli. Teşhis logu `66bad27f` ("Glass navigation bar measure, height: .. padding: .. app room: .. added: .."),
   test: youtube-morphe run 41897213414, derleme kontrolü run 41897218687. Beklenen: app room 137, added 0.
+  **Log 2 (alan düzeltmesiyle):** sorun sürdü: "measure, height: 293 padding: 137 app room: 0 added: 137" → çubuğun
+  alanı da 0, YouTube odayı yüksekliğe başka yoldan ekliyor. Düzeltme `75047423`: ölçümde yükseklik − taban = alt padding
+  ise oda "uygulamanın eklediği" olarak hatırlanıyor (padding değişene kadar), app room = max(alan, görülen). Debug:
+  "Glass navigation bar room added by the app: 137". Test: youtube-morphe run 41907052069, kontrol run 41907058434.
+  Kullanıcının cihazında ayar açıkken de sorun çıkmıyor; test sorunu yaşayan kullanıcıda.
   Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
   kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
