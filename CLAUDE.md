@@ -109,6 +109,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Uzamış kapsül hatası (2026-11-04):** Bazı kullanıcılar (3 tuşlu/jest, çubuk sistem tuşlarının üstünde) yeniden
   başlatınca kapsülün ~1,7 kat uzadığını, ikonların ortada kaldığını bildirdi. Tahmin: YouTube'un yüksekliğe zaten
   eklediği sistem odası (statik `appRoom`, kancalardan öğreniliyordu) yanlış/eski kalınca oda iki kez ekleniyor.
+  **Log (2026-11-05, etkilenen kullanıcı):** "Disable layout updates" açıkken oluyor (kullanıcı tespiti). Log: base 156,
+  app room 0, sonra çubuk 430 = 156 + 137 + 137 (sistem odası 137 iki kez). YouTube odayı yüksekliğe bizim kancamızdan
+  (`getNavigationBarBottomPadding`) geçmeyen bir yolla eklemiş, `appRoom` 0 kalmış. Düzeltme (alanı okumak) bu durumu
+  çözmeli. Teşhis logu `66bad27f` ("Glass navigation bar measure, height: .. padding: .. app room: .. added: .."),
+  test: youtube-morphe run 41897213414, derleme kontrolü run 41897218687. Beklenen: app room 137, added 0.
   Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
   kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
