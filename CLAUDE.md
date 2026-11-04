@@ -125,7 +125,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   bağlantısı verildi. **PR:** https://github.com/MorpheApp/morphe-patches/pull/4426 (kullanıcı açtı, açıklama kısaltıldı).
   0xrxL uyarısı: cam boyutu ayarı (#4424) değişikliklerine dikkat. Dalımız zaten #4424 (`0295f21b`) üzerinde; o tarihten
   sonra `GlassNavigationBar.java`'ya upstream commit'i yok, çakışma yok. PR dalı test APK'sı (boyut ayarıyla birlikte):
-  youtube-morphe run 41928728346. `test/glass-room-field` yalnızca test.
+  youtube-morphe run 41928728346. **PR 4426 birleştirildi** (upstream `dev` `a4913def`). Test eden kullanıcı: cam sorunu düzeldi;
+  "tema yaması hariç tutulunca açılışta çökme" sürüyor. Cam kodunda tema yamasına bağımlılık yok (yalnızca
+  `ThemeUtils.getAppBackgroundColor`, varsayılanlı, ve `Utils.isDarkModeEnabled`); muhtemelen bizden değil,
+  çökme yığın izi (logcat) gerekli. `test/glass-room-field` yalnızca test.
   Kullanıcının cihazında sorun hiç yok (desteklenen deneysel sürüm, 3 tuş dahil); tahmin doğrulanamadı, etkilenen
   kullanıcılardan log ve YouTube sürümü gerekli. Test APK yalnızca gerileme kontrolü için. PR 4338 upstream'e birleştirildi (`6d740979`),
   dev.8'de cam için ek upstream commit'leri var. Düzeltme `a5846fb0` (dal `test/glass-room-field`, etiket
