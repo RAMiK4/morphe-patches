@@ -106,6 +106,12 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   translation'ı, kaydırmada negatif alt margin) eklenen oda da aynı oranda ekleniyor; ortak `getAddedRoom`. Mantıklı,
   bizim yöntemle uyumlu. Test APK: youtube-morphe run 41596409164. Üstteki Home/Subs sekme çubuğundaki hap biçimli
   seçim göstergesi bizden değil (yalnızca `pivot_bar`'a dokunuyoruz), YouTube'un tasarımı/denemesi.
+- **Uzamış kapsül hatası (2026-11-04):** Bazı kullanıcılar (3 tuşlu/jest, çubuk sistem tuşlarının üstünde) yeniden
+  başlatınca kapsülün ~1,7 kat uzadığını, ikonların ortada kaldığını bildirdi. Tahmin: YouTube'un yüksekliğe zaten
+  eklediği sistem odası (statik `appRoom`, kancalardan öğreniliyordu) yanlış/eski kalınca oda iki kez ekleniyor.
+  Düzeltme `39121b50` (dal `test/glass-room-field`, PR dalı `d6f04ca6` üstünde): oda çubuğun kendi alanından
+  (`patch_getSystemButtonsRoom` köprüsü) okunuyor, `setAppRoom` kaldırıldı. Test: youtube-morphe run 41838307889,
+  derleme kontrolü run 41838312597. Doğrulanınca PR dalına eklenecek (önce `origin`'den çek; 0xrxL ile paylaşılıyor).
 - **Son durum (2026-11-03):** Kullanıcı test etti: çubuk sürüklemede tamamen gizleniyor. 0xrxL dalı yeni `dev` üzerine
   yeniden yazdı (commit hash'leri değişti: `922ad346` ana, `87899ecf` Liso, `da341e22` kaydırıcı, `1987cafa` gizleme) ve
   `d6f04ca6` ekledi: snackbar'lar cam çubuğun eklenen odası kadar yukarı (`GlassNavigationBar.getAddedRoomOnScreen`,
