@@ -140,14 +140,42 @@ public final class GlassNavigationBar {
     private static String lastMeasureLog;
 
     /**
+     * The room below the buttons the app was seen adding to the height of the bar,
+     * and the bottom padding it was seen with.
+     */
+    private static volatile int seenAppRoom;
+    private static volatile int seenAppRoomPadding;
+
+    /**
+     * Some configurations, such as with the layout updates of the app disabled, add the room
+     * for the system navigation buttons to the height of the bar without the field of the bar.
+     * The bar is then given its full height plus exactly its bottom padding, which is remembered
+     * for as long as the padding stays the same, also while the app animates the height.
+     */
+    private static void updateSeenAppRoom(View navigationBar, int height) {
+        final int padding = navigationBar.getPaddingBottom();
+        if (padding != seenAppRoomPadding) {
+            seenAppRoom = 0;
+            seenAppRoomPadding = padding;
+        }
+
+        final int base = baseHeight;
+        if (base > 0 && padding > 0 && height - base == padding && seenAppRoom != padding) {
+            seenAppRoom = padding;
+            Logger.printDebug(() -> "Glass navigation bar room added by the app: " + padding);
+        }
+    }
+
+    /**
      * The room below the buttons the app added to the height of the bar itself,
-     * the room for the system navigation buttons. Read from the bar, which adds it to its height,
-     * so it is right whichever way the app set it.
+     * the room for the system navigation buttons.
      */
     private static int getAppRoom(View navigationBar) {
-        return navigationBar instanceof NavigationBarPatch.PivotBarAccess access
-                ? Math.max(0, access.patch_getSystemButtonsRoom())
+        final int fieldRoom = navigationBar instanceof NavigationBarPatch.PivotBarAccess access
+                ? access.patch_getSystemButtonsRoom()
                 : 0;
+        final int seenRoom = navigationBar.getPaddingBottom() == seenAppRoomPadding ? seenAppRoom : 0;
+        return Math.max(0, Math.max(fieldRoom, seenRoom));
     }
 
     /**
@@ -167,6 +195,7 @@ public final class GlassNavigationBar {
             }
 
             final int height = View.MeasureSpec.getSize(heightMeasureSpec);
+            updateSeenAppRoom(navigationBar, height);
             final int added = getAddedRoom(navigationBar, height);
             if (height >= baseHeight) {
                 final String measure = height + " padding: " + navigationBar.getPaddingBottom()
