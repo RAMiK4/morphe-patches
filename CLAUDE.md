@@ -89,6 +89,8 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Doğrulandı + PR hazır (2026-11-05):** İki kullanıcı da düzeldiğini bildirdi. İki commit upstream `dev` `0223075c`
   (Shorts PR 4447 birleşmiş) üzerinde tek commit `84f9ba4d`, `fix/glass-room-rounding` force-push. Karşılaştırma
   bağlantısı verildi, PR'ı kullanıcı açacak. Not: `git reset --soft upstream/dev` yalnızca dal upstream ucunun üstündeyken.
+- **Birleştirildi:** PR 4452 (`6d6c523e`, issue 4443 kapanır) ve Shorts açık tema PR 4447 (`0223075c`) upstream `dev`'de.
+  Test dalları (`test/glass-room-field`, `test/glass-shorts-light`) artık gerekmiyor.
 
 ### 2026-11-05: Glass navigation bar: açık temada Shorts'ta beyaz panel
 
