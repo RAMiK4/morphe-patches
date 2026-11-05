@@ -75,7 +75,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
 
-- **Bildirim:** dev.11, YouTube 21.30.216, 3 tuşlu gezinmede kapsül yine uzuyor (PR 4426'dan sonra).
+- **Bildirim (issue 4443):** dev.11, YouTube 21.30.216, 3 tuşlu gezinmede kapsül yine uzuyor (PR 4426'dan sonra).
 - **Log:** base 119, app room 0, applied height 338, bottom padding 110. 338 = 119 + 110 + 109: YouTube odayı
   yüksekliğe 109 (padding'den 1 px az, yuvarlama) olarak eklemiş, PR 4426'daki tam eşitlik koşulu tutmamış.
 - **Düzeltme `d2544c9d`** (dal `fix/glass-room-rounding`, upstream `dev` `6d241067` üzerinde): görülen oda padding'den
