@@ -80,7 +80,10 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   arkadaki pencere arka planı (açık temada beyaz) görünüyor. Koyu temada aynı alan koyu olduğu için fark edilmiyor.
 - **Düzeltme `1a85a39e`** (dal `test/glass-shorts-light`, etiket `v2.1.0-dev.11` üzerinde; cam kodu o tarihten beri
   upstream'de değişmedi): Shorts stilinde kapsülün etrafı siyah çiziliyor. Test: youtube-morphe run 42038915670,
-  derleme kontrolü run 42038920804. Önce kullanıcının cihazında sorunu üretip ekran görüntüsüyle doğrulamak gerek.
+  derleme kontrolü run 42038920804.
+- **Doğrulandı (2026-11-05):** Kullanıcı: tahmin doğru, test APK'sında düzeldi. PR dalı `fix/glass-shorts-light-theme`,
+  upstream `dev` `d0b98475` üzerinde tek commit `e32ff66f`. Karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
+  Not: upstream `dev` force-push ile yeniden yazılmış; fetch'te `+dev:refs/remotes/upstream/dev` kullan.
 
 ### 2026-11-02: Navigation bar: cam (glass) stili (PR 4338 açık)
 
