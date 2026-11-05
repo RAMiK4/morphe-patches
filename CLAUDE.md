@@ -81,6 +81,11 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
 - **Düzeltme `d2544c9d`** (dal `fix/glass-room-rounding`, upstream `dev` `6d241067` üzerinde): görülen oda padding'den
   en çok 2dp farklı olabilir, görülen değer (yükseklik − taban) saklanıyor. Derleme kontrolü run 42052452844,
   test APK (21.44.528) youtube-morphe run 42052458673. Doğrulama 21.30.216 kullanan bildiren kullanıcıda (.mpp ile).
+- **İkinci kullanıcı (aynı issue, 20.10.38 userAgent):** gesture ↔ 3 tuş geçince kısa/uzun kapsül, yeniden başlatınca
+  düzeliyor. Log: yeni çubukta taban eski çubuğun statik `appRoom`'uyla hesaplanmış (144 − 48 = 96, 144 − 142 = 2).
+  Düzeltme `99f18f24` (aynı dal): taban çubuğun kendi oda alanıyla (`patch_getSystemButtonsRoom` köprüsü), `appRoom`
+  padding'le sınırlı. Derleme kontrolü run 42061931475, test APK youtube-morphe run 42061939453. Tek .mpp ile iki
+  kullanıcı da deneyecek. Shorts açık tema PR'ı: 4447.
 
 ### 2026-11-05: Glass navigation bar: açık temada Shorts'ta beyaz panel
 
