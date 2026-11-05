@@ -86,6 +86,9 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Düzeltme `99f18f24` (aynı dal): taban çubuğun kendi oda alanıyla (`patch_getSystemButtonsRoom` köprüsü), `appRoom`
   padding'le sınırlı. Derleme kontrolü run 42061931475, test APK youtube-morphe run 42061939453. Tek .mpp ile iki
   kullanıcı da deneyecek. Shorts açık tema PR'ı: 4447.
+- **Doğrulandı + PR hazır (2026-11-05):** İki kullanıcı da düzeldiğini bildirdi. İki commit upstream `dev` `0223075c`
+  (Shorts PR 4447 birleşmiş) üzerinde tek commit `84f9ba4d`, `fix/glass-room-rounding` force-push. Karşılaştırma
+  bağlantısı verildi, PR'ı kullanıcı açacak. Not: `git reset --soft upstream/dev` yalnızca dal upstream ucunun üstündeyken.
 
 ### 2026-11-05: Glass navigation bar: açık temada Shorts'ta beyaz panel
 
