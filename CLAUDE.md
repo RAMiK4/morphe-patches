@@ -73,6 +73,15 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
+
+- **Bildirim:** dev.11, YouTube 21.30.216, 3 tuşlu gezinmede kapsül yine uzuyor (PR 4426'dan sonra).
+- **Log:** base 119, app room 0, applied height 338, bottom padding 110. 338 = 119 + 110 + 109: YouTube odayı
+  yüksekliğe 109 (padding'den 1 px az, yuvarlama) olarak eklemiş, PR 4426'daki tam eşitlik koşulu tutmamış.
+- **Düzeltme `d2544c9d`** (dal `fix/glass-room-rounding`, upstream `dev` `6d241067` üzerinde): görülen oda padding'den
+  en çok 2dp farklı olabilir, görülen değer (yükseklik − taban) saklanıyor. Derleme kontrolü run 42052452844,
+  test APK (21.44.528) youtube-morphe run 42052458673. Doğrulama 21.30.216 kullanan bildiren kullanıcıda (.mpp ile).
+
 ### 2026-11-05: Glass navigation bar: açık temada Shorts'ta beyaz panel
 
 - **Bildirim (bir kullanıcı, 2.1.0-dev.11, YouTube 21.44.528):** açık temada Shorts'ta alt panel beyaz görünüyor.
