@@ -73,6 +73,15 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-05: Glass navigation bar: açık temada Shorts'ta beyaz panel
+
+- **Bildirim (bir kullanıcı, 2.1.0-dev.11, YouTube 21.44.528):** açık temada Shorts'ta alt panel beyaz görünüyor.
+- **Tahmin (doğrulanmadı):** Shorts oynatıcısı çubuğun üstünde bitiyor; cam kapsül dışını saydam bıraktığı için
+  arkadaki pencere arka planı (açık temada beyaz) görünüyor. Koyu temada aynı alan koyu olduğu için fark edilmiyor.
+- **Düzeltme `1a85a39e`** (dal `test/glass-shorts-light`, etiket `v2.1.0-dev.11` üzerinde; cam kodu o tarihten beri
+  upstream'de değişmedi): Shorts stilinde kapsülün etrafı siyah çiziliyor. Test: youtube-morphe run 42038915670,
+  derleme kontrolü run 42038920804. Önce kullanıcının cihazında sorunu üretip ekran görüntüsüyle doğrulamak gerek.
+
 ### 2026-11-02: Navigation bar: cam (glass) stili (PR 4338 açık)
 
 - **PR:** https://github.com/MorpheApp/morphe-patches/pull/4338 (kullanıcı açtı, 4 ekran görüntüsü tabloda).
