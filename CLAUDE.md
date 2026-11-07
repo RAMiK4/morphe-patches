@@ -130,7 +130,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Son test (2026-11-07):** youtube-morphe run 42412970551 (PR dalı, `v2.2.0-dev.1` tabanı) cihazda sorunsuz. Son bağlantı verildi:
   YTindir bağlantısız metin, deneysel sürüm kutusu işaretli, "Tested on YouTube 21.44.528 (patches based on v2.2.0-dev.1)".
 
-### 2026-11-07: YouTube Music cam navigasyon çubuğu (PR hazırlığı)
+### 2026-11-07: YouTube Music cam navigasyon çubuğu (PR 4542 açık)
 
 - Hızlı indir menüsü PR'ı açıldı: upstream PR 4539.
 - Eski dal `feat/music-glass-navigation-bar` (`d1dc820b`, ~50 commit geride) force-push yapılmadan yeni dala taşındı:
@@ -146,7 +146,8 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - Kullanıcı ikisini de denedi, ciddi sorun yok. Bulanıklık kararı: Music'te Android 12+ açık kalıyor, sorun olursa
   karar bakımcılara (PR açıklamasında belirtildi). YT Music 9.45.51 kaynağıyla yeni test APK run 42419605285.
   YouTube debug logunda hata yok (tek toast "You have the latest version", ayarlarda güncelleme denetimi).
-  PR karşılaştırma bağlantısı verildi; PR'ı kullanıcı açacak.
+  PR karşılaştırma bağlantısı verildi.
+- **PR açıldı (2026-11-07): upstream PR 4542**, bakımcı incelemesi bekleniyor.
 
 ### 2026-11-07: Glass navigation bar durumu ve YouTube Music cam çubuğu
 
