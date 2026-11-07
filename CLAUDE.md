@@ -86,7 +86,7 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Derleme kontrolü run 42343221245 başarılı. Yeni metinler yalnızca İngilizce (Crowdin).
 - **YTindir tarafı:** `RAMiK4/ytindir` dalı `claude/quick-download-quality-options-hkyzig` (build 68) bu ekleri anlıyor;
   eski YTindir `TYPE=thumbnail`'i video olarak indirir.
-- **Durum:** Kullanıcı testi bekleniyor (test APK'sı youtube-morphe'de bu dalla derlenecek).
+- **Durum:** Kullanıcı testi bekleniyor. Test APK: youtube-morphe run 42344763069 (`patches_source`, publish kapalı).
 
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
 
