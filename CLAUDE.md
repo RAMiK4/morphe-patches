@@ -120,7 +120,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **YTDLnis:** bu menüyü görmez (`supportsQuickDownloadQuality` yalnızca YTindir), eski Video/Audio/All options menüsü kalır.
 - **Karar (2026-11-07):** YouTube tarafı şimdilik tamam. PR açılmayacak: önce YTindir düzeltmeleri yapılıp yeni YTindir
   sürümü yayınlanacak, sonra 4 commit tek commit'e sıkıştırılıp karşılaştırma bağlantısı verilecek (kullanıcı onayıyla).
-  Ayrıntılı test geçmişi: commit mesajları ve bu oturumun özetleri.
+- **YTindir 2.15.0 yayınlandı (2026-11-07, build 78):** hızlı liste, ekler (`ShareActivity.queueInBackground`),
+  geniş videolarda kalite etiketten okunuyor (3840x1920 = 2160p, bu menüdeki `qualityOf` ile aynı mantık).
+- **PR hazır (2026-11-07):** commit'ler upstream `dev` `d2383876` üzerine çakışmasız taşınıp tek commit'e sıkıştırıldı:
+  yeni dal `feat/quick-download-quality-menu` (`b0bab50b`). Eski dal `feat/quick-download-qualities`'e force-push
+  izni verilmediği için o dal olduğu gibi duruyor (artık gereksiz, silinebilir). Derleme kontrolü run 42405289646.
+  Upstream PR şablonuna göre başlık ve açıklamalı karşılaştırma bağlantısı kullanıcıya verildi; PR'ı kullanıcı açacak.
 
 ### Önceki işler (özet; ayrıntı `docs/is-gunlugu-arsiv.md`)
 
