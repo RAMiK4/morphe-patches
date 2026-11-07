@@ -9,6 +9,8 @@ package app.morphe.extension.youtube.videoplayer;
 
 import androidx.annotation.Nullable;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +51,9 @@ final class QuickDownloadFormats {
      * @param aac    Bytes of the AAC (M4A) audio, 0 if unknown.
      * @param mp3    Estimated bytes of a {@link #MP3_KBPS} kbps MP3, 0 if unknown.
      */
-    record Sizes(long[] videos, long opus, long aac, long mp3) {
+    record Sizes(long[] videos, long opus, long aac, long mp3,
+                 int[] fps, String[] codecs, int aacKbps,
+                 String title, String author, long lengthSeconds) {
     }
 
     private record Candidate(int height, int fps, boolean hdr, int codecRank, int bitrate, long length) {
@@ -82,7 +86,7 @@ final class QuickDownloadFormats {
     private static Sizes parse(PlayerResponse response) {
         Candidate[] best = new Candidate[HEIGHTS.length];
         long opus = 0, aac = 0;
-        int opusBitrate = -1, aacBitrate = -1;
+        int opusBitrate = -1, aacBitrate = -1, aacAverageBitrate = 0;
         boolean opusOriginal = false, aacOriginal = false;
         long durationMs = 0;
 
@@ -133,6 +137,7 @@ final class QuickDownloadFormats {
                             || (original == aacOriginal && format.getBitrate() > aacBitrate)) {
                         aac = length;
                         aacBitrate = format.getBitrate();
+                        aacAverageBitrate = format.getAverageBitrate();
                         aacOriginal = original;
                     }
                 }
@@ -150,8 +155,22 @@ final class QuickDownloadFormats {
                 videos[i] = candidate.length() + videoAudio;
             }
         }
+        int[] fps = new int[HEIGHTS.length];
+        String[] codecs = new String[HEIGHTS.length];
+        for (int i = 0; i < HEIGHTS.length; i++) {
+            Candidate candidate = best[i];
+            if (candidate == null) continue;
+            fps[i] = candidate.fps();
+            codecs[i] = codecName(candidate);
+        }
+        long lengthSeconds = response.getVideoDetails().getLengthSeconds();
+        if (durationMs <= 0) durationMs = lengthSeconds * 1000;
         long mp3 = durationMs > 0 ? durationMs * MP3_KBPS / 8 : 0;
-        return new Sizes(videos, opus, aac, mp3);
+        final int aacBits = aacAverageBitrate > 0 ? aacAverageBitrate : aacBitrate;
+        int aacKbps = aacBits > 0 ? Math.round(aacBits / 1000f) : 0;
+        return new Sizes(videos, opus, aac, mp3, fps, codecs, aacKbps,
+                response.getVideoDetails().getTitle(), response.getVideoDetails().getOwnerChannelName(),
+                lengthSeconds);
     }
 
     /**
@@ -165,6 +184,16 @@ final class QuickDownloadFormats {
         if (a.hdr() != b.hdr()) return !a.hdr();
         if (a.codecRank() != b.codecRank()) return a.codecRank() < b.codecRank();
         return a.bitrate() > b.bitrate();
+    }
+
+    private static String codecName(Candidate candidate) {
+        final boolean aboveFullHd = candidate.height() > 1080;
+        return switch (candidate.codecRank()) {
+            case 0 -> aboveFullHd ? "AV1" : "H.264";
+            case 1 -> aboveFullHd ? "VP9" : "AV1";
+            case 2 -> "VP9";
+            default -> "H.264";
+        };
     }
 
     private static boolean isWantedCodec(Candidate candidate) {
@@ -198,6 +227,36 @@ final class QuickDownloadFormats {
         }
         if (fps <= 0) fps = format.getFps() > 0 ? format.getFps() : 30;
         return new int[]{height, fps};
+    }
+
+    /** YouTube's own JPG thumbnails, largest first. A missing size answers 404. */
+    static final String[] THUMBNAIL_NAMES = {"maxresdefault", "sddefault", "hqdefault"};
+
+    /**
+     * Network request, call off the main thread.
+     *
+     * @return Bytes of the largest JPG thumbnail of the video, 0 if unknown.
+     */
+    static long fetchThumbnailSize(String videoId) {
+        for (String name : THUMBNAIL_NAMES) {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL("https://i.ytimg.com/vi/" + videoId + "/" + name + ".jpg")
+                        .openConnection();
+                connection.setRequestMethod("HEAD");
+                connection.setConnectTimeout(10_000);
+                connection.setReadTimeout(10_000);
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    return Math.max(0, connection.getContentLengthLong());
+                }
+            } catch (Exception ex) {
+                Logger.printDebug(() -> "Could not read the thumbnail size of: " + videoId, ex);
+                return 0;
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        }
+        return 0;
     }
 
     private static long clen(String url) {
