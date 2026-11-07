@@ -73,6 +73,21 @@ Upstream'e (`MorpheApp/morphe-patches`) giden hiçbir dala veya PR'a eklenmez.
 Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt eklenir ve bu dosya
 fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde tutulur.
 
+### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
+
+- **İstek:** YouTube'daki "Hızlı indir" menüsü (Video 1080p / Ses 192 kbps / Tüm seçenekler) cihaza kaydet
+  dalındaki seçim ekranı gibi olsun, tek ekrana sığsın: 2160p 4K ve 1440p 2K (AV1, yoksa VP9), 1080p FHD ve
+  720p HD (H.264), yalnızca ses (Opus, M4A, MP3), küçük resim; boyutlar gelsin. 480p yok.
+- **Commit `cbfbb45f`** (dal `feat/quick-download-qualities`, upstream `dev` `cd29774f` üzerinde): yalnızca kaliteyi
+  uygulayan indiricide (YTindir) yeni menü (`ExternalDownloadButton.showQualityMenu`), boyutlar
+  `QuickDownloadFormats` ile `StreamingDataRequest.fetchRequestForDownload`'dan (proto `Format`'a width/height/fps/
+  qualityLabel eklendi, `InAppDownloadsPatch.DOWNLOAD_CLIENTS` public). Videoda olmayan kaliteler gizleniyor.
+  Intent ekleri: `VIDEO_QUALITY` + `VIDEO_CODEC` (h264/av1), `AUDIO_FORMAT` (opus/m4a/mp3), `TYPE=thumbnail`.
+  Derleme kontrolü run 42343221245 başarılı. Yeni metinler yalnızca İngilizce (Crowdin).
+- **YTindir tarafı:** `RAMiK4/ytindir` dalı `claude/quick-download-quality-options-hkyzig` (build 68) bu ekleri anlıyor;
+  eski YTindir `TYPE=thumbnail`'i video olarak indirir.
+- **Durum:** Kullanıcı testi bekleniyor (test APK'sı youtube-morphe'de bu dalla derlenecek).
+
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
 
 - **Bildirim (issue 4443):** dev.11, YouTube 21.30.216, 3 tuşlu gezinmede kapsül yine uzuyor (PR 4426'dan sonra).
