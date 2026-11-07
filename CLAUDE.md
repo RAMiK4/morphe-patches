@@ -86,7 +86,16 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   Derleme kontrolü run 42343221245 başarılı. Yeni metinler yalnızca İngilizce (Crowdin).
 - **YTindir tarafı:** `RAMiK4/ytindir` dalı `claude/quick-download-quality-options-hkyzig` (build 68) bu ekleri anlıyor;
   eski YTindir `TYPE=thumbnail`'i video olarak indirir.
-- **Durum:** Kullanıcı testi bekleniyor. Test APK: youtube-morphe run 42344763069 (`patches_source`, publish kapalı).
+- **Test 1:** Test APK: youtube-morphe run 42344763069 (`patches_source`, publish kapalı).
+- **Test 1 sonucu (2026-11-07):** Çalışıyor. İstekler: Opus yok; çözünürlüğün yanında fps; açıklamalar 4K "Larger file",
+  2K "Better quality", FHD "Recommended", HD "Smaller file"; M4A etiketi ≈kbps + "AAC · Source audio"; MP3 etiketi 192 kbps
+  + "Opus → MP3 · Recommended", boyut "≈"; küçük resim doğrudan maxresdefault JPG (webp dönüştürme yok), JPG etiketi,
+  "≈200 KB"; panel renkleri tema diyaloglarıyla (0F0F0F); başlıkta video adı ve süre. YTindir'de aynı etiketler.
+- **Düzeltme `c58842a3`:** hepsi; panel `ThemeUtils.getDialogBackgroundColor()`, başlıkta küçük resim (mqdefault),
+  süre, başlık, kanal (aynı player yanıtından); fps/codec akış okununca; küçük resim boyutu HEAD ile. YTindir build 69
+  (`fec4568`, YouTube küçük resmi `YoutubeThumbnail` ile doğrudan JPG). Derleme kontrolü run 42349876012,
+  test APK youtube-morphe run 42349880033.
+- **Durum:** Kullanıcı testi bekleniyor.
 
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
 
