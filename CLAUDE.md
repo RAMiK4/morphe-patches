@@ -127,6 +127,8 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   izni verilmediği için o dal olduğu gibi duruyor (artık gereksiz, silinebilir). Derleme kontrolü run 42405289646.
   Upstream PR şablonuna göre başlık ve açıklamalı karşılaştırma bağlantısı kullanıcıya verildi; PR'ı kullanıcı açacak.
 - **Tekrar kontrol (2026-11-07):** dal hâlâ upstream `dev` ucunda (`d2383876`), PR henüz açılmamıştı; bağlantı yeniden verildi.
+- **Son test (2026-11-07):** youtube-morphe run 42412970551 (PR dalı, `v2.2.0-dev.1` tabanı) cihazda sorunsuz. Son bağlantı verildi:
+  YTindir bağlantısız metin, deneysel sürüm kutusu işaretli, "Tested on YouTube 21.44.528 (patches based on v2.2.0-dev.1)".
 
 ### 2026-11-07: Glass navigation bar durumu ve YouTube Music cam çubuğu
 
