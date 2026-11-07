@@ -143,6 +143,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   kısıtlaması Music'e uygulanacak mı kullanıcıya soruldu.
 - Testler: derleme run 42417396280, YT Music test APK `yt-music-morphe` run 42417411050, YouTube test APK
   `youtube-morphe` run 42417417732 (hepsi başarılı); cihazda deneme bekleniyor, sonra PR bağlantısı.
+- Kullanıcı ikisini de denedi, ciddi sorun yok. Bulanıklık kararı: Music'te Android 12+ açık kalıyor, sorun olursa
+  karar bakımcılara (PR açıklamasında belirtildi). YT Music 9.45.51 kaynağıyla yeni test APK run 42419605285.
+  YouTube debug logunda hata yok (tek toast "You have the latest version", ayarlarda güncelleme denetimi).
+  PR karşılaştırma bağlantısı verildi; PR'ı kullanıcı açacak.
 
 ### 2026-11-07: Glass navigation bar durumu ve YouTube Music cam çubuğu
 
