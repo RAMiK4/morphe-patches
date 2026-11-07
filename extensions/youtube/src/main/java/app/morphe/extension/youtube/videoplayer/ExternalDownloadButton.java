@@ -361,8 +361,9 @@ public class ExternalDownloadButton {
             });
             Utils.runOnBackgroundThread(() -> {
                 final long thumbnailBytes = QuickDownloadFormats.fetchThumbnailSize(videoId);
+                // The real size, without the approximate sign.
                 if (thumbnailBytes > 0) Utils.runOnMainThread(() -> thumbnailRow.size.setText(
-                        "≈" + Formatter.formatShortFileSize(context, thumbnailBytes)));
+                        Formatter.formatShortFileSize(context, thumbnailBytes)));
             });
             Utils.runOnBackgroundThread(() -> {
                 QuickDownloadFormats.Sizes sizes = QuickDownloadFormats.fetch(videoId);
@@ -396,11 +397,13 @@ public class ExternalDownloadButton {
                         if (sizes.codecs()[i] != null) {
                             row.detail.setText(sizes.codecs()[i] + " · " + str(qualityHint(height)));
                         }
-                        row.size.setText(formatSize(context, bytes, false));
+                        row.size.setText(formatSize(context, bytes));
                     }
-                    if (sizes.aacKbps() > 0) m4aRow.badge.setText("≈" + sizes.aacKbps() + " kbps");
-                    m4aRow.size.setText(formatSize(context, sizes.aac(), false));
-                    mp3Row.size.setText(formatSize(context, sizes.mp3(), true));
+                    // Read from the stream: the real bitrate, without the approximate sign.
+                    if (sizes.aacKbps() > 0) m4aRow.badge.setText(sizes.aacKbps() + " kbps");
+                    m4aRow.size.setText(formatSize(context, sizes.aac()));
+                    // A constant bitrate MP3 of the stream's length.
+                    mp3Row.size.setText(formatSize(context, sizes.mp3()));
                 });
             });
         } catch (Exception ex) {
@@ -434,7 +437,7 @@ public class ExternalDownloadButton {
 
     /** What a quality is good for, next to Full HD, the recommended one. */
     private static String qualityHint(int height) {
-        if (height >= 2160) return "morphe_external_downloader_quick_larger_file";
+        if (height >= 2160) return "morphe_external_downloader_quick_best_quality";
         if (height >= 1440) return "morphe_external_downloader_quick_better_quality";
         if (height >= 1080) return "morphe_external_downloader_quick_recommended";
         return "morphe_external_downloader_quick_smaller_file";
@@ -460,10 +463,8 @@ public class ExternalDownloadButton {
                 : String.format(Locale.US, "%d:%02d", minutes, rest);
     }
 
-    private static String formatSize(Context context, long bytes, boolean approximate) {
-        if (bytes <= 0) return "";
-        String size = Formatter.formatShortFileSize(context, bytes);
-        return approximate ? "≈" + size : size;
+    private static String formatSize(Context context, long bytes) {
+        return bytes > 0 ? Formatter.formatShortFileSize(context, bytes) : "";
     }
 
     @Nullable
