@@ -130,6 +130,20 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Son test (2026-11-07):** youtube-morphe run 42412970551 (PR dalı, `v2.2.0-dev.1` tabanı) cihazda sorunsuz. Son bağlantı verildi:
   YTindir bağlantısız metin, deneysel sürüm kutusu işaretli, "Tested on YouTube 21.44.528 (patches based on v2.2.0-dev.1)".
 
+### 2026-11-07: YouTube Music cam navigasyon çubuğu (PR hazırlığı)
+
+- Hızlı indir menüsü PR'ı açıldı: upstream PR 4539.
+- Eski dal `feat/music-glass-navigation-bar` (`d1dc820b`, ~50 commit geride) force-push yapılmadan yeni dala taşındı:
+  **`feat/music-glass-nav-bar`** (`46528ef2`, upstream `dev` `0b7ea38d` üzerinde).
+- Çakışma: commit YouTube cam kodunu `shared-youtube`'a (`GlassCapsuleDrawable`, `GlassNavigationBarLayout`,
+  `GlassNavigationBarSizePreference`) taşıyor; upstream'deki 0xrxL düzeltmeleri ortak koda işlendi:
+  tablette en küçük tuş genişliği (`Buttons.minWidth`, `lastMinButtonWidth`, `getButtonsLayout(appMinWidth)`) ve
+  YouTube `CapsuleHost.getCapsule`'da slim status bar. Upstream "blur yalnızca Android 14+" (YouTube) korunuyor.
+- Açık karar: Music kendi bulanıklığını Android 12+ RenderEffect (öncesi yazılım) ile çiziyor; YouTube'daki 12/13
+  kısıtlaması Music'e uygulanacak mı kullanıcıya soruldu.
+- Testler: derleme run 42417396280, YT Music test APK `yt-music-morphe` run 42417411050, YouTube test APK
+  `youtube-morphe` run 42417417732 (hepsi başarılı); cihazda deneme bekleniyor, sonra PR bağlantısı.
+
 ### 2026-11-07: Glass navigation bar durumu ve YouTube Music cam çubuğu
 
 - Upstream `dev`'de YouTube cam çubuğu PR'larımız (4338, 4426, 4447, 4452) ve 0xrxL'nin sonraki düzeltmeleri var
