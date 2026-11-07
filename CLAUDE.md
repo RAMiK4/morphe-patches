@@ -126,6 +126,15 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   yeni dal `feat/quick-download-quality-menu` (`b0bab50b`). Eski dal `feat/quick-download-qualities`'e force-push
   izni verilmediği için o dal olduğu gibi duruyor (artık gereksiz, silinebilir). Derleme kontrolü run 42405289646.
   Upstream PR şablonuna göre başlık ve açıklamalı karşılaştırma bağlantısı kullanıcıya verildi; PR'ı kullanıcı açacak.
+- **Tekrar kontrol (2026-11-07):** dal hâlâ upstream `dev` ucunda (`d2383876`), PR henüz açılmamıştı; bağlantı yeniden verildi.
+
+### 2026-11-07: Glass navigation bar durumu ve YouTube Music cam çubuğu
+
+- Upstream `dev`'de YouTube cam çubuğu PR'larımız (4338, 4426, 4447, 4452) ve 0xrxL'nin sonraki düzeltmeleri var
+  (tablette uç tuşlar, gizli mod/bağlantı çubuğu, Android 11 siyah bant, boyut önizlemesi).
+- YouTube'da varsayılan opaklık upstream'de **50**. %20 varsayılan yalnızca dal `feat/music-glass-navigation-bar`
+  (`d1dc820b`, YouTube Music cam çubuğu, upstream'de PR yok) içinde ve yalnızca Music ayarı için; YouTube için %20
+  yapan bir commit hiçbir dalda bulunamadı.
 
 ### Önceki işler (özet; ayrıntı `docs/is-gunlugu-arsiv.md`)
 
