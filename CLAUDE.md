@@ -95,7 +95,12 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   süre, başlık, kanal (aynı player yanıtından); fps/codec akış okununca; küçük resim boyutu HEAD ile. YTindir build 69
   (`fec4568`, YouTube küçük resmi `YoutubeThumbnail` ile doğrudan JPG). Derleme kontrolü run 42349876012,
   test APK youtube-morphe run 42349880033.
-- **Durum:** Kullanıcı testi bekleniyor.
+- **Test 2 sonucu (2026-11-07):** Kullanıcı: "çok iyi olmuş". Son istekler: 4K "Best quality"; gerçek değerler okununca
+  "≈" yok (M4A kbps, MP3 boyutu, küçük resim boyutu), yalnızca okunamayan tahminlerde "≈". Düzeltme `f8a8d505`, YTindir
+  `860a0c4` (build 70). Derleme kontrolü run 42355469761, test APK youtube-morphe run 42355471521.
+- **Durum:** YouTube tarafı kullanıcıya göre tamam (son düzeltmenin testi bekleniyor). YTindir iyileştirmeleri ayrı
+  sohbette sürecek. Upstream PR için: 4 commit tek commit'e sıkıştırılıp karşılaştırma bağlantısı verilecek (kullanıcı onayıyla).
+  YTDLnis bu menüyü görmez (`supportsQuickDownloadQuality` yalnızca YTindir), eski Video/Audio/All options menüsü kalır.
 
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
 
