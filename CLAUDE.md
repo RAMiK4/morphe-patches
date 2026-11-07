@@ -100,6 +100,8 @@ fork'un `main` dalına commit edilir. Kayıtlar en yeni üstte olacak şekilde t
   `860a0c4` (build 70). Derleme kontrolü run 42355469761, test APK youtube-morphe run 42355471521.
 - **Durum:** YouTube tarafı kullanıcıya göre tamam (son düzeltmenin testi bekleniyor). YTindir iyileştirmeleri ayrı
   sohbette sürecek. Upstream PR için: 4 commit tek commit'e sıkıştırılıp karşılaştırma bağlantısı verilecek (kullanıcı onayıyla).
+- **Karar (2026-11-07):** YouTube tarafı şimdilik tamam. PR açılmayacak: önce YTindir düzeltmeleri yapılıp yeni YTindir
+  sürümü yayınlanacak, sonra PR (yeni özellik kararı gelirse önce o).
   YTDLnis bu menüyü görmez (`supportsQuickDownloadQuality` yalnızca YTindir), eski Video/Audio/All options menüsü kalır.
 
 ### 2026-11-05: Glass navigation bar: 3 tuşlu gezinmede uzama (YouTube 21.30.216)
