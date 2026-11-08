@@ -157,6 +157,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   (`d1dc820b`, YouTube Music cam çubuğu, upstream'de PR yok) içinde ve yalnızca Music ayarı için; YouTube için %20
   yapan bir commit hiçbir dalda bulunamadı.
 
+- **PR açıldı (2026-11-08): #4539.** Bakımcı (LisoUseInAIKyrios) dala "refactor: Simplify the quick download quality
+  menu" (`ee1870f3`) commit'ini ekledi ve bizim commit'i küçük bir düzeltmeyle yeniden yazdı (`6587b7a1`).
+  Upstream `dev`'deki büyük temizlik commit'i (`2705d3a8`, `getVideoUrl`/`isOpenInPlayer` satır içine alındı)
+  `ExternalDownloadButton.java`'da çakıştı: upstream `dev` dala merge edildi (`06e20ff8`, force-push yok), URL satır
+  içinde ve `quickExtras` parametresi korunarak çözüldü. Derleme kontrolü çalıştırıldı. Bundan sonra dalda iş
+  yapmadan önce `origin`'den çekilecek.
+
 ### Önceki işler (özet; ayrıntı `docs/is-gunlugu-arsiv.md`)
 
 - **2026-11-05 Glass navigation bar düzeltmeleri:** 3 tuşlu gezinmede uzama (issue 4443) PR 4452 ve açık temada Shorts
