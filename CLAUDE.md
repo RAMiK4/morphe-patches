@@ -129,6 +129,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Tekrar kontrol (2026-11-07):** dal hâlâ upstream `dev` ucunda (`d2383876`), PR henüz açılmamıştı; bağlantı yeniden verildi.
 - **Son test (2026-11-07):** youtube-morphe run 42412970551 (PR dalı, `v2.2.0-dev.1` tabanı) cihazda sorunsuz. Son bağlantı verildi:
   YTindir bağlantısız metin, deneysel sürüm kutusu işaretli, "Tested on YouTube 21.44.528 (patches based on v2.2.0-dev.1)".
+- **PR açıldı (2026-11-08): #4539.** Bakımcı (LisoUseInAIKyrios) dala "refactor: Simplify the quick download quality
+  menu" (`ee1870f3`) commit'ini ekledi ve bizim commit'i küçük bir düzeltmeyle yeniden yazdı (`6587b7a1`).
+  Upstream `dev`'deki büyük temizlik commit'i (`2705d3a8`, `getVideoUrl`/`isOpenInPlayer` satır içine alındı)
+  `ExternalDownloadButton.java`'da çakıştı: upstream `dev` dala merge edildi (`06e20ff8`, force-push yok), URL satır
+  içinde ve `quickExtras` parametresi korunarak çözüldü. Derleme kontrolü run 42456074478 yeşil. Bundan sonra dalda iş
+  yapmadan önce `origin`'den çekilecek.
 
 ### 2026-11-07: YouTube Music cam navigasyon çubuğu (PR 4542 açık)
 
@@ -156,13 +162,6 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - YouTube'da varsayılan opaklık upstream'de **50**. %20 varsayılan yalnızca dal `feat/music-glass-navigation-bar`
   (`d1dc820b`, YouTube Music cam çubuğu, upstream'de PR yok) içinde ve yalnızca Music ayarı için; YouTube için %20
   yapan bir commit hiçbir dalda bulunamadı.
-
-- **PR açıldı (2026-11-08): #4539.** Bakımcı (LisoUseInAIKyrios) dala "refactor: Simplify the quick download quality
-  menu" (`ee1870f3`) commit'ini ekledi ve bizim commit'i küçük bir düzeltmeyle yeniden yazdı (`6587b7a1`).
-  Upstream `dev`'deki büyük temizlik commit'i (`2705d3a8`, `getVideoUrl`/`isOpenInPlayer` satır içine alındı)
-  `ExternalDownloadButton.java`'da çakıştı: upstream `dev` dala merge edildi (`06e20ff8`, force-push yok), URL satır
-  içinde ve `quickExtras` parametresi korunarak çözüldü. Derleme kontrolü çalıştırıldı. Bundan sonra dalda iş
-  yapmadan önce `origin`'den çekilecek.
 
 ### Önceki işler (özet; ayrıntı `docs/is-gunlugu-arsiv.md`)
 
