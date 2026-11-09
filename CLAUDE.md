@@ -135,6 +135,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `ExternalDownloadButton.java`'da çakıştı: upstream `dev` dala merge edildi (`06e20ff8`, force-push yok), URL satır
   içinde ve `quickExtras` parametresi korunarak çözüldü. Derleme kontrolü run 42456074478 yeşil. Bundan sonra dalda iş
   yapmadan önce `origin`'den çekilecek.
+- **Moda eklendi (2026-11-09):** PR birleşmeyi beklerken özellik `RAMiK4/yt-morphe`'ye
+  `addons/morphe/quick-download-quality-menu.patch` olarak girdi (PR dalının upstream'e göre farkı; iş akışı resmi kaynağa
+  uygular, Morphe içerince atlar, uymazsa derleme durur; TR/RU metinleri `extras/strings`). Sürüm
+  `v21.44.528-p2.2.0-dev.2-b95` yayınlandı. Bakımcı dalı değiştirirse yama dosyası yeniden üretilmeli.
 
 ### 2026-11-07: YouTube Music cam navigasyon çubuğu (PR 4542 açık)
 
