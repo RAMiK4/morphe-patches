@@ -115,6 +115,13 @@ public final class FeedViewCountPatch {
     /** Space between the thumbnail and the title. */
     private static final int THUMBNAIL_TEXT_GAP_DP = 12;
     private static final int FALLBACK_HEIGHT_DP = 20;
+    /** The duration badge, if it is estimated, see {@link #estimateDurationBadge(View, Rect, String)}. */
+    private static final float ESTIMATED_DURATION_TEXT_SP = 12f;
+    private static final int ESTIMATED_DURATION_PADDING_DP = 5;
+    private static final String ESTIMATED_DURATION_TEXT = "00:00";
+    /** Thumbnails of the rows of a list, which have the duration badge closer to their edges. */
+    private static final int SMALL_THUMBNAIL_WIDTH_DP = 240;
+    private static final int SMALL_THUMBNAIL_MARGIN_DP = 6;
     /** Cards of a grid of up to three columns, such as the feed in landscape. */
     private static final float MIN_GRID_CARD_WIDTH_OF_SCREEN = 0.3f;
     private static final int MIN_DURATION_HEIGHT_DP = 12;
@@ -1170,7 +1177,38 @@ public final class FeedViewCountPatch {
                 thumbnail = new Rect(0, 0, host.getWidth(), squareBottom);
             }
         }
-        return new ThumbnailFrame(info.duration, thumbnail, false);
+        Rect duration = info.duration;
+        if (duration == null && info.hasDuration && thumbnail != null) {
+            // The host of the whole thumbnail draws the duration, such as on the small thumbnails of the
+            // rows of a playlist, so where it is is estimated, and the badges do not overlap it.
+            duration = estimateDurationBadge(host, thumbnail, info.badgeText);
+        }
+        return new ThumbnailFrame(duration, thumbnail, false);
+    }
+
+    /**
+     * Estimates where the duration badge of a thumbnail is, if it can not be found.
+     * Its size is estimated from its text, with the font size of the app, a little larger than it is.
+     *
+     * @param text The text of the duration badge, or null if not known.
+     */
+    public static Rect estimateDurationBadge(View view, Rect thumbnail, @Nullable String text) {
+        final float density = view.getResources().getDisplayMetrics().density;
+        final float fontScale = view.getResources().getConfiguration().fontScale;
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        paint.setTextSize(ESTIMATED_DURATION_TEXT_SP * density * fontScale);
+        Paint.FontMetrics metrics = paint.getFontMetrics();
+        final int width = Math.round(paint.measureText(text != null ? text : ESTIMATED_DURATION_TEXT)
+                + 2 * ESTIMATED_DURATION_PADDING_DP * density);
+        final int height = Math.max(Math.round(FALLBACK_HEIGHT_DP * density),
+                Math.round(metrics.descent - metrics.ascent + 2 * ESTIMATED_DURATION_PADDING_DP / 2f * density));
+        // Small thumbnails have the badge closer to their edges.
+        final int margin = Math.round((thumbnail.width() < SMALL_THUMBNAIL_WIDTH_DP * density
+                ? SMALL_THUMBNAIL_MARGIN_DP : FALLBACK_MARGIN_DP) * density);
+        final int bottom = thumbnail.bottom - margin;
+        final int left = isRtl(view) ? thumbnail.left + margin : thumbnail.right - margin - width;
+        return new Rect(left, bottom - height, left + width, bottom);
     }
 
     /**

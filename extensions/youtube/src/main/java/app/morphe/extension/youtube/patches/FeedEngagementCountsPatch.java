@@ -660,7 +660,8 @@ public final class FeedEngagementCountsPatch {
             // as the duration badge.
             final boolean atRight = MIDDLE_RIGHT ? !rtl : rtl && this.frame != null;
             // At the right edge, the badge is below the Watch later button, or the menu of a Short.
-            final int minTop = thumbnailTop + margin + (MIDDLE_RIGHT ? px(TOP_BUTTON_DP) : 0);
+            final int cornerTop = thumbnailTop + margin;
+            final int minTop = cornerTop + (MIDDLE_RIGHT ? px(TOP_BUTTON_DP) : 0);
             // The badge does not overlap the row of the duration badge, which can also have the view count.
             compact = minTop + height > bottom;
             // The bottom of the thumbnail is about as far below the row of the duration as the duration badge.
@@ -694,8 +695,10 @@ public final class FeedEngagementCountsPatch {
                 final int rowWidth = Math.round(compactWidth) + compactPadding * 2;
                 final int rowHeight = px(COMPACT_HEIGHT_DP);
                 final int rowLeft = atRight ? thumbnailRight - margin - rowWidth : thumbnailLeft + margin;
+                // Small thumbnails, such as of the rows of a list, have no Watch later button,
+                // so the row can be above where the button would be.
                 final int rowTop = MIDDLE_RIGHT
-                        ? Math.max(minTop, Math.min(bottom - rowHeight, middle - rowHeight / 2))
+                        ? Math.max(cornerTop, Math.min(bottom - rowHeight, middle - rowHeight / 2))
                         : top;
                 setBounds(rowLeft, rowTop, rowLeft + rowWidth, rowTop + rowHeight);
             } else {
@@ -775,21 +778,25 @@ public final class FeedEngagementCountsPatch {
                     rtl ? viewCount.left : viewCount.right, top, bottom, durationLimit, rtl)) {
                 return true;
             }
-            // Where the view count badge would be, or above it if both do not fit in the row of the duration.
             final int start = rtl ? thumbnailRight - margin : thumbnailLeft + margin;
-            int rowTop = top;
-            int rowBottom = bottom;
-            int limit = durationLimit;
-            if (viewCount != null) {
-                rowBottom = top - gap;
-                rowTop = rowBottom - height;
-                limit = rtl ? thumbnailLeft + margin : thumbnailRight - margin;
-                if (rowTop < (thumbnail != null ? thumbnail.top : 0) + margin) {
-                    return false;
+            // Where the view count badge would be, if it's not shown.
+            if (viewCount == null) {
+                for (float scale : ROW_TEXT_SCALES) {
+                    if (setRow(host, loading, textSize * scale, false, start, top, bottom, durationLimit, rtl)) {
+                        return true;
+                    }
                 }
             }
+            // Above the row of the duration, if the row does not fit next to the duration badge,
+            // such as on the small thumbnails of the rows of a list, or the Shorts of a shelf.
+            final int aboveBottom = top - gap;
+            final int aboveTop = aboveBottom - height;
+            if (aboveTop < (thumbnail != null ? thumbnail.top : 0) + margin) {
+                return false;
+            }
+            final int edgeLimit = rtl ? thumbnailLeft + margin : thumbnailRight - margin;
             for (float scale : ROW_TEXT_SCALES) {
-                if (setRow(host, loading, textSize * scale, false, start, rowTop, rowBottom, limit, rtl)) {
+                if (setRow(host, loading, textSize * scale, false, start, aboveTop, aboveBottom, edgeLimit, rtl)) {
                     return true;
                 }
             }
