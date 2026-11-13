@@ -105,8 +105,11 @@ public final class FeedViewCountPatch {
     private static final int TOLERANCE_DP = 4;
     /** Space between the duration badge and the edges of the thumbnail, if the badge is not found. */
     private static final int FALLBACK_MARGIN_DP = 8;
-    /** A little more space than the duration badge has, so the count is not at the very edge. */
-    private static final int EXTRA_MARGIN_DP = 2;
+    /**
+     * Space of the badge from the edge of the thumbnail, in addition to the space of the duration badge.
+     * None, so both badges are as far from the edges.
+     */
+    public static final int EXTRA_MARGIN_DP = 0;
     /** A square thumbnail is this much taller than 16:9, at least. */
     private static final int SQUARE_MIN_EXTRA_DP = 40;
     /** Space between the thumbnail and the title. */
@@ -115,7 +118,8 @@ public final class FeedViewCountPatch {
     /** Cards of a grid of up to three columns, such as the feed in landscape. */
     private static final float MIN_GRID_CARD_WIDTH_OF_SCREEN = 0.3f;
     private static final int MIN_DURATION_HEIGHT_DP = 12;
-    private static final int PADDING_DP = 5;
+    /** Space between the edges of the badge and its content. */
+    public static final int PADDING_DP = 5;
     private static final int GAP_DP = 3;
     /** Same as the like count badge, close to the corners of the duration badge. */
     private static final int RADIUS_DP = 8;
