@@ -103,6 +103,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
 
+- **Durum (2026-11-13):** kullanıcı son test APK'yı onayladı ("her şey tamam") ve PR'ı dal `feat/feed-like-count-position`
+  ile upstream'e açıyor. Sonraki adım: PR numarasını kaydetmek, bakımcı incelemesini takip etmek (dalda çalışmadan önce
+  `origin`'den çek, force-push yok).
+
 - **İstek:** Akış küçük resminde sol alttaki izlenme rozetinin (yerinde kalıyor) yanına yatay olarak:
   `[▶][izlenme] | [👍][beğeni] [dikey beğeni/beğenmeme çubuğu][%N]`.
 - **Commit `d9091903f`** (dal `claude/morphe-thumbnail-badges-wyg0ny`, upstream `dev` `0306f45b1` üzerinde): yeni ayar
