@@ -1290,6 +1290,7 @@ public final class FeedViewCountPatch {
             if (badge != null) {
                 badge.detach(host);
                 badges.remove(host);
+                FeedEngagementCountsPatch.onViewCountBadgeChanged(host);
             }
             return;
         }
@@ -1298,6 +1299,40 @@ public final class FeedViewCountPatch {
             badges.put(host, badge);
         }
         badge.bind(host, viewCount, duration, thumbnail);
+        // The like count badge can be shown next to the view count.
+        FeedEngagementCountsPatch.onViewCountBadgeChanged(host);
+    }
+
+    /**
+     * @return The text size of a badge of this height, the same as of the view count badge.
+     */
+    public static float getBadgeTextSize(View view, int height) {
+        final float maxTextSize = TEXT_SP * view.getResources().getDisplayMetrics().density
+                * view.getResources().getConfiguration().fontScale;
+        return Math.min(maxTextSize, height * TEXT_SIZE_OF_HEIGHT);
+    }
+
+    /**
+     * @return Where the view count badge of a card is, relative to the card, or null if it's not shown.
+     * Must be called on the main thread.
+     */
+    @Nullable
+    public static Rect getBadgeBounds(View host) {
+        ViewCountBadge badge = badges.get(host);
+        return badge == null || !badge.added ? null : new Rect(badge.getBounds());
+    }
+
+    /**
+     * Sets if the like count badge of the Return YouTube Dislike patch is shown right after the view count badge,
+     * as one badge. Then the view count badge has no rounded corners on that side.
+     * Must be called on the main thread.
+     */
+    public static void setBadgeJoined(View host, boolean joined) {
+        ViewCountBadge badge = badges.get(host);
+        if (badge != null && badge.joined != joined) {
+            badge.joined = joined;
+            badge.invalidateSelf();
+        }
     }
 
     // endregion
@@ -1310,10 +1345,17 @@ public final class FeedViewCountPatch {
         private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path iconPath = new Path();
+        private final Path backgroundPath = new Path();
+        private final float[] radii = new float[8];
         private final RectF rect = new RectF();
         private final float density;
         private final float maxTextSize;
         private final WeakReference<ComponentHost> hostRef;
+        /**
+         * If the like count badge is shown right after this badge, at its right,
+         * or at its left in right to left languages.
+         */
+        private boolean joined;
 
         /**
          * False after the card was detached, such as when a list reuses it for something else.
@@ -1467,7 +1509,22 @@ public final class FeedViewCountPatch {
             Rect bounds = getBounds();
             final float radius = px(RADIUS_DP);
             rect.set(bounds);
-            canvas.drawRoundRect(rect, radius, radius, backgroundPaint);
+            if (joined) {
+                // The like count badge continues the badge on the joined side.
+                final boolean joinedAtLeft = host != null && isRtl(host);
+                final float left = joinedAtLeft ? 0 : radius;
+                final float right = joinedAtLeft ? radius : 0;
+                // Top left, top right, bottom right and bottom left corners.
+                radii[0] = radii[1] = left;
+                radii[2] = radii[3] = right;
+                radii[4] = radii[5] = right;
+                radii[6] = radii[7] = left;
+                backgroundPath.reset();
+                backgroundPath.addRoundRect(rect, radii, Path.Direction.CW);
+                canvas.drawPath(backgroundPath, backgroundPaint);
+            } else {
+                canvas.drawRoundRect(rect, radius, radius, backgroundPaint);
+            }
 
             final float centerY = bounds.exactCenterY();
             final float iconSize = textPaint.getTextSize() * ICON_SIZE_OF_TEXT;

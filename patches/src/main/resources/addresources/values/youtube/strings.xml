@@ -563,6 +563,8 @@ After a video with the Ask button is opened once, the feature works with all vid
     <!-- layout.returnyoutubedislike.returnYouTubeDislikePatch -->
     <string name="morphe_ryd_feed_like_count_title">Show feed thumbnail like count</string>
     <string name="morphe_ryd_feed_like_ratio_title">Show feed thumbnail like percentage</string>
+    <string name="morphe_ryd_feed_next_to_view_count_title">Show feed thumbnail likes next to view count</string>
+    <string name="morphe_ryd_feed_next_to_view_count_summary">The like count and percentage are shown in one row next to the view count at the bottom of the thumbnail, instead of at the top. Thumbnails too small for the row still show them at the top</string>
 
     <!-- interaction.searchcomments.searchCommentsPatch -->
     <string name="morphe_search_comments_title">Search comments</string>

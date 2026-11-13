@@ -67,6 +67,7 @@ val returnYouTubeDislikePatch = patch(
             SwitchPreference("morphe_ryd_dislike_percentage", summary = true),
             SwitchPreference("morphe_ryd_feed_like_count"),
             SwitchPreference("morphe_ryd_feed_like_ratio"),
+            SwitchPreference("morphe_ryd_feed_next_to_view_count", summary = true),
             SwitchPreference("morphe_ryd_estimated_like", summary = true),
             SwitchPreference("morphe_ryd_toast_on_connection_error", summary = true),
             screenInfoPreferenceCategory(
