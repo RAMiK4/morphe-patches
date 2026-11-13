@@ -119,7 +119,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   ızgarası); ayar listeye döndü `morphe_ryd_feed_counts_position`: Next to view count (varsayılan), Middle right
   vertical (sağ kenar ortası, "Daha sonra izle" altında), Top left vertical (upstream'deki eski düzen);
   `FeedViewCountPatch.EXTRA_MARGIN_DP` 2→0 (süre rozetiyle simetrik). Test APK #104 (run 43368757234) yeşil,
-  cihazda deneme bekleniyor. PR'dan önce 3 commit tek commit'e sıkıştırılacak.
+  kullanıcı onayladı ("tam istediğim gibi"). Ayar sağ orta idi (sol yazılmıştı), düzeltildi.
+- **Küçük kapaklar (`f789f1546`):** oynatma listesi / kanal Videolar satırlarında süreyi kapak host'u çiziyor, yeri
+  bulunamıyordu; `FeedViewCountPatch.estimateDurationBadge` metinden ve yazı ölçeğinden tahmin ediyor (Litho:
+  `findThumbnailFrame`, Litho dışı: `updateCompactVideo`). Satır sığmazsa %90/%80, sonra sürenin üstünde. Sağ ortada
+  küçük kapakta "Daha sonra izle" boşluğu yok. Test APK #105 (run 43376623130) yeşil, cihazda deneme bekleniyor.
+  PR'dan önce 4 commit tek commit'e sıkıştırılacak.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
