@@ -112,7 +112,8 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Testler:** derleme kontrolü run 43359247676 yeşil. Eklerle test APK #100 kırmızı: `quick-download-quality-menu.patch`
   upstream `dev` ucuna (ve `v2.3.0-dev.2`'ye) uymuyor; mod bir sonraki sürüme geçerken yeniden üretilmeli. `v2.3.0-dev.1`
   üzerine taşınmış test dalı `test/thumbnail-badges-row` ile #101. Karar sonrası youtube-morphe'ye `official_only`
-  girdisi eklendi (PR 27, birleşti) ve asıl dal yalnızca resmi yamalarla derlendi. Cihazda deneme bekleniyor.
+  girdisi eklendi (PR 27, birleşti) ve asıl dal yalnızca resmi yamalarla derlendi: **Release YT Morphe #102** (run 43361086444) yeşil, artifact
+  `test-build`. Cihazda deneme bekleniyor.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
