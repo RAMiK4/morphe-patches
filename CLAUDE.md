@@ -118,7 +118,15 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `patches_source=RAMiK4/morphe-patches@feat/glass-minimal-miniplayer`) yeşil, cihazda deneme bekleniyor.
 - **youtube-morphe (artık `RAMiK4/yt-morphe`) dalı `fix/test-build-name-time` (`0af44c4`):** test APK adına `-b<build>`
   eki, artifact içindeki APK'nın saati `LOCAL_TZ` (Europe/Istanbul) yerel saatine göre (zip saati UTC yazıyordu).
-  `main`'e birleşmedi.
+  PR 28 ile `main`'e birleşti.
+- **Cihaz denemesi (#109):** kullanıcı "çok iyi görünüyor" dedi. İstekler, commit `4910db7d3`: ilerleme çubuğu camın düz
+  alt kenarında (köşe yarıçapında kırpılıyor; görünüm şekliyle bulunuyor: player genişliğinde, ≤12dp, alt kenarı
+  player'ın altında, debug logda sınıf/id yazılıyor); yatay modda cam çubuk navigasyon kapsülü genişliğinde ve onun
+  ortasında (en az 360dp, kapsül yoksa en çok 480dp; `YouTubeGlassNavigationBar.getCapsuleSpanInWindow`); cam opaklık
+  varsayılanı her yerde 20 (YouTube navigasyon 50→20, Music mini oynatıcı 25→20). Navigasyon kapsülü köşesi tam
+  yarım yükseklik (hap), çubuk 16dp; kullanıcı soruyor. Büyürken/küçülürken kayma sırasında çubuk opak tema rengine
+  dönüyor (`barFill`), video köşesi düz: geçiş anı, kullanıcı "normalse sorun yok" dedi.
+- **Kullanıcı tercihi:** test APK'yı başlatınca bitişini kullanıcı kendisi kontrol eder (bekleme gerekmez, ~4 dk).
 
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
 
