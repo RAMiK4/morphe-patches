@@ -113,7 +113,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   arkasında, kare scrim yerine cam (`Host.isOverVideo`, siyah zemin çizmeden koyu stil). Camda YouTube'un kendi
   yuvarlak köşeleri kapalı. Yerleşik (docked) çubukta köşeler düz.
 - **Not:** oturum dalı `ccr-e5e0bdae-gtbbhs` yanlışlıkla fork `main` kopyası olarak gönderildi, işle ilgisi yok (silinebilir).
-- **Testler:** derleme kontrolü run 43421599110; cihazda test bekleniyor (önce `official_only`).
+- **Testler:** derleme kontrolü run 43421599110 yeşil. Kullanıcının ilk denemesi `patches_source` boş olduğu için
+  upstream dev sürümüyle derlendi (yeni ayar yoktu). Doğru test: youtube-morphe run 43425809757 (#109, `official_only`,
+  `patches_source=RAMiK4/morphe-patches@feat/glass-minimal-miniplayer`) yeşil, cihazda deneme bekleniyor.
+- **youtube-morphe (artık `RAMiK4/yt-morphe`) dalı `fix/test-build-name-time` (`0af44c4`):** test APK adına `-b<build>`
+  eki, artifact içindeki APK'nın saati `LOCAL_TZ` (Europe/Istanbul) yerel saatine göre (zip saati UTC yazıyordu).
+  `main`'e birleşmedi.
 
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
 
