@@ -131,6 +131,11 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   görünümler (iz ve dolgu ayrı olabilir), her çizimden önce yeniden kırpılıyor. Navigasyon kapsülü köşesi yüksekliğin
   %30'u (`YouTubeGlassNavigationBar.CORNER_RADIUS_FRACTION`, ayar önizlemesi dahil, sekme göstergesi köşeye uyuyor).
   Test APK başlatıldı. Hâlâ taşarsa debug logdaki "Miniplayer progress bar" satırı gerekli.
+- **Üçüncü deneme:** %30 köşe onaylandı. Log: "Miniplayer progress bar not found"; çizgi oynatıcının seekbar'ı
+  (`SeekbarOnDrawFingerprint`, SponsorBlock `setSeekbarRectangle` mini oynatıcıda right≈1180), ayrı ince görünüm değil.
+  Commit `cf3db6127`: görünüm araması kaldırıldı, seekbar `onDraw` başına `MinimalMiniplayerPatch.clipSeekbar` kancası,
+  bar modunda kanvas camın düz alt kenarına (köşe yarıçapı kadar içeri) kırpılıyor. Yeni ayar
+  `morphe_navigation_bar_glass_round` ("Round glass navigation bar", varsayılan kapalı: %30, açık: %50).
 - **Kullanıcı tercihi:** test APK'yı başlatınca bitişini kullanıcı kendisi kontrol eder (bekleme gerekmez, ~4 dk).
 
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
