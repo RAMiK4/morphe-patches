@@ -112,10 +112,14 @@ public final class YouTubeGlassNavigationBar {
     public static final int MARGIN_HORIZONTAL = Dim.dp12;
 
     /**
-     * The corner radius of the capsule, in parts of its height. Less round than a capsule with round ends.
-     * Also used by the preview in the settings.
+     * The corner radius of the capsule, in parts of its height: less round by default, with corners like the
+     * glass miniplayer, or with round ends. Also used by the preview in the settings.
      */
-    public static final float CORNER_RADIUS_FRACTION = 0.3f;
+    public static float getCornerRadiusFraction() {
+        return Settings.NAVIGATION_BAR_GLASS_ROUND.get() ? 0.5f : 0.3f;
+    }
+
+    private static final float CORNER_RADIUS_FRACTION = getCornerRadiusFraction();
 
     /**
      * The most alpha of the tint the app draws over its blurred background.

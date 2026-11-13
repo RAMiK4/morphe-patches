@@ -33,7 +33,6 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
-import android.os.SystemClock;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
 import android.view.View;
@@ -138,11 +137,6 @@ public final class MinimalMiniplayerPatch {
      */
     private static final int GLASS_LANDSCAPE_MIN_WIDTH = Dim.dp(360);
     private static final int GLASS_LANDSCAPE_MAX_WIDTH = Dim.dp(480);
-
-    /**
-     * The tallest view taken for the progress bar of the miniplayer, which runs along the bottom of the bar.
-     */
-    private static final int PROGRESS_BAR_MAX_HEIGHT = Dim.dp24;
 
     /**
      * YouTube's own {@code floaty_bar_height}.
@@ -297,16 +291,7 @@ public final class MinimalMiniplayerPatch {
     private static final int[] glassPlayerLocation = new int[2];
     private static final int[] glassContainerLocation = new int[2];
     private static final int[] navigationCapsuleSpan = new int[2];
-
-    /**
-     * The progress bar of the miniplayer, found by its shape, which is cut to the straight bottom edge of the glass.
-     */
-    private static final List<WeakReference<View>> progressBars = new ArrayList<>();
-    private static final Rect progressBarClip = new Rect();
-    private static final int[] progressBarLocation = new int[2];
-    private static boolean progressBarLogged;
-    private static long lastProgressBarSearch;
-    private static final long PROGRESS_BAR_SEARCH_MILLIS = 2000;
+    private static final int[] seekbarLocation = new int[2];
 
     /**
      * The player the video was rounded on, and the outline it had before.
@@ -1344,7 +1329,6 @@ public final class MinimalMiniplayerPatch {
         }
 
         updateGlass();
-        updateProgressBarClip(watchPlayer);
 
         final int height = currentBounds.height();
         final int width = currentBounds.width();
@@ -1505,133 +1489,30 @@ public final class MinimalMiniplayerPatch {
     }
 
     /**
-     * The progress bar of the miniplayer runs along the bottom of the bar, and is cut where the rounded corners
-     * of the glass begin, so it only covers the straight bottom edge. It is put back while the player is not a bar.
-     * The track and the played part can be separate views, so every view of it is cut.
+     * Injection point.
+     * <p>
+     * Called at the start of each frame the progress bar draws. Under the glass bar, the progress bar runs
+     * along its bottom edge, and is cut where the rounded corners of the glass begin, so it only covers
+     * the straight part of the edge. The clip is only for this draw of the progress bar.
      */
-    private static void updateProgressBarClip(@Nullable View watchPlayer) {
-        if (!GLASS) return;
+    public static void clipSeekbar(View seekbar, Canvas canvas) {
+        if (!GLASS || !inBarMode()) return;
 
-        final boolean bar = watchPlayer != null && inBarMode() && watchPlayer.getWidth() > 0
-                && glassCornerRadius(watchPlayer.getHeight()) > 0;
-        if (!bar) {
-            for (WeakReference<View> reference : progressBars) {
-                View view = reference.get();
-                if (view != null && view.getClipBounds() != null) {
-                    view.setClipBounds(null);
-                }
-            }
-            return;
-        }
+        try {
+            View player = watchPlayerRef.get();
+            if (player == null || player.getWidth() <= 0 || !player.isAttachedToWindow()) return;
 
-        boolean attached = !progressBars.isEmpty();
-        for (WeakReference<View> reference : progressBars) {
-            View view = reference.get();
-            if (view == null || !view.isAttachedToWindow()) {
-                attached = false;
-                break;
-            }
-        }
-        if (!attached) {
-            // The window is walked again only now and then, while the progress bar is not found.
-            final long now = SystemClock.uptimeMillis();
-            if (!progressBars.isEmpty() || now - lastProgressBarSearch >= PROGRESS_BAR_SEARCH_MILLIS) {
-                lastProgressBarSearch = now;
-                findProgressBars(watchPlayer);
-            }
-        }
+            final float radius = glassCornerRadius(player.getHeight());
+            if (radius <= 0) return;
 
-        final float radius = glassCornerRadius(watchPlayer.getHeight());
-        watchPlayer.getLocationInWindow(glassPlayerLocation);
-        // The straight bottom edge of the glass, in the window.
-        final float edgeLeft = glassPlayerLocation[0] + radius;
-        final float edgeRight = glassPlayerLocation[0] + watchPlayer.getWidth() - radius;
-
-        for (WeakReference<View> reference : progressBars) {
-            View view = reference.get();
-            if (view == null) continue;
-
-            view.getLocationInWindow(progressBarLocation);
-            final int left = Math.max(0, (int) Math.ceil(edgeLeft - progressBarLocation[0]));
-            final int right = (int) Math.floor(edgeRight - progressBarLocation[0]);
-            progressBarClip.set(left, 0, Math.max(left, right), view.getHeight());
-            if (!progressBarClip.equals(view.getClipBounds())) {
-                view.setClipBounds(new Rect(progressBarClip));
-            }
-        }
-    }
-
-    /**
-     * Thin views along the bottom of the player, from its start or to its end, such as the track and the played
-     * part of the progress bar. The feeds are left out, so the progress bars of the videos in them are not taken.
-     */
-    private static void findProgressBars(View watchPlayer) {
-        progressBars.clear();
-
-        watchPlayer.getLocationInWindow(glassPlayerLocation);
-        List<View> found = new ArrayList<>();
-        findProgressBars(watchPlayer.getRootView(), watchPlayer, glassPlayerLocation[0],
-                glassPlayerLocation[0] + watchPlayer.getWidth(),
-                glassPlayerLocation[1] + watchPlayer.getHeight(), found);
-
-        for (View view : found) {
-            progressBars.add(new WeakReference<>(view));
-            // Cut again before every frame, in case the app sets its own clip.
-            view.getViewTreeObserver().addOnPreDrawListener(() -> {
-                if (barShapeApplied && !morphing) {
-                    updateProgressBarClip(watchPlayerRef.get());
-                }
-                return true;
-            });
-        }
-
-        if (!progressBarLogged) {
-            progressBarLogged = true;
-            Logger.printDebug(() -> {
-                if (found.isEmpty()) return "Miniplayer progress bar not found";
-                StringBuilder builder = new StringBuilder("Miniplayer progress bar:");
-                for (View view : found) {
-                    String id = "none";
-                    try {
-                        if (view.getId() != View.NO_ID) {
-                            id = view.getResources().getResourceEntryName(view.getId());
-                        }
-                    } catch (Exception ignored) {
-                    }
-                    builder.append(' ').append(view.getClass().getName()).append(" id: ").append(id)
-                            .append(" size: ").append(view.getWidth()).append('x').append(view.getHeight());
-                }
-                return builder.toString();
-            });
-        }
-    }
-
-    private static void findProgressBars(View view, View watchPlayer, int playerLeft, int playerRight,
-                                         int playerBottom, List<View> out) {
-        if (view == watchPlayer || view == controlsRef.get() || view.getVisibility() != View.VISIBLE
-                || view.getAlpha() <= 0 || view.getClass().getName().contains("RecyclerView")) {
-            return;
-        }
-
-        final int height = view.getHeight();
-        if (height > 0 && height <= PROGRESS_BAR_MAX_HEIGHT && view.getWidth() > 0) {
-            view.getLocationInWindow(progressBarLocation);
-            final int left = progressBarLocation[0];
-            final int right = left + view.getWidth();
-            final int bottom = progressBarLocation[1] + height;
-            final int slop = Dim.dp16;
-            if (Math.abs(bottom - playerBottom) <= Dim.dp12
-                    && left >= playerLeft - slop && right <= playerRight + slop
-                    && (Math.abs(left - playerLeft) <= slop || Math.abs(right - playerRight) <= slop)) {
-                out.add(view);
-                return;
-            }
-        }
-
-        if (view instanceof ViewGroup group) {
-            for (int i = 0, count = group.getChildCount(); i < count; i++) {
-                findProgressBars(group.getChildAt(i), watchPlayer, playerLeft, playerRight, playerBottom, out);
-            }
+            player.getLocationInWindow(glassPlayerLocation);
+            seekbar.getLocationInWindow(seekbarLocation);
+            // The straight bottom edge of the glass, in the progress bar.
+            final float left = glassPlayerLocation[0] + radius - seekbarLocation[0];
+            final float right = glassPlayerLocation[0] + player.getWidth() - radius - seekbarLocation[0];
+            canvas.clipRect(left, -seekbar.getHeight(), Math.max(left, right), 2f * seekbar.getHeight());
+        } catch (Exception ex) {
+            Logger.printException(() -> "clipSeekbar failure", ex);
         }
     }
 

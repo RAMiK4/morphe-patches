@@ -59,7 +59,7 @@ public class YouTubeGlassNavigationBarPreference extends GlassNavigationBarSizeP
 
     @Override
     protected float getCornerRadiusFraction() {
-        return YouTubeGlassNavigationBar.CORNER_RADIUS_FRACTION;
+        return YouTubeGlassNavigationBar.getCornerRadiusFraction();
     }
 
     @Override

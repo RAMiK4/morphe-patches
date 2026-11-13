@@ -50,6 +50,7 @@ import app.morphe.patches.youtube.misc.playservice.versionCheckPatch
 import app.morphe.patches.youtube.misc.settings.PreferenceScreen
 import app.morphe.patches.youtube.misc.settings.settingsPatch
 import app.morphe.patches.youtube.shared.Constants.COMPATIBILITY_YOUTUBE
+import app.morphe.patches.youtube.shared.SeekbarOnDrawFingerprint
 import app.morphe.patches.youtube.shared.openVideoIntentPatch
 import app.morphe.patches.youtube.shared.startVideoInformerPatch
 import app.morphe.patches.youtube.video.format.hookAdaptiveFormat
@@ -664,6 +665,13 @@ val miniplayerPatch = patch(
                 )
             }
         }
+
+        // The progress bar under the glass bar is cut to the straight bottom edge of the glass.
+        SeekbarOnDrawFingerprint.method.addInstruction(
+            0,
+            "invoke-static/range { p0 .. p1 }, $MINIMAL_EXTENSION_CLASS->" +
+                    "clipSeekbar(Landroid/view/View;Landroid/graphics/Canvas;)V"
+        )
 
         // The bar is moved up by the same height as YouTube's own miniplayer.
         BottomUiContainerReportHeightFingerprint.let {
