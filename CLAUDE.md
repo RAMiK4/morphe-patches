@@ -124,7 +124,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   bulunamıyordu; `FeedViewCountPatch.estimateDurationBadge` metinden ve yazı ölçeğinden tahmin ediyor (Litho:
   `findThumbnailFrame`, Litho dışı: `updateCompactVideo`). Satır sığmazsa %90/%80, sonra sürenin üstünde. Sağ ortada
   küçük kapakta "Daha sonra izle" boşluğu yok. Test APK #105 (run 43376623130) yeşil, cihazda deneme bekleniyor.
-  PR'dan önce 4 commit tek commit'e sıkıştırılacak.
+  Kullanıcı onayladı.
+- **Son düzeltmeler ve PR dalı (2026-11-13):** en küçük kapaklarda (ekranın kısa kenarının %40'ından dar, ör. oynatma
+  listesi satırları) yüzde gösterilmiyor, kanal Videolar sekmesinde gösteriliyor; oynatma listesi satırında kartın
+  solundaki süre rozeti (`isThumbnailBadge`'den geçmeyen, `CardInfo.rowBadge`) tanınıyor. Tek commit, upstream `dev`
+  `06078d2bc` üzerinde: dal **`feat/feed-like-count-position`** (`300917f88`). Oturum dalı
+  `claude/morphe-thumbnail-badges-wyg0ny` eski çalışma geçmişi. Sade açıklamalı karşılaştırma bağlantısı verildi;
+  son test APK ile denendikten sonra PR'ı kullanıcı açacak.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
