@@ -103,6 +103,11 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 
 ### 2026-11-13: YouTube Minimal / Minimal 2 mini oynatıcı cam görünümü
 
+- **Durum (2026-11-13):** kullanıcı son test APK'yı onayladı ("her şey tamam"). PR dalı **`feat/glass-miniplayer`**
+  (`27c6c5c7f`, 4 commit tek commit, upstream `dev` `0b0a55802` üzerinde); çalışma dalı `feat/glass-minimal-miniplayer`
+  geçmiş olarak duruyor. Açıklamalı karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak. Sonraki adım: PR numarasını
+  kaydetmek, bakımcı incelemesini takip etmek.
+
 - **İstek:** Minimal (ve uygunsa Minimal 2) mini oynatıcı glass navigation bar ile uyumlu, cam görünümünde olsun.
 - **Commit `59e8ec132`** (dal `feat/glass-minimal-miniplayer`, upstream `dev` `404f88e1a` üzerinde): yeni ayar
   `morphe_miniplayer_glass` ("Glass miniplayer", varsayılan açık, yalnızca Minimal/Minimal 2 ve cam navigasyon çubuğu
