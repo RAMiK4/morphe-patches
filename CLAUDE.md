@@ -96,6 +96,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
+
+- **İstek:** Akış küçük resminde sol alttaki izlenme rozetinin (yerinde kalıyor) yanına yatay olarak:
+  `[▶][izlenme] | [👍][beğeni] [dikey beğeni/beğenmeme çubuğu][%N]`.
+- **Commit `d9091903f`** (dal `claude/morphe-thumbnail-badges-wyg0ny`, upstream `dev` `0306f45b1` üzerinde): yeni ayar
+  `morphe_ryd_feed_next_to_view_count` (varsayılan açık, RYD ekranında). `FeedEngagementCountsPatch.placeRow` rozeti
+  izlenme rozetinin hemen yanına aynı yükseklik ve yazı boyutunda koyuyor; izlenme rozeti o kenarda köşesiz çiziliyor
+  (`FeedViewCountPatch.setBadgeJoined`), araya ince ayırıcı. İzlenme rozeti yoksa satır onun yerinde tek başına.
+  Süre rozetine çarpacaksa (dar küçük resim) eski sol üst düzene dönüyor. Shorts'ta başlık çizilene kadar gizli.
+- **Testler:** derleme kontrolü run 43359247676, test APK youtube-morphe run 43359265467. Cihazda deneme bekleniyor.
+
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
 - **İstek:** YouTube'daki "Hızlı indir" menüsü (Video 1080p / Ses 192 kbps / Tüm seçenekler) cihaza kaydet
