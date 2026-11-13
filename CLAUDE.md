@@ -126,6 +126,11 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   varsayılanı her yerde 20 (YouTube navigasyon 50→20, Music mini oynatıcı 25→20). Navigasyon kapsülü köşesi tam
   yarım yükseklik (hap), çubuk 16dp; kullanıcı soruyor. Büyürken/küçülürken kayma sırasında çubuk opak tema rengine
   dönüyor (`barFill`), video köşesi düz: geçiş anı, kullanıcı "normalse sorun yok" dedi.
+- **İkinci deneme:** yatay genişlik ve opaklık onaylandı; ilerleme çubuğu hâlâ köşelere taşıyordu (bulunamamıştı).
+  Commit `75d41a1cd`: arama tüm pencerede (RecyclerView'lar hariç), ≤24dp, oynatıcının başına/sonuna hizalı ince
+  görünümler (iz ve dolgu ayrı olabilir), her çizimden önce yeniden kırpılıyor. Navigasyon kapsülü köşesi yüksekliğin
+  %30'u (`YouTubeGlassNavigationBar.CORNER_RADIUS_FRACTION`, ayar önizlemesi dahil, sekme göstergesi köşeye uyuyor).
+  Test APK başlatıldı. Hâlâ taşarsa debug logdaki "Miniplayer progress bar" satırı gerekli.
 - **Kullanıcı tercihi:** test APK'yı başlatınca bitişini kullanıcı kendisi kontrol eder (bekleme gerekmez, ~4 dk).
 
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
