@@ -72,6 +72,15 @@ public final class GlassCapsuleDrawable extends Drawable {
         }
 
         /**
+         * @return If the capsule is drawn over a playing video, such as a miniplayer that shows the video
+         *         behind its controls. The capsule then has the colors it has over a dark player,
+         *         but nothing is drawn around it.
+         */
+        default boolean isOverVideo() {
+            return false;
+        }
+
+        /**
          * Draws what is behind the bar, such as blurred, if the app does not give the bar a blurred
          * background. The canvas is clipped to the capsule, and the fill of the glass is drawn over it.
          */
@@ -334,7 +343,7 @@ public final class GlassCapsuleDrawable extends Drawable {
      * Updates the colors if the theme changed or the bar moved over or away from a dark player.
      */
     public void updateStyle() {
-        final int newStyle = host.isOverDarkPlayer()
+        final int newStyle = host.isOverDarkPlayer() || host.isOverVideo()
                 ? STYLE_DARK_PLAYER
                 : Utils.isDarkModeEnabled() ? STYLE_DARK : STYLE_LIGHT;
         if (newStyle == style) return;
@@ -486,7 +495,7 @@ public final class GlassCapsuleDrawable extends Drawable {
             // The dark player can end above the navigation bar, so the background of the window
             // would show around the capsule, which is white with the light theme.
             // The player is always dark, so the bar is kept black around the capsule.
-            if (style == STYLE_DARK_PLAYER) {
+            if (style == STYLE_DARK_PLAYER && !host.isOverVideo()) {
                 canvas.drawColor(Color.BLACK);
             }
 
