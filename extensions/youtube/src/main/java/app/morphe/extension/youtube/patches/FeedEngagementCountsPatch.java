@@ -21,6 +21,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -109,6 +110,12 @@ public final class FeedEngagementCountsPatch {
      * in right to left languages, used if the duration badge is not found.
      */
     private static final int RIGHT_MARGIN_DP = 8;
+    /**
+     * Thumbnails narrower than this part of the smallest side of the screen, such as of the rows
+     * of a playlist, do not show the like ratio, as it does not fit next to the duration.
+     * The thumbnails of the videos of a channel are wider, and show it.
+     */
+    private static final float MAX_SMALL_THUMBNAIL_OF_SCREEN = 0.4f;
     /** Height of the Watch later button at the top right of the thumbnail, with the space below it. */
     private static final int TOP_BUTTON_DP = 40;
     /** Space between the badge and the duration badge below it. */
@@ -299,6 +306,10 @@ public final class FeedEngagementCountsPatch {
         private String videoId;
         @Nullable
         private String countText;
+        /** The like ratio of the video. */
+        @Nullable
+        private String videoRatioText;
+        /** The like ratio, if shown on this thumbnail, see {@link #MAX_SMALL_THUMBNAIL_OF_SCREEN}. */
         @Nullable
         private String ratioText;
         private float likeFraction = -1;
@@ -382,6 +393,7 @@ public final class FeedEngagementCountsPatch {
             if (!newVideoId.equals(videoId)) {
                 videoId = newVideoId;
                 countText = null;
+                videoRatioText = null;
                 ratioText = null;
                 likeFraction = -1;
                 fetching = false;
@@ -519,16 +531,16 @@ public final class FeedEngagementCountsPatch {
             final float fraction = data.getLikePercentage();
             if (LIKE_RATIO && votes > 0 && fraction >= 0 && fraction <= 1) {
                 likeFraction = fraction;
-                ratioText = formatPercent(fraction);
+                videoRatioText = formatPercent(fraction);
             } else {
                 likeFraction = -1;
-                ratioText = null;
+                videoRatioText = null;
             }
         }
 
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         private boolean hasContent() {
-            return countText != null || ratioText != null;
+            return countText != null || videoRatioText != null;
         }
 
         /**
@@ -548,7 +560,25 @@ public final class FeedEngagementCountsPatch {
                 removeFromOverlay(host);
                 return;
             }
-            if (NEXT_TO_VIEW_COUNT && placeRow(host, loading)) {
+            // Cards of some layouts show the thumbnail inset from their edges, such as the shelves
+            // of a channel, or below other content, such as the video of a channel post.
+            // So the badge is placed from the duration badge, or else from the thumbnail.
+            FeedViewCountPatch.ThumbnailFrame frame = this.frame != null || !(host instanceof ComponentHost componentHost)
+                    ? this.frame
+                    : FeedViewCountPatch.findThumbnailFrame(componentHost);
+            if (frame == null) {
+                removeFromOverlay(host);
+                return;
+            }
+            // The smallest thumbnails, such as of the rows of a playlist, show only the like count.
+            final Rect frameThumbnail = frame.thumbnail();
+            final int thumbnailWidth = frameThumbnail != null ? frameThumbnail.width() : host.getWidth();
+            final DisplayMetrics metrics = host.getResources().getDisplayMetrics();
+            final boolean small = thumbnailWidth
+                    < Math.min(metrics.widthPixels, metrics.heightPixels) * MAX_SMALL_THUMBNAIL_OF_SCREEN;
+            ratioText = small && LIKE_COUNT ? null : videoRatioText;
+
+            if (NEXT_TO_VIEW_COUNT && placeRow(host, frame, loading)) {
                 return;
             }
             row = false;
@@ -580,16 +610,6 @@ public final class FeedEngagementCountsPatch {
             final int width = Math.max(px(MIN_WIDTH_DP), Math.round(contentWidth) + padding * 2);
             final int height = Math.round(contentHeight) + padding * 2;
 
-            // Cards of some layouts show the thumbnail inset from their edges, such as the shelves
-            // of a channel, or below other content, such as the video of a channel post.
-            // So the badge is placed from the duration badge, or else from the thumbnail.
-            FeedViewCountPatch.ThumbnailFrame frame = this.frame != null || !(host instanceof ComponentHost componentHost)
-                    ? this.frame
-                    : FeedViewCountPatch.findThumbnailFrame(componentHost);
-            if (frame == null) {
-                removeFromOverlay(host);
-                return;
-            }
             final Rect duration = frame.duration();
             final Rect thumbnail = frame.thumbnail();
             // In right to left languages the duration badge is at the left.
@@ -718,13 +738,7 @@ public final class FeedEngagementCountsPatch {
          *
          * @return If the badge is placed or waits, or false if the row does not fit on the thumbnail.
          */
-        private boolean placeRow(View host, boolean loading) {
-            FeedViewCountPatch.ThumbnailFrame frame = this.frame != null || !(host instanceof ComponentHost componentHost)
-                    ? this.frame
-                    : FeedViewCountPatch.findThumbnailFrame(componentHost);
-            if (frame == null) {
-                return false;
-            }
+        private boolean placeRow(View host, FeedViewCountPatch.ThumbnailFrame frame, boolean loading) {
             if (frame.estimated()) {
                 // The row of the duration moves down once the title of the Short is drawn.
                 row = false;

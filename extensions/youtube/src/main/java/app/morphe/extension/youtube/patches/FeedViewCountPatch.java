@@ -953,6 +953,14 @@ public final class FeedViewCountPatch {
         Rect thumbnail;
         /** If the thumbnail is the host that shows the duration, not only the image. */
         boolean thumbnailShowsDuration;
+        /**
+         * The first duration or live badge that is not where it is on the thumbnails of the feed,
+         * such as of a row of a playlist, whose thumbnail is at the left of the card.
+         */
+        @Nullable
+        Rect rowBadge;
+        @Nullable
+        String rowBadgeText;
         /** Texts below the thumbnail, with their top and left. */
         final List<PlacedText> texts = new ArrayList<>();
         /** Texts above this are on the thumbnail, such as the duration. */
@@ -1011,8 +1019,15 @@ public final class FeedViewCountPatch {
                     }
                     info.addText(text, rect);
                     String badgeText = text.toString().trim();
-                    if (!FeedVideoCardsPatch.isVideoBadgeText(badgeText)
-                            || !FeedVideoCardsPatch.isThumbnailBadge(root, rect)) {
+                    if (!FeedVideoCardsPatch.isVideoBadgeText(badgeText)) {
+                        continue;
+                    }
+                    if (!FeedVideoCardsPatch.isThumbnailBadge(root, rect)) {
+                        // Such as the duration of a row of a playlist, whose thumbnail is at the left of the card.
+                        if (info.rowBadge == null) {
+                            info.rowBadge = new Rect(rect);
+                            info.rowBadgeText = badgeText;
+                        }
                         continue;
                     }
                     info.hasDuration = true;
@@ -1130,13 +1145,22 @@ public final class FeedViewCountPatch {
      * or at the bottom left in right to left languages.
      */
     private static boolean isDurationBadgeShaped(ComponentHost root, Rect rect) {
+        return isDurationBadgeShaped(root, rect, true);
+    }
+
+    /**
+     * @param atThumbnailEnd If the badge must be at the end of a thumbnail as wide as the card.
+     */
+    private static boolean isDurationBadgeShaped(ComponentHost root, Rect rect, boolean atThumbnailEnd) {
         final float density = root.getResources().getDisplayMetrics().density;
         // Thumbnails are 16:9 or square, such as of music videos.
         return rect.width() > 0
                 && rect.width() <= FeedVideoCardsPatch.MAX_DURATION_WIDTH_DP * density
                 && rect.height() >= MIN_DURATION_HEIGHT_DP * density
                 && rect.height() <= FeedVideoCardsPatch.MAX_DURATION_HEIGHT_DP * density
-                && (isRtl(root) ? rect.centerX() < root.getWidth() / 2 : rect.centerX() > root.getWidth() / 2)
+                && (!atThumbnailEnd || (isRtl(root)
+                ? rect.centerX() < root.getWidth() / 2
+                : rect.centerX() > root.getWidth() / 2))
                 && rect.bottom <= root.getWidth() + TOLERANCE_DP * density;
     }
 
@@ -1178,6 +1202,37 @@ public final class FeedViewCountPatch {
             }
         }
         Rect duration = info.duration;
+        if (duration == null && info.rowBadge != null
+                && (thumbnail == null || Rect.intersects(thumbnail, info.rowBadge))) {
+            // The thumbnail is at the left of the card, or at its right in right to left languages.
+            final float density = host.getResources().getDisplayMetrics().density;
+            final Rect badge = info.rowBadge;
+            final int margin = Math.round(SMALL_THUMBNAIL_MARGIN_DP * density);
+            if (isDurationBadgeShaped(host, badge, false)) {
+                // A host only as large as the badge.
+                duration = badge;
+            }
+            if (duration != null && thumbnail == null) {
+                final int bottom = badge.bottom + margin;
+                if (isRtl(host)) {
+                    final int left = badge.left - margin;
+                    final int width = host.getWidth() - left;
+                    thumbnail = new Rect(left, bottom - Math.round(width * FeedVideoCardsPatch.THUMBNAIL_RATIO),
+                            host.getWidth(), bottom);
+                } else {
+                    final int right = badge.right + margin;
+                    thumbnail = new Rect(0, bottom - Math.round(right * FeedVideoCardsPatch.THUMBNAIL_RATIO),
+                            right, bottom);
+                }
+            } else if (duration == null && badge.width() < host.getWidth()
+                    && badge.height() >= badge.width() * FeedVideoCardsPatch.THUMBNAIL_RATIO - TOLERANCE_DP * density) {
+                // The host of the whole thumbnail draws the duration.
+                if (thumbnail == null) {
+                    thumbnail = badge;
+                }
+                duration = estimateDurationBadge(host, thumbnail, info.rowBadgeText);
+            }
+        }
         if (duration == null && info.hasDuration && thumbnail != null) {
             // The host of the whole thumbnail draws the duration, such as on the small thumbnails of the
             // rows of a playlist, so where it is is estimated, and the badges do not overlap it.
