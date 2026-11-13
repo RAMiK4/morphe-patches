@@ -113,7 +113,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   upstream `dev` ucuna (ve `v2.3.0-dev.2`'ye) uymuyor; mod bir sonraki sürüme geçerken yeniden üretilmeli. `v2.3.0-dev.1`
   üzerine taşınmış test dalı `test/thumbnail-badges-row` ile #101. Karar sonrası youtube-morphe'ye `official_only`
   girdisi eklendi (PR 27, birleşti) ve asıl dal yalnızca resmi yamalarla derlendi: **Release YT Morphe #102** (run 43361086444) yeşil, artifact
-  `test-build`. Cihazda deneme bekleniyor.
+  `test-build`. Kullanıcı denedi: çalışıyor (ilk açılışta yükleme ara sıra gidip geldi, yeniden açılışta yok).
+- **Düzeltmeler (`691547cf7`, `c6b34e46a`):** ayırıcının iki yanında eşit boşluk (izlenme rozeti iç boşluğu ve ikon kenar
+  boşluğu hesaba katılıyor); satır sığmazsa izlenme rozetinin üstünde ayrı satır, sonra yazı %90/%80 (kanal Shorts
+  ızgarası); ayar listeye döndü `morphe_ryd_feed_counts_position`: Next to view count (varsayılan), Middle right
+  vertical (sağ kenar ortası, "Daha sonra izle" altında), Top left vertical (upstream'deki eski düzen);
+  `FeedViewCountPatch.EXTRA_MARGIN_DP` 2→0 (süre rozetiyle simetrik). Test APK #104 (run 43368757234) yeşil,
+  cihazda deneme bekleniyor. PR'dan önce 3 commit tek commit'e sıkıştırılacak.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
