@@ -11,6 +11,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -48,6 +49,8 @@ import app.morphe.extension.youtube.settings.Settings;
  * with the same cache as the player. A video is fetched when its card is laid out. Until the fetch
  * completes, the badge shows a loading spinner, and the counts fade in once they are fetched.
  * The counts are not clickable, so tapping them opens the video.
+ * <p>
+ * The counts can also be shown in one row at the bottom of the thumbnail, continuing the view count badge.
  */
 @SuppressWarnings("unused")
 public final class FeedEngagementCountsPatch {
@@ -56,6 +59,11 @@ public final class FeedEngagementCountsPatch {
     private static final boolean LIKE_COUNT = RYD_ENABLED && Settings.RYD_FEED_LIKE_COUNT.get();
     private static final boolean LIKE_RATIO = RYD_ENABLED && Settings.RYD_FEED_LIKE_RATIO.get();
     public static final boolean ENABLED = LIKE_COUNT || LIKE_RATIO;
+    /**
+     * If the counts are shown in one row at the bottom of the thumbnail, right after the view count badge,
+     * or where it would be. Thumbnails too small for the row show the counts at the top.
+     */
+    private static final boolean NEXT_TO_VIEW_COUNT = ENABLED && Settings.RYD_FEED_NEXT_TO_VIEW_COUNT.get();
 
     /** Longest wait for a fetch, which is done off the main thread. */
     private static final long FETCH_TIMEOUT_MS = 10_000;
@@ -105,6 +113,26 @@ public final class FeedEngagementCountsPatch {
     private static final int COMPACT_ICON_DP = 12;
     private static final int COMPACT_CORNER_RADIUS_DP = 4;
     private static final int COMPACT_BAR_HEIGHT_DP = 2;
+
+    /** The row next to the view count, see {@link #NEXT_TO_VIEW_COUNT}. */
+    private static final int ROW_PADDING_DP = 5;
+    /** Space at each side of the divider between the view count and the like count. */
+    private static final int ROW_DIVIDER_SPACE_DP = 5;
+    private static final float ROW_DIVIDER_WIDTH_DP = 1f;
+    /** Height of the divider, relative to the height of the row. */
+    private static final float ROW_DIVIDER_OF_HEIGHT = 0.5f;
+    /** Space between the like count and the like bar. */
+    private static final int ROW_GROUP_GAP_DP = 6;
+    private static final int ROW_BAR_WIDTH_DP = 3;
+    /** Size of the like icon, which has some space around it, relative to the text size. */
+    private static final float ROW_ICON_OF_TEXT = 1.15f;
+    /** Height of the like bar and of the spinner, relative to the text size. */
+    private static final float ROW_BAR_OF_TEXT = 0.85f;
+    /** Space of the row from the edges of the thumbnail if the duration badge is not found. */
+    private static final int ROW_FALLBACK_MARGIN_DP = 10;
+    private static final int ROW_FALLBACK_HEIGHT_DP = 20;
+    private static final int ROW_MIN_HEIGHT_DP = 12;
+    private static final int DIVIDER_COLOR = 0x80FFFFFF;
 
     /** A little darker than the duration badge, for the smaller texts. */
     private static final int BACKGROUND_COLOR = 0xA6000000;
@@ -199,6 +227,24 @@ public final class FeedEngagementCountsPatch {
     }
 
     /**
+     * Called by {@link FeedViewCountPatch} on the main thread after the view count badge of a card
+     * is placed or removed, so the counts shown next to it are placed again.
+     */
+    public static void onViewCountBadgeChanged(View host) {
+        if (!NEXT_TO_VIEW_COUNT) {
+            return;
+        }
+        try {
+            CountsBadge badge = badges.get(host);
+            if (badge != null && badge.videoId != null) {
+                badge.place(host);
+            }
+        } catch (Exception ex) {
+            Logger.printException(() -> "onViewCountBadgeChanged failure", ex);
+        }
+    }
+
+    /**
      * Dark rounded badge with the like count and the like ratio, drawn on the overlay of the card.
      */
     private static final class CountsBadge extends Drawable implements View.OnAttachStateChangeListener {
@@ -207,6 +253,11 @@ public final class FeedEngagementCountsPatch {
         private final Paint ratioPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint spinnerPaint;
+        /** Texts of the row next to the view count, with the font of the view count. */
+        private final Paint rowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path backgroundPath = new Path();
+        private final float[] radii = new float[8];
         private final RectF rect = new RectF();
         private final float density;
         private final WeakReference<View> hostRef;
@@ -254,6 +305,12 @@ public final class FeedEngagementCountsPatch {
         private int durationHostWidth = -1;
         /** If the badge is the compact single row, see {@link #COMPACT_HEIGHT_DP}. */
         private boolean compact;
+        /** If the badge is the row next to the view count, see {@link #NEXT_TO_VIEW_COUNT}. */
+        private boolean row;
+        /** If the row continues the view count badge, with a divider between them. */
+        private boolean joined;
+        /** If the view count badge is at the right of the row, in right to left languages. */
+        private boolean joinedAtRight;
 
         CountsBadge(View host) {
             hostRef = new WeakReference<>(host);
@@ -275,6 +332,12 @@ public final class FeedEngagementCountsPatch {
             ratioPaint.setTextSize(RATIO_TEXT_SP * scaledDensity);
 
             spinnerPaint = FeedVideoCardsPatch.createSpinnerPaint(density, TEXT_COLOR);
+
+            rowPaint.setColor(TEXT_COLOR);
+            rowPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+
+            dividerPaint.setColor(DIVIDER_COLOR);
+            dividerPaint.setStrokeWidth(ROW_DIVIDER_WIDTH_DP * density);
         }
 
         private int px(float dp) {
@@ -452,6 +515,11 @@ public final class FeedEngagementCountsPatch {
                 removeFromOverlay(host);
                 return;
             }
+            if (NEXT_TO_VIEW_COUNT && placeRow(host, loading)) {
+                return;
+            }
+            row = false;
+            setJoined(host, false);
 
             final int padding = px(PADDING_DP);
             final int gap = px(GAP_DP);
@@ -596,6 +664,131 @@ public final class FeedEngagementCountsPatch {
             invalidateSelf();
         }
 
+        /**
+         * Places the badge as one row at the bottom of the thumbnail, right after the view count badge,
+         * or where the view count badge would be if it's not shown.
+         *
+         * @return If the badge is placed or waits, or false if the row does not fit on the thumbnail.
+         */
+        private boolean placeRow(View host, boolean loading) {
+            FeedViewCountPatch.ThumbnailFrame frame = this.frame != null || !(host instanceof ComponentHost componentHost)
+                    ? this.frame
+                    : FeedViewCountPatch.findThumbnailFrame(componentHost);
+            if (frame == null) {
+                return false;
+            }
+            if (frame.estimated()) {
+                // The row of the duration moves down once the title of the Short is drawn.
+                row = false;
+                setJoined(host, false);
+                removeFromOverlay(host);
+                return true;
+            }
+            final Rect duration = frame.duration();
+            final Rect thumbnail = frame.thumbnail();
+            final boolean rtl = FeedViewCountPatch.isRtl(host);
+            final int thumbnailLeft = thumbnail != null ? thumbnail.left : 0;
+            final int thumbnailRight = thumbnail != null ? thumbnail.right : host.getWidth();
+            final Rect viewCount = FeedViewCountPatch.getBadgeBounds(host);
+
+            // Same height and bottom as the view count badge and the duration badge.
+            final int top;
+            final int bottom;
+            if (viewCount != null) {
+                top = viewCount.top;
+                bottom = viewCount.bottom;
+            } else if (duration != null) {
+                top = duration.top;
+                bottom = duration.bottom;
+            } else {
+                final int thumbnailBottom = thumbnail != null
+                        ? thumbnail.bottom
+                        : host instanceof ComponentHost componentHost
+                        ? FeedVideoCardsPatch.getThumbnailBottom(componentHost)
+                        : host.getHeight();
+                bottom = thumbnailBottom - px(RIGHT_MARGIN_DP);
+                top = bottom - px(ROW_FALLBACK_HEIGHT_DP);
+            }
+            final int height = bottom - top;
+            if (height < px(ROW_MIN_HEIGHT_DP)) {
+                return false;
+            }
+            // The same space from the edge of the thumbnail as the view count badge.
+            final int margin = duration != null
+                    ? Math.max(0, rtl ? duration.left - thumbnailLeft : thumbnailRight - duration.right) + px(2)
+                    : px(ROW_FALLBACK_MARGIN_DP);
+
+            final boolean newJoined = viewCount != null;
+            rowPaint.setTextSize(FeedViewCountPatch.getBadgeTextSize(host, height));
+            final int width = Math.round(measureRow(loading, newJoined));
+            final int left;
+            if (newJoined) {
+                left = rtl ? viewCount.left - width : viewCount.right;
+            } else {
+                left = rtl ? thumbnailRight - margin - width : thumbnailLeft + margin;
+            }
+            final int right = left + width;
+
+            // The row does not overlap the duration badge, or the edge of the thumbnail.
+            final int gap = px(DURATION_GAP_DP);
+            if (duration != null
+                    ? (rtl ? left < duration.right + gap : right > duration.left - gap)
+                    : (rtl ? left < thumbnailLeft + margin : right > thumbnailRight - margin)) {
+                return false;
+            }
+
+            row = true;
+            compact = false;
+            joinedAtRight = rtl;
+            setBounds(left, top, right, bottom);
+            setJoined(host, newJoined);
+            if (!added) {
+                host.getOverlay().add(this);
+                added = true;
+            }
+            invalidateSelf();
+            return true;
+        }
+
+        /**
+         * @return The width of the row next to the view count, with the text size set to {@link #rowPaint}.
+         */
+        private float measureRow(boolean loading, boolean withDivider) {
+            final float textSize = rowPaint.getTextSize();
+            final int gap = px(GAP_DP);
+            float width = px(ROW_PADDING_DP);
+            width += withDivider
+                    ? px(ROW_DIVIDER_SPACE_DP) * 2 + ROW_DIVIDER_WIDTH_DP * density
+                    : px(ROW_PADDING_DP);
+            if (countText != null || (loading && LIKE_COUNT)) {
+                width += textSize * ROW_ICON_OF_TEXT + gap;
+            }
+            if (loading) {
+                width += textSize * ROW_BAR_OF_TEXT;
+                return width;
+            }
+            if (countText != null) {
+                width += rowPaint.measureText(countText);
+            }
+            if (ratioText != null) {
+                if (countText != null) {
+                    width += px(ROW_GROUP_GAP_DP);
+                }
+                width += px(ROW_BAR_WIDTH_DP) + gap + rowPaint.measureText(ratioText);
+            }
+            return width;
+        }
+
+        /**
+         * Sets if the view count badge is continued by this badge.
+         */
+        private void setJoined(View host, boolean joined) {
+            if (this.joined != joined) {
+                this.joined = joined;
+                FeedViewCountPatch.setBadgeJoined(host, joined);
+            }
+        }
+
         void detach(View host) {
             host.removeOnAttachStateChangeListener(this);
             cancelPendingFetch();
@@ -626,6 +819,7 @@ public final class FeedEngagementCountsPatch {
         }
 
         private void removeFromOverlay(View host) {
+            setJoined(host, false);
             if (added) {
                 host.getOverlay().remove(this);
                 added = false;
@@ -640,6 +834,10 @@ public final class FeedEngagementCountsPatch {
             }
             if (hostRef.get() instanceof ComponentHost host && FeedVideoCardsPatch.isCardPlayingInline(host)) {
                 // The inline player shows its own buttons over the thumbnail.
+                return;
+            }
+            if (row) {
+                drawRow(canvas, loading);
                 return;
             }
             Rect bounds = getBounds();
@@ -761,6 +959,98 @@ public final class FeedEngagementCountsPatch {
 
                 Paint.FontMetrics metrics = ratioPaint.getFontMetrics();
                 canvas.drawText(ratioText, centerX, y - metrics.ascent, ratioPaint);
+            }
+        }
+
+        /**
+         * Draws the row next to the view count: a divider, the like icon and the like count,
+         * and a vertical like bar with the like ratio.
+         */
+        private void drawRow(Canvas canvas, boolean loading) {
+            Rect bounds = getBounds();
+            // Same corners as the view count badge, which this row continues on the joined side.
+            final float radius = px(CORNER_RADIUS_DP);
+            final float leftRadius = joined && !joinedAtRight ? 0 : radius;
+            final float rightRadius = joined && joinedAtRight ? 0 : radius;
+            radii[0] = radii[1] = leftRadius;
+            radii[2] = radii[3] = rightRadius;
+            radii[4] = radii[5] = rightRadius;
+            radii[6] = radii[7] = leftRadius;
+            rect.set(bounds);
+            backgroundPath.reset();
+            backgroundPath.addRoundRect(rect, radii, Path.Direction.CW);
+            canvas.drawPath(backgroundPath, backgroundPaint);
+
+            final float textSize = rowPaint.getTextSize();
+            final float centerY = bounds.exactCenterY();
+            final int gap = px(GAP_DP);
+            final float dividerBlock = px(ROW_DIVIDER_SPACE_DP) * 2 + ROW_DIVIDER_WIDTH_DP * density;
+            if (joined) {
+                final float dividerX = joinedAtRight
+                        ? bounds.right - dividerBlock / 2
+                        : bounds.left + dividerBlock / 2;
+                final float dividerHalf = bounds.height() * ROW_DIVIDER_OF_HEIGHT / 2;
+                dividerPaint.setAlpha(Math.round((DIVIDER_COLOR >>> 24) * alpha / 255f));
+                canvas.drawLine(dividerX, centerY - dividerHalf, dividerX, centerY + dividerHalf, dividerPaint);
+            }
+            float x = bounds.left + (joined && !joinedAtRight ? dividerBlock : px(ROW_PADDING_DP));
+
+            if (countText != null || (loading && LIKE_COUNT)) {
+                final int iconSize = Math.round(textSize * ROW_ICON_OF_TEXT);
+                Drawable icon = getLikeIcon();
+                if (icon != null) {
+                    final int top = Math.round(centerY - iconSize / 2f);
+                    icon.setBounds(Math.round(x), top, Math.round(x) + iconSize, top + iconSize);
+                    // Shared by all badges, and shown with the loading spinner, so it does not fade in.
+                    icon.setAlpha(255);
+                    icon.draw(canvas);
+                }
+                x += iconSize + gap;
+            }
+
+            if (loading) {
+                final float spinnerSize = textSize * ROW_BAR_OF_TEXT;
+                rect.set(x, centerY - spinnerSize / 2, x + spinnerSize, centerY + spinnerSize / 2);
+                FeedVideoCardsPatch.drawSpinner(canvas, rect, spinnerPaint);
+                // Drawn again, so the spinner turns.
+                invalidateSelf();
+                return;
+            }
+
+            rowPaint.setAlpha(alpha);
+            Paint.FontMetrics metrics = rowPaint.getFontMetrics();
+            final float baseline = centerY - (metrics.ascent + metrics.descent) / 2;
+            if (countText != null) {
+                canvas.drawText(countText, x, baseline, rowPaint);
+                x += rowPaint.measureText(countText);
+            }
+
+            if (ratioText != null) {
+                if (countText != null) {
+                    x += px(ROW_GROUP_GAP_DP);
+                }
+                // A vertical bar, with the likes in green from the bottom and the dislikes in red at the top.
+                final float barWidth = px(ROW_BAR_WIDTH_DP);
+                final float barHeight = textSize * ROW_BAR_OF_TEXT;
+                final float barTop = centerY - barHeight / 2;
+                final float barBottom = centerY + barHeight / 2;
+                final float barRadius = barWidth / 2;
+                final float split = barBottom - barHeight * likeFraction;
+                rect.set(x, barTop, x + barWidth, barBottom);
+                barPaint.setColor(DISLIKE_BAR_COLOR);
+                barPaint.setAlpha(alpha);
+                canvas.drawRoundRect(rect, barRadius, barRadius, barPaint);
+                if (split < barBottom) {
+                    canvas.save();
+                    canvas.clipRect(x, split, x + barWidth, barBottom);
+                    barPaint.setColor(LIKE_BAR_COLOR);
+                    barPaint.setAlpha(alpha);
+                    canvas.drawRoundRect(rect, barRadius, barRadius, barPaint);
+                    canvas.restore();
+                }
+                x += barWidth + gap;
+
+                canvas.drawText(ratioText, x, baseline, rowPaint);
             }
         }
 
