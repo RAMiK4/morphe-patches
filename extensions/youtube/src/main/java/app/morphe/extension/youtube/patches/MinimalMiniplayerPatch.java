@@ -132,6 +132,18 @@ public final class MinimalMiniplayerPatch {
     private static final float GLASS_BLUR_RADIUS = Dim.dp20;
 
     /**
+     * In landscape the glass bar is as wide as the capsule of the glass navigation bar, at least this wide,
+     * or this wide at most without the capsule, instead of spanning the whole screen.
+     */
+    private static final int GLASS_LANDSCAPE_MIN_WIDTH = Dim.dp(360);
+    private static final int GLASS_LANDSCAPE_MAX_WIDTH = Dim.dp(480);
+
+    /**
+     * The tallest view taken for the progress bar of the miniplayer, which runs along the bottom of the bar.
+     */
+    private static final int PROGRESS_BAR_MAX_HEIGHT = Dim.dp12;
+
+    /**
      * YouTube's own {@code floaty_bar_height}.
      */
     private static final int BAR_HEIGHT = Dim.dp(56);
@@ -283,6 +295,15 @@ public final class MinimalMiniplayerPatch {
     private static final List<View> viewsBehind = new ArrayList<>();
     private static final int[] glassPlayerLocation = new int[2];
     private static final int[] glassContainerLocation = new int[2];
+    private static final int[] navigationCapsuleSpan = new int[2];
+
+    /**
+     * The progress bar of the miniplayer, found by its shape, which is cut to the straight bottom edge of the glass.
+     */
+    private static WeakReference<View> progressBarRef = new WeakReference<>(null);
+    private static final Rect progressBarClip = new Rect();
+    private static final int[] progressBarLocation = new int[2];
+    private static boolean progressBarLogged;
 
     /**
      * The player the video was rounded on, and the outline it had before.
@@ -728,6 +749,10 @@ public final class MinimalMiniplayerPatch {
         updateBarSpan();
         barBounds.set(barSpan.left + BAR_MARGIN, bottom - BAR_HEIGHT,
                 barSpan.right - BAR_MARGIN, bottom);
+
+        if (GLASS && !DOCKED) {
+            fitLandscapeWidth(playerLayout);
+        }
 
         if (atTop) {
             // Below the status bar and the display cutout.
@@ -1316,6 +1341,7 @@ public final class MinimalMiniplayerPatch {
         }
 
         updateGlass();
+        updateProgressBarClip(watchPlayer);
 
         final int height = currentBounds.height();
         final int width = currentBounds.width();
@@ -1442,6 +1468,119 @@ public final class MinimalMiniplayerPatch {
             videoOutlineRadius = radius;
             watchPlayer.invalidateOutline();
         }
+    }
+
+    /**
+     * A bar across a landscape screen is too wide, so the glass bar is as wide as the capsule of the
+     * glass navigation bar and above it, at least {@link #GLASS_LANDSCAPE_MIN_WIDTH} wide.
+     * Without the capsule, such as with a navigation rail, it is at most {@link #GLASS_LANDSCAPE_MAX_WIDTH} wide.
+     */
+    private static void fitLandscapeWidth(@Nullable View playerLayout) {
+        View root = playerLayout != null ? playerLayout.getRootView() : null;
+        final int screenWidth = root != null ? root.getWidth() : Dim.getMetrics().widthPixels;
+        final int screenHeight = root != null ? root.getHeight() : Dim.getMetrics().heightPixels;
+        if (screenWidth <= screenHeight) return;
+
+        int width = GLASS_LANDSCAPE_MAX_WIDTH;
+        int center = barBounds.centerX();
+        if (YouTubeGlassNavigationBar.getCapsuleSpanInWindow(navigationCapsuleSpan)) {
+            // The bounds are relative to the layout that holds the player, not to the window.
+            int origin = 0;
+            if (playerLayout != null) {
+                playerLayout.getLocationInWindow(windowLocation);
+                origin = windowLocation[0];
+            }
+            width = Math.max(GLASS_LANDSCAPE_MIN_WIDTH, navigationCapsuleSpan[1] - navigationCapsuleSpan[0]);
+            center = (navigationCapsuleSpan[0] + navigationCapsuleSpan[1]) / 2 - origin;
+        }
+
+        if (width >= barBounds.width()) return;
+
+        final int left = Math.max(barBounds.left, Math.min(barBounds.right - width, center - width / 2));
+        barBounds.left = left;
+        barBounds.right = left + width;
+    }
+
+    /**
+     * The progress bar of the miniplayer runs along the bottom of the bar, and is cut where the rounded corners
+     * of the glass begin, so it follows the straight bottom edge. It is put back while the player is not a bar.
+     */
+    private static void updateProgressBarClip(View watchPlayer) {
+        if (!GLASS) return;
+
+        View progressBar = progressBarRef.get();
+        final float radius = glassCornerRadius(watchPlayer.getHeight());
+        if (!inBarMode() || radius <= 0 || watchPlayer.getWidth() <= 0) {
+            if (progressBar != null && progressBar.getClipBounds() != null) {
+                progressBar.setClipBounds(null);
+            }
+            return;
+        }
+
+        if (progressBar == null || !progressBar.isAttachedToWindow()) {
+            progressBar = findProgressBar(watchPlayer);
+            if (progressBar == null) return;
+            progressBarRef = new WeakReference<>(progressBar);
+        }
+
+        watchPlayer.getLocationInWindow(glassPlayerLocation);
+        progressBar.getLocationInWindow(progressBarLocation);
+        final int left = Math.max(0, Math.round(glassPlayerLocation[0] + radius - progressBarLocation[0]));
+        final int right = Math.round(glassPlayerLocation[0] + watchPlayer.getWidth() - radius - progressBarLocation[0]);
+        progressBarClip.set(left, 0, Math.max(left, right), progressBar.getHeight());
+        if (!progressBarClip.equals(progressBar.getClipBounds())) {
+            progressBar.setClipBounds(new Rect(progressBarClip));
+        }
+    }
+
+    /**
+     * A thin view about as wide as the player, with its bottom at the bottom of the player.
+     */
+    @Nullable
+    private static View findProgressBar(View watchPlayer) {
+        if (!(watchPlayer.getParent() instanceof ViewGroup layout)) return null;
+
+        watchPlayer.getLocationInWindow(glassPlayerLocation);
+        final int playerBottom = glassPlayerLocation[1] + watchPlayer.getHeight();
+        View found = findProgressBar(layout, watchPlayer, playerBottom);
+
+        if (!progressBarLogged) {
+            progressBarLogged = true;
+            Logger.printDebug(() -> {
+                if (found == null) return "Miniplayer progress bar not found";
+                String id = "none";
+                try {
+                    if (found.getId() != View.NO_ID) {
+                        id = found.getResources().getResourceEntryName(found.getId());
+                    }
+                } catch (Exception ignored) {
+                }
+                return "Miniplayer progress bar: " + found.getClass().getName() + " id: " + id;
+            });
+        }
+        return found;
+    }
+
+    @Nullable
+    private static View findProgressBar(ViewGroup group, View watchPlayer, int playerBottom) {
+        for (int i = 0, count = group.getChildCount(); i < count; i++) {
+            View child = group.getChildAt(i);
+            if (child == watchPlayer || child == controlsRef.get() || !child.isShown()) continue;
+
+            final int height = child.getHeight();
+            if (height > 0 && height <= PROGRESS_BAR_MAX_HEIGHT && child.getWidth() >= watchPlayer.getWidth() * 0.8f) {
+                child.getLocationInWindow(progressBarLocation);
+                if (Math.abs(progressBarLocation[1] + height - playerBottom) <= Dim.dp8) {
+                    return child;
+                }
+            }
+
+            if (child instanceof ViewGroup childGroup) {
+                View found = findProgressBar(childGroup, watchPlayer, playerBottom);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 
     private static GlassCapsuleDrawable glassFor(View container) {
