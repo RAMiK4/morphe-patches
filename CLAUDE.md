@@ -76,6 +76,10 @@ Geçmiş işlerden çıkan, yeni işlerde de geçerli bilgiler.
 - **Test APK:** Kullanıcı Morphe Manager'la yamalanan Actions `.mpp`'lerinde (1.49, Patcher 2.0) açılışta çökme yaşadı.
   Test için `RAMiK4/youtube-morphe` `release.yml` `workflow_dispatch`, `patches_source=RAMiK4/morphe-patches@<dal>`,
   `publish` kapalı; artifact `test-build`, yalnızca BBK Clone (hiby) varyantı, kullanıcının anahtarıyla imzalı.
+- **Test sırası (kullanıcı kararı, 2026-11-13):** Morphe özellik/düzeltme testleri önce **`official_only` işaretli**
+  yapılır: mod ekleri (`addons/morphe`), `extras/` ve YaVoT girmez, dal upstream `dev` üzerinde kalabilir.
+  Her şey yolunda gidince en son aşamada `official_only` kapalı (eklerle) bir test derlemesi yapılır; ekler yalnızca
+  son etikete uyduğundan o derleme için dal gerekirse son etikete taşınır.
 - **Upstream `dev` ucu:** yayınlanmamış commit'ler yamalamayı bozabiliyor (ör. "Series tracking", `HistoryPatch.kt`
   ClassCastException). Böyle olursa test dalı son etikete (`vX.Y.Z-dev.N`) taşınır, PR yine upstream `dev` üzerinde.
 - **Upstream `dev` force-push edilebiliyor:** fetch `+dev:...` ile. `git reset --soft upstream/dev` ile tek commit'e
@@ -105,7 +109,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   izlenme rozetinin hemen yanına aynı yükseklik ve yazı boyutunda koyuyor; izlenme rozeti o kenarda köşesiz çiziliyor
   (`FeedViewCountPatch.setBadgeJoined`), araya ince ayırıcı. İzlenme rozeti yoksa satır onun yerinde tek başına.
   Süre rozetine çarpacaksa (dar küçük resim) eski sol üst düzene dönüyor. Shorts'ta başlık çizilene kadar gizli.
-- **Testler:** derleme kontrolü run 43359247676, test APK youtube-morphe run 43359265467. Cihazda deneme bekleniyor.
+- **Testler:** derleme kontrolü run 43359247676 yeşil. Eklerle test APK #100 kırmızı: `quick-download-quality-menu.patch`
+  upstream `dev` ucuna (ve `v2.3.0-dev.2`'ye) uymuyor; mod bir sonraki sürüme geçerken yeniden üretilmeli. `v2.3.0-dev.1`
+  üzerine taşınmış test dalı `test/thumbnail-badges-row` ile #101. Karar sonrası youtube-morphe'ye `official_only`
+  girdisi eklendi (PR 27, birleşti) ve asıl dal yalnızca resmi yamalarla derlendi. Cihazda deneme bekleniyor.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
