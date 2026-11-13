@@ -112,6 +112,12 @@ public final class YouTubeGlassNavigationBar {
     public static final int MARGIN_HORIZONTAL = Dim.dp12;
 
     /**
+     * The corner radius of the capsule, in parts of its height. Less round than a capsule with round ends.
+     * Also used by the preview in the settings.
+     */
+    public static final float CORNER_RADIUS_FRACTION = 0.3f;
+
+    /**
      * The most alpha of the tint the app draws over its blurred background.
      */
     private static final float LIGHT_BLUR_TINT_ALPHA = 0.50f;
@@ -647,6 +653,11 @@ public final class YouTubeGlassNavigationBar {
         public boolean isOverDarkPlayer() {
             // The Shorts player is always dark, whatever the app theme.
             return ShortsPlayerState.isOpen();
+        }
+
+        @Override
+        public float getCornerRadius(RectF capsule) {
+            return capsule.height() * CORNER_RADIUS_FRACTION;
         }
     }
 

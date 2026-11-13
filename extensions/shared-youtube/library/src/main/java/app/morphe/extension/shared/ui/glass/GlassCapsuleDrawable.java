@@ -598,12 +598,20 @@ public final class GlassCapsuleDrawable extends Drawable {
 
         scratch.set(left, capsule.top + INDICATOR_INSET, right, capsule.bottom - INDICATOR_INSET);
         if (scratch.height() <= 0) return;
-        final float radius = scratch.height() / 2;
+        // The corners follow the corners of the capsule, half the height with a round capsule.
+        final float radius = getIndicatorRadius(host.getCornerRadius(capsule), scratch.height());
         canvas.drawRoundRect(scratch, radius, radius, indicatorPaint);
 
         lastIndicatorLeft = left;
         lastIndicatorRight = right;
         lastIndicatorValid = true;
+    }
+
+    /**
+     * @return The corner radius of the selected button indicator inside a capsule with this corner radius.
+     */
+    public static float getIndicatorRadius(float capsuleRadius, float indicatorHeight) {
+        return Math.max(0, Math.min(indicatorHeight / 2, capsuleRadius - INDICATOR_INSET));
     }
 
     @Override
