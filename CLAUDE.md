@@ -101,6 +101,20 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-13: YouTube Minimal / Minimal 2 mini oynatıcı cam görünümü
+
+- **İstek:** Minimal (ve uygunsa Minimal 2) mini oynatıcı glass navigation bar ile uyumlu, cam görünümünde olsun.
+- **Commit `59e8ec132`** (dal `feat/glass-minimal-miniplayer`, upstream `dev` `404f88e1a` üzerinde): yeni ayar
+  `morphe_miniplayer_glass` ("Glass miniplayer", varsayılan açık, yalnızca Minimal/Minimal 2 ve cam navigasyon çubuğu
+  açıkken). `MinimalMiniplayerPatch`: çubuk kabı `GlassCapsuleDrawable` (opaklık navigasyon çubuğununki, köşe 16dp,
+  yandan 12dp boşluk), konum `watch_player`'dan. Minimal: arkadaki sayfa Android 14+ bulanık (`GlassBackdrop`'a çoklu
+  görünüm `draw` eklendi, kaptan önce çizilen kardeş görünümler), altında uygulama arka plan rengi; video 6dp içeride,
+  köşeleri outline ile yuvarlak (SurfaceView uymazsa köşe düz kalır); düğmeler yarı saydam. Minimal 2: video camın
+  arkasında, kare scrim yerine cam (`Host.isOverVideo`, siyah zemin çizmeden koyu stil). Camda YouTube'un kendi
+  yuvarlak köşeleri kapalı. Yerleşik (docked) çubukta köşeler düz.
+- **Not:** oturum dalı `ccr-e5e0bdae-gtbbhs` yanlışlıkla fork `main` kopyası olarak gönderildi, işle ilgisi yok (silinebilir).
+- **Testler:** derleme kontrolü run 43421599110; cihazda test bekleniyor (önce `official_only`).
+
 ### 2026-11-13: Küçük resimde izlenme ve beğeni tek satırda (RYD)
 
 - **Durum (2026-11-13):** kullanıcı son test APK'yı onayladı ("her şey tamam") ve PR'ı dal `feat/feed-like-count-position`
