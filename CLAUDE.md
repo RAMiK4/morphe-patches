@@ -92,7 +92,8 @@ Geçmiş işlerden çıkan, yeni işlerde de geçerli bilgiler.
   bağlantıları proxy'de kapalı. Klon yalnızca `main`'i izler: yeni dalı `git push -u` ile gönder, izleme için
   `remote.origin.fetch`'e o dalın refspec'ini ekleyip fetch et.
 - **YouTube APK incelemesi:** kaynak APK youtube-morphe'nin "source" taslak sürümünde (androguard ile).
-- **Silinemeyen geçici dallar:** `test/feat-external-downloader-quick-download-on-dev`, `test/ccr-511e3576-s4c9y4-on-dev`.
+- **Silinemeyen geçici dallar:** `test/feat-external-downloader-quick-download-on-dev`, `test/ccr-511e3576-s4c9y4-on-dev`,
+  `test/upstream-dev-ci`, `test/thumbnail-badges-row`.
 
 ## İş günlüğü
 
@@ -131,6 +132,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `06078d2bc` üzerinde: dal **`feat/feed-like-count-position`** (`300917f88`). Oturum dalı
   `claude/morphe-thumbnail-badges-wyg0ny` eski çalışma geçmişi. Sade açıklamalı karşılaştırma bağlantısı verildi;
   son test APK ile denendikten sonra PR'ı kullanıcı açacak.
+- **Derleme düzeltmesi:** değişken adı çakışması (`thumbnailWidth`), ayrı commit `6e4742678` (force-push izni
+  verilmedi; dalda 2 commit). Test APK #107 (run 43408786473) yeşil. Derleme kontrolü run 43408791109 ilk denemede
+  `QueueRuntimeBoundaryTest` (kuyruk yaması, bizimle ilgisiz) NPE ile düştü, yeniden çalıştırmada yeşil: test ara sıra düşüyor.
 
 ### 2026-11-07: Hızlı indir menüsünde kaliteler ve dosya boyutları (YTindir)
 
