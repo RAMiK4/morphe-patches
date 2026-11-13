@@ -411,7 +411,7 @@
     </string-array>
     <string-array name="morphe_ryd_feed_counts_position_entry_values">
         <item>NEXT_TO_VIEW_COUNT</item>
-        <item>MIDDLE_LEFT</item>
+        <item>MIDDLE_RIGHT</item>
         <item>TOP_LEFT</item>
     </string-array>
 

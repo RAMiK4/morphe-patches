@@ -51,7 +51,7 @@ import app.morphe.extension.youtube.settings.Settings;
  * The counts are not clickable, so tapping them opens the video.
  * <p>
  * The counts are shown in one row at the bottom of the thumbnail, continuing the view count badge,
- * or below each other at the left of the thumbnail, see {@link FeedCountsPosition}.
+ * or below each other at an edge of the thumbnail, see {@link FeedCountsPosition}.
  */
 @SuppressWarnings("unused")
 public final class FeedEngagementCountsPatch {
@@ -66,9 +66,12 @@ public final class FeedEngagementCountsPatch {
      */
     private static final boolean NEXT_TO_VIEW_COUNT = ENABLED
             && Settings.RYD_FEED_COUNTS_POSITION.get() == FeedCountsPosition.NEXT_TO_VIEW_COUNT;
-    /** If the badge is at the middle of the left edge of the thumbnail, instead of at its top. */
-    private static final boolean MIDDLE_LEFT = ENABLED
-            && Settings.RYD_FEED_COUNTS_POSITION.get() == FeedCountsPosition.MIDDLE_LEFT;
+    /**
+     * If the badge is at the middle of the right edge of the thumbnail, or of its left edge
+     * in right to left languages, instead of at its top left corner.
+     */
+    private static final boolean MIDDLE_RIGHT = ENABLED
+            && Settings.RYD_FEED_COUNTS_POSITION.get() == FeedCountsPosition.MIDDLE_RIGHT;
 
     /**
      * Where the counts are shown on the thumbnails.
@@ -76,8 +79,8 @@ public final class FeedEngagementCountsPatch {
     public enum FeedCountsPosition {
         /** In one row at the bottom of the thumbnail, continuing the view count badge. */
         NEXT_TO_VIEW_COUNT,
-        /** Below each other, at the middle of the left edge of the thumbnail. */
-        MIDDLE_LEFT,
+        /** Below each other, at the middle of the right edge of the thumbnail, below the Watch later button. */
+        MIDDLE_RIGHT,
         /** Below each other, at the top left corner of the thumbnail. */
         TOP_LEFT
     }
@@ -106,6 +109,8 @@ public final class FeedEngagementCountsPatch {
      * in right to left languages, used if the duration badge is not found.
      */
     private static final int RIGHT_MARGIN_DP = 8;
+    /** Height of the Watch later button at the top right of the thumbnail, with the space below it. */
+    private static final int TOP_BUTTON_DP = 40;
     /** Space between the badge and the duration badge below it. */
     private static final int DURATION_GAP_DP = 4;
     /** Height of the duration badge, which is 20 dp and 8 dp above the bottom, plus a gap. */
@@ -646,17 +651,21 @@ public final class FeedEngagementCountsPatch {
                 thumbnailRight = host.getWidth();
                 margin = px(RIGHT_MARGIN_DP);
             }
-            // The top left corner of the thumbnail, as far from the edges as the duration badge.
+            // The top left corner of the thumbnail, as far from the edges as the duration badge,
+            // or the middle of its right edge.
             // Video cards have the Watch later button at the top right in any language. Cards of Shorts
             // have their menu at the top right, or at the top left in right to left languages,
             // so their badge is at the top right then, as is the badge of the thumbnails of compact videos.
-            final boolean atRight = rtl && this.frame != null;
-            final int minTop = thumbnailTop + margin;
+            // At the middle of the right edge, the badge is at the left in right to left languages,
+            // as the duration badge.
+            final boolean atRight = MIDDLE_RIGHT ? !rtl : rtl && this.frame != null;
+            // At the right edge, the badge is below the Watch later button, or the menu of a Short.
+            final int minTop = thumbnailTop + margin + (MIDDLE_RIGHT ? px(TOP_BUTTON_DP) : 0);
             // The badge does not overlap the row of the duration badge, which can also have the view count.
             compact = minTop + height > bottom;
             // The bottom of the thumbnail is about as far below the row of the duration as the duration badge.
             final int middle = (thumbnailTop + bottom + px(ABOVE_DURATION_DP)) / 2;
-            final int top = MIDDLE_LEFT && !compact
+            final int top = MIDDLE_RIGHT && !compact
                     ? Math.max(minTop, Math.min(bottom - height, middle - height / 2))
                     : minTop;
             if (compact && this.frame != null && this.frame.estimated()) {
@@ -685,7 +694,7 @@ public final class FeedEngagementCountsPatch {
                 final int rowWidth = Math.round(compactWidth) + compactPadding * 2;
                 final int rowHeight = px(COMPACT_HEIGHT_DP);
                 final int rowLeft = atRight ? thumbnailRight - margin - rowWidth : thumbnailLeft + margin;
-                final int rowTop = MIDDLE_LEFT
+                final int rowTop = MIDDLE_RIGHT
                         ? Math.max(minTop, Math.min(bottom - rowHeight, middle - rowHeight / 2))
                         : top;
                 setBounds(rowLeft, rowTop, rowLeft + rowWidth, rowTop + rowHeight);
