@@ -109,6 +109,11 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   Gönderilen logda Abonelikler'e hiç girilmemiş (yalnızca `FEwhat_to_watch`), ipucu yok; ProtoNode "Could not decode"
   hataları `RestoreOriginalTitlesPatch` kaynaklı gürültü. Kullanıcıda (21.44, dev.2, klasik ve kart düzeni) menü ve
   uzun basma çalışıyor; rafta rozet yok (yana kaydırmalı raf, tasarım gereği), tam listede var.
+- **Sebep (ikinci log, 2026-11-15):** Abonelikler Shorts rafı menüsünde (`FEsubscriptions_shorts`) yalnızca Share, Hide,
+  Send feedback var; kullanıcının "Feed flyout menu filter" listesi üçünü de gizliyor (`LayoutComponentsFilter:
+  Hiding popup menu item`), menü boş kalıp açılmıyor. Hata değil, ayar; kod değişikliği yok. Filtre öğe başına
+  (`hideFlyoutMenuItems`) çağrıldığı için "hepsi gizlenirse menüyü koru" gibi bir düzeltme yamada liste düzeyinde
+  değişiklik ister. Rozetler yana kaydırmalı rafta tasarım gereği yok. Kullanıcıya İngilizce yanıt metni verildi.
 - **Test:** güncel yamalarla (`patches=dev`, v2.3.0-dev.5, `official_only`) yt-morphe run 43598382159 (#113). Sorun
   çıkarsa dal `fix/subscriptions-shorts-shelf` (upstream `dev` üzerinde, henüz commit yok). Şüpheliler:
   `FeedVideoActionsPatch.onComponentHostTouch`, `FeedCardLayoutPatch` (shorts_video_cell modelini yeniden kuruyor).
