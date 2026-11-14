@@ -101,6 +101,18 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-14: Abonelikler Shorts rafında menü yok (upstream issue 4814)
+
+- **Bildirim:** YouTube 21.30.216 + v2.3.0-dev.3; Abonelikler'deki Shorts rafında üç nokta ve uzun basma menü açmıyor,
+  beğeni/izlenme rozetleri yok. Ana Sayfa'da çalışıyor.
+- **İnceleme:** sorun metni `gh api search/issues` ile okunabiliyor; ekler (log, video) proxy'de 403, kullanıcı yüklüyor.
+  Gönderilen logda Abonelikler'e hiç girilmemiş (yalnızca `FEwhat_to_watch`), ipucu yok; ProtoNode "Could not decode"
+  hataları `RestoreOriginalTitlesPatch` kaynaklı gürültü. Kullanıcıda (21.44, dev.2, klasik ve kart düzeni) menü ve
+  uzun basma çalışıyor; rafta rozet yok (yana kaydırmalı raf, tasarım gereği), tam listede var.
+- **Test:** güncel yamalarla (`patches=dev`, v2.3.0-dev.5, `official_only`) yt-morphe run 43598382159 (#113). Sorun
+  çıkarsa dal `fix/subscriptions-shorts-shelf` (upstream `dev` üzerinde, henüz commit yok). Şüpheliler:
+  `FeedVideoActionsPatch.onComponentHostTouch`, `FeedCardLayoutPatch` (shorts_video_cell modelini yeniden kuruyor).
+
 ### 2026-11-13: YouTube Minimal / Minimal 2 mini oynatıcı cam görünümü
 
 - **Durum (2026-11-13):** kullanıcı son test APK'yı onayladı ("her şey tamam"). PR dalı **`feat/glass-miniplayer`**
