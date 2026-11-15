@@ -109,7 +109,14 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `FeedVideoActionsPatch.findThumbnailTop` süre rozetinin dikdörtgenini buluyor, küçük resmin yan boşluğunu
   (`VideoCard.thumbnailInset`) ondan hesaplıyor; düğmenin sağ kenarı süre rozetinin sağ kenarıyla aynı, üst kenar
   daralan küçük resim yüksekliğine göre. Normal düzende boşluk 0 (değişiklik yok). Canlı yayınlarda (süre yok) eski konum.
-- **Testler:** derleme kontrolü başlatıldı. Test APK için `RAMiK4/yt-morphe` oturuma eklenmemişti, kullanıcıya soruldu.
+- **Testler:** kullanıcının test APK'sı #116 (`official_only`, dal) değişiklik göstermedi: kart düzeninde süreyi
+  muhtemelen küçük resmin tamamını çizen host çiziyor, rozet dikdörtgeni bulunamıyor. Commit `25ddbe512`: önce
+  `FeedViewCountPatch.findThumbnailFrame` (RYD satırının kullandığı) ile küçük resim ve süre rozeti bulunuyor; küçük
+  resim host'tan darsa üst kenar ondan, sağ kenar süre rozetinden. Debug logda "Watch later button:" satırı.
+  Test APK yt-morphe run 43666916936 (#117).
+- **Ortam:** `RAMiK4/yt-morphe` ve `RAMiK4/yt-music-morphe` `add_repo` ile oturuma eklenebiliyor (kullanıcı derlemeleri
+  gerektiğinde Claude'un başlatmasını istedi). Test derlemesi: `patches=dev`, `patches_source=RAMiK4/morphe-patches@<dal>`,
+  `official_only=true`, `publish=false`.
 
 ### 2026-11-14: Abonelikler Shorts rafında menü yok (upstream issue 4814)
 
