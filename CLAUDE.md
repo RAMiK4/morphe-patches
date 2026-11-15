@@ -114,8 +114,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Test:** kullanıcı dilleri farklı yapınca sorunu kendinde de gördü. Test APK yt-morphe run 43698407768 (#120,
   `official_only`) işe yaramadı: log `Share button labels: [Поделиться] languages: [tr_TR]` (YouTube Türkçe, Morphe
   Rusça); `ResourceUtils.getStringByLocale` Morphe dilini döndürüyor. Commit `0d84bd20d`: etiketler görünümün
-  context'inden `createConfigurationContext` ile her dilde okunuyor. Test APK run 43699419411 (#121). Dal 2 commit,
-  PR öncesi tek commit'e sıkıştırılacak.
+  context'inden `createConfigurationContext` ile her dilde okunuyor. Test APK run 43699419411 (#121): kullanıcı
+  onayladı. Force-push izni olmadığından tek commit yeni dalda: **`fix/post-image-share-label`** (`26618e3a0`, upstream
+  `dev` `a04b05c6c` üzerinde); `fix/post-image-download-language` geçmiş olarak duruyor. Karşılaştırma bağlantısı
+  verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok, Shorts varsayılan hızı sıfırlanıyor (upstream issue 4759)
 
