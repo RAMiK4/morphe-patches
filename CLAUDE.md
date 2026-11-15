@@ -112,6 +112,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   ayarları eklenmiyor, `MusicGlassNavigationBar.isGlassSupported()` yalnızca 9.39+'da `true` döndürülüyor (önceden
   kaydedilmiş ayar kullanılmıyor; `ChangeMiniplayerColorPatch` da bu kontrolü kullanıyor). Derleme kontrolü başlatıldı.
   Kullanıcıya issue ekran görüntülerinde ne göründüğü soruldu.
+- **Ekran görüntüleri (issue sahibi, Android 13, 2.3.0-dev.3):** her iki opaklık %0. Cam çubuk düzgün görünüyor;
+  mini oynatıcı kartı yanlardan içeride ama **kapak resmi yok** (sol taraf boş) ve kart opak (Android 13'te bulanıklık
+  yok, sayfa rengiyle dolduruluyor: tasarım gereği). Tahmin: 9.30'da kapak mini oynatıcının altında çiziliyor, kart
+  örtüyor (doğrulanmadı). Commit `9cb462437`: kısıtlama yalnızca cam mini oynatıcıda
+  (`isMiniplayerGlassSupported`), cam çubuk her sürümde açık. Derleme kontrolü run 43701442271 (ilk commit) yeşil,
+  ikinci commit için yeniden başlatıldı. Issue sahibine sorulacak: cam mini oynatıcı kapalıyken kapak görünüyor mu,
+  9.45/9.46'da sorun sürüyor mu.
 
 ### 2026-11-15: Gönderilerde indirme düğmesi yok, Morphe dili YouTube dilinden farklı (upstream issue 4660)
 
