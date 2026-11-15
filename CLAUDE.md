@@ -157,7 +157,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   Yeniden başlatınca kuyruk boşalıyor. Logda Shorts'ta `isLiveStream` doğru şekilde false: ilk iki deneme yanlış izdi.
 - **Dal `fix/shorts-speed-live-chat`** (`b779a5086`, tek commit, upstream `dev` `197969bc9` üzerinde):
   `EngagementPanel.open` aynı paneli kuyruktan çıkarıp sona ekliyor. Build pull request #156 (run 43743477562),
-  test APK yt-morphe #122 (run 43743480681). Issue sahibinin denemesi bekleniyor.
+  test APK yt-morphe #122 (run 43743480681).
+- **Kullanıcının logu (2026-11-15):** sorun onda da var. Sohbet iki kez açılıyor, canlı yayın mini oynatıcıya alınıp
+  Shorts açılınca kapanış hiç kaydedilmiyor: yalnızca tekilleştirme yetmez. Commit `6f5fa8f2c`: `EngagementPanel` panelleri
+  Shorts oynatıcısında açılıp açılmadığıyla tutuyor, yeni `getLastOpenedShortsPanelId()`; `FlyoutUtils.isShortsPlayerMenu`
+  ve `ShortsAutoplayPatch` (panel açıkken Short ilerlemiyordu) onu kullanıyor. Build pull request #157 (run 43749276592),
+  test APK #123 (run 43749279545). Dal 2 commit; PR öncesi tek commit (force-push izni yoksa yeni dal).
 - Eski dal `fix/shorts-speed-after-live` (canlı yayın durumu denemeleri, #149/#150) gereksiz.
 - Kullanıcıda sorun oluşmuyor; Shorts varsayılan hızı da canlı yayından sonra korunuyor.
 
