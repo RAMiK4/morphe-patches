@@ -12,6 +12,8 @@ import static app.morphe.extension.shared.StringRef.str;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
@@ -596,20 +598,29 @@ public final class PostImageDownloadPatch {
             if (systemShareId != 0) {
                 addShareLabel(labels, Utils.getContext().getString(systemShareId));
             }
-            for (Locale locale : locales) {
-                for (String name : SHARE_LABEL_NAMES) {
-                    if (ResourceUtils.getStringIdentifier(name) != 0) {
-                        String label = ResourceUtils.getStringByLocale(name, locale);
-                        if (!name.equals(label)) {
-                            addShareLabel(labels, label);
-                        }
-                    }
+            // Texts in the languages YouTube can use. The resources are read from the view,
+            // since the resources of Morphe are in the language of Morphe.
+            List<Integer> ids = new ArrayList<>();
+            for (String name : SHARE_LABEL_NAMES) {
+                final int id = ResourceUtils.getStringIdentifier(name);
+                if (id != 0) {
+                    ids.add(id);
                 }
-                if (systemShareId != 0) {
-                    String label = ResourceUtils.getSystemStringByLocale("share", locale);
-                    if (!"share".equals(label)) {
-                        addShareLabel(labels, label);
+            }
+            if (systemShareId != 0) {
+                ids.add(systemShareId);
+            }
+            Context context = view.getContext();
+            for (Locale locale : locales) {
+                try {
+                    Configuration configuration = new Configuration(view.getResources().getConfiguration());
+                    configuration.setLocales(new LocaleList(locale));
+                    Resources resources = context.createConfigurationContext(configuration).getResources();
+                    for (int id : ids) {
+                        addShareLabel(labels, resources.getString(id));
                     }
+                } catch (Exception ex) {
+                    Logger.printInfo(() -> "Could not read the Share labels of: " + locale, ex);
                 }
             }
             Logger.printDebug(() -> "Share button labels: " + labels + " languages: " + languages);
