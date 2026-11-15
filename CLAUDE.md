@@ -101,6 +101,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: Gönderilerde indirme düğmesi yok, Morphe dili YouTube dilinden farklı (upstream issue 4660)
+
+- **Sebep (issue sahibinin debug logu):** öğeler kaydediliyor ("Post element ... with N images"), ama
+  `Share button labels: [Share]`: Morphe dili İngilizce, cihaz/YouTube dili Hindi (`hi_IN`). Share düğmesinin
+  açıklaması sunucudan YouTube dilinde geliyor, yama yalnızca Morphe dilindeki etiketlerle arıyordu; düğme bulunmayınca
+  indirme düğmesi çizilmiyor. Seyrek olması bundan (iki dilin farklı olması gerekiyor).
+- **Commit `22e3ec674`** (dal `fix/post-image-download-language`, upstream `dev` `8c40810e7` üzerinde): etiketler
+  Morphe dili, YouTube görünümlerinin dili, `Locale.getDefault()` ve cihaz dillerinde okunuyor
+  (`ResourceUtils.getStringByLocale` / `getSystemStringByLocale`), diller değişince yenileniyor. Debug logda dillerle
+  birlikte yazılıyor. Derleme kontrolü (Build pull request) başlatıldı; .mpp issue sahibine denetilebilir.
+
 ### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok, Shorts varsayılan hızı sıfırlanıyor (upstream issue 4759)
 
 - **Sebep (koddan, logsuz):** `VideoInformation.isLiveStream()` son player response'a göre; normal oynatıcıda açılan
