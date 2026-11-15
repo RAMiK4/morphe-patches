@@ -101,6 +101,16 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: Kart düzeninde Daha sonra izle düğmesi kenara taşıyor (upstream issue 4802)
+
+- **Sorun:** "Feed card layout" kartlarında küçük resim kartın içinde, düğme ise host'un sağ kenarına göre (8dp)
+  konuyordu; süre rozetinden sağda ve üstte kalıyordu.
+- **Commit `703ec31bf`** (dal `fix/feed-watch-later-card-offset`, upstream `dev` `b1241c045` üzerinde):
+  `FeedVideoActionsPatch.findThumbnailTop` süre rozetinin dikdörtgenini buluyor, küçük resmin yan boşluğunu
+  (`VideoCard.thumbnailInset`) ondan hesaplıyor; düğmenin sağ kenarı süre rozetinin sağ kenarıyla aynı, üst kenar
+  daralan küçük resim yüksekliğine göre. Normal düzende boşluk 0 (değişiklik yok). Canlı yayınlarda (süre yok) eski konum.
+- **Testler:** derleme kontrolü başlatıldı. Test APK için `RAMiK4/yt-morphe` oturuma eklenmemişti, kullanıcıya soruldu.
+
 ### 2026-11-14: Abonelikler Shorts rafında menü yok (upstream issue 4814)
 
 - **Bildirim:** YouTube 21.30.216 + v2.3.0-dev.3; Abonelikler'deki Shorts rafında üç nokta ve uzun basma menü açmıyor,
