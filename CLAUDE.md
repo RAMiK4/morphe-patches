@@ -110,7 +110,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Commit `22e3ec674`** (dal `fix/post-image-download-language`, upstream `dev` `8c40810e7` üzerinde): etiketler
   Morphe dili, YouTube görünümlerinin dili, `Locale.getDefault()` ve cihaz dillerinde okunuyor
   (`ResourceUtils.getStringByLocale` / `getSystemStringByLocale`), diller değişince yenileniyor. Debug logda dillerle
-  birlikte yazılıyor. Derleme kontrolü (Build pull request) başlatıldı; .mpp issue sahibine denetilebilir.
+  birlikte yazılıyor. Derleme kontrolü (Build pull request) başlatıldı; .mpp issue sahibine verilebilir.
 
 ### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok, Shorts varsayılan hızı sıfırlanıyor (upstream issue 4759)
 
