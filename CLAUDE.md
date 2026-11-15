@@ -101,6 +101,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: YouTube cam navigasyon çubuğu bulanık değil (upstream issue 4831)
+
+- **Bildirim:** YouTube **21.46.520 Beta** (desteklenen en yeni 21.45.82), log yok, HyperOS ekran görüntüsü: kapsülün
+  içi koyu ve opak, arkadaki sayfa görünmüyor (kapsülün dışında görünüyor); opaklık %50, yuvarlak çubuk açık.
+- **Koddan:** YouTube çubuğu kendi bulanıklığını çizmiyor, uygulamanın translucent navigasyon çubuğu bulanık arka
+  planını kapsüle kırpıyor (`setAppBackground`); bulanıklık yalnızca Android 14+ ve donanım hızlandırmalı
+  (`NavigationBarPatch.useNavigationBarBlur`), Navigation bar style Transparent/Opaque'ta yok. Android 12/13'te
+  bilinçli kapalı (oynatıcı sürüklenirken çökme).
+- **Durum:** kod değişikliği yok; issue sahibinden Android sürümü, Navigation bar style ve debug log istenecek
+  ("Glass navigation bar", "translucent background", "blur tint alpha" satırları). 21.45.82 ile de denemesi istenecek.
+
 ### 2026-11-15: YT Music 9.30.53'te cam navigasyon çubuğu ve mini oynatıcı bozuk (upstream issue 4799)
 
 - **Bildirim:** YT Music 9.30.53; issue'da yalnızca ekran görüntüleri (proxy'de 403) ve 3 yorum (okunamadı). Kullanıcının
