@@ -108,14 +108,15 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   yalnızca `floating_action_button`'a alt boşluk ekliyordu.
 - **Commit `488dd84c5`** (dal `fix/music-liked-play-button`, upstream `dev` `232f6d076` üzerinde): iki id de aynı alt
   kenar boşluğunu alıyor. Derleme kontrolü ve YT Music test APK (yt-music-morphe run 43670937998, #27; bu depoda
-  `official_only` yok, ekler giriyor) başlatıldı, cihazda deneme bekleniyor.
+  `official_only` yok, ekler giriyor) yeşil; kullanıcı onayladı ("sorun düzeldi"). Dal zaten tek commit ve upstream `dev` ucunda,
+  karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-15: Kart düzeninde Daha sonra izle düğmesi kenara taşıyor (upstream issue 4802)
 
 - **Durum:** test APK #117 ile kullanıcı onayladı ("sorun düzeldi"). PR dalı **`fix/feed-watch-later-button-card`**
   (`fd3ac21de`, tek commit, upstream `dev` `e0c196358` üzerinde, debug log ve süre yazısından boşluk hesaplayan ilk
   deneme çıkarıldı); çalışma dalı `fix/feed-watch-later-card-offset` geçmiş olarak duruyor. Karşılaştırma bağlantısı
-  verildi, PR'ı kullanıcı açacak. Sonraki adım: PR numarasını kaydetmek.
+  verildi. **PR açıldı: upstream PR 4854**, bakımcı incelemesi bekleniyor.
 - **Sorun:** "Feed card layout" kartlarında küçük resim kartın içinde, düğme ise host'un sağ kenarına göre (8dp)
   konuyordu; süre rozetinden sağda ve üstte kalıyordu.
 - **Commit `703ec31bf`** (dal `fix/feed-watch-later-card-offset`, upstream `dev` `b1241c045` üzerinde):
