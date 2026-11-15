@@ -248,28 +248,28 @@ public final class MusicGlassNavigationBar {
     }
 
     /**
-     * The glass navigation bar and miniplayer are laid out around the floating miniplayer of the app,
-     * which older app versions do not have.
+     * The glass miniplayer is laid out for the floating miniplayer of the app, which the patch turns on
+     * from 9.39. On older app versions the card covers the artwork of the miniplayer.
      *
-     * @return If the app version has the floating miniplayer.
+     * @return If the app version supports the glass miniplayer.
      */
     @SuppressWarnings("SameReturnValue")
-    public static boolean isGlassSupported() {
+    public static boolean isMiniplayerGlassSupported() {
         return false; // Modified during patching.
     }
 
     /**
-     * @return If the navigation bar is glass, set in the settings and supported by the app version.
+     * @return If the navigation bar is glass.
      */
     public static boolean isNavigationBarGlassEnabled() {
-        return isGlassSupported() && Settings.NAVIGATION_BAR_GLASS.get();
+        return Settings.NAVIGATION_BAR_GLASS.get();
     }
 
     /**
      * @return If the miniplayer is glass, set in the settings and supported by the app version.
      */
     public static boolean isMiniplayerGlassEnabled() {
-        return isGlassSupported() && Settings.MINIPLAYER_GLASS.get();
+        return isMiniplayerGlassSupported() && Settings.MINIPLAYER_GLASS.get();
     }
 
     /**
