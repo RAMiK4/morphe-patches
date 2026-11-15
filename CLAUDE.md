@@ -106,13 +106,16 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Sebep (koddan, logsuz):** `VideoInformation.isLiveStream()` son player response'a göre; normal oynatıcıda açılan
   canlı yayından sonra Shorts'ta "canlı" kalıyor (Shorts'un player response'u yeniden okunmuyor olabilir). Bu hem
   Shorts menüsündeki Hız'ı gizliyor hem de `RememberPlaybackSpeedPatch.applyShortsPlaybackSpeed`'i atlatıyor:
-  kullanıcıda menü sorunu yok ama Shorts varsayılan hızı canlı yayından sonra uygulanmıyor (2026-11-15).
+  kullanıcıda ikisi de oluşmuyor (hız sıfırlanıyor demesi yanlış yazımdı, düzeltti).
 - **Dal `fix/shorts-speed-after-live`** (upstream `dev` `232f6d076` üzerinde): ilk commit `c43a74b67` yalnızca menüye
   bakıyordu (#118); ikinci commit `dd7e5597a` onu geri alıp kaynağı düzeltiyor: `liveStreamIsShort` (canlı yayın Shorts
   oynatıcısında mı), Shorts oynatıcısı açıkken normal oynatıcıdaki canlı yayın canlı sayılmıyor. Net fark yalnızca
   `VideoInformation.java`. Test APK yt-morphe run 43694667257 (#119). PR öncesi tek commit'e sıkıştırılacak.
-- Menü hatası kullanıcıda oluşmuyor; issue sahibine #119 ile aynı dalın `.mpp`'si (Build pull request artifact'ı)
-  denemesi için önerildi.
+- **Issue sahibi** Build pull request #149'u (ilk commit) denedi: "yalnızca Shorts oynatıcısında canlı yayın açınca
+  düzeliyor", normal oynatıcıdan sonra sorun sürüyor. Olası: Shorts'ta `flyoutVideoId` ve `getVideoId()` boş (21.15+),
+  eski kontrole düşüyor; ya da arkadaki canlı yayın Shorts açıkken `setLiveStream(true)`'yu yeniden çağırıyor (o zaman
+  ikinci commit de yetmez, video ID'si player response'tan alınmalı: patch değişikliği). Build pull request #150
+  (`dd7e5597a`) denemesi ve olmazsa debug log istendi.
 
 ### 2026-11-15: YT Music Beğenilenler'de Oynat düğmesi cam çubuğun altında (upstream issue 4693)
 
