@@ -519,6 +519,25 @@ public final class FeedVideoActionsPatch {
     private static int findThumbnailTop(ComponentHost host, View menuButton, int[] inset) {
         final int width = host.getWidth();
         inset[0] = 0;
+
+        // The thumbnail of the cards of the "Feed card layout" patch is narrower than the host,
+        // and its duration can be drawn by the host of the whole thumbnail, so it is found
+        // the same way as for the view count badge.
+        FeedViewCountPatch.ThumbnailFrame frame = FeedViewCountPatch.findThumbnailFrame(host);
+        Rect thumbnail = frame.thumbnail();
+        Logger.printDebug(() -> "Watch later button: host width " + width + ", thumbnail " + thumbnail
+                + ", duration " + frame.duration());
+        if (thumbnail != null && thumbnail.top >= 0 && thumbnail.width() < width
+                && thumbnail.width() > width * 3 / 4) {
+            Rect duration = frame.duration();
+            // The end of the button lines up with the end of the duration badge.
+            inset[0] = duration != null && !FeedViewCountPatch.isRtl(host)
+                    && duration.right <= thumbnail.right && duration.right > thumbnail.centerX()
+                    ? width - duration.right - dp(host, BADGE_RIGHT_MARGIN_DP)
+                    : width - thumbnail.right;
+            return thumbnail.top;
+        }
+
         Rect rect = new Rect();
         Rect duration = new Rect(0, -1, 0, -1);
         findDurationBadge(host, host, duration, rect);
