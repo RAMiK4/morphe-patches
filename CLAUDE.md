@@ -101,6 +101,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok (upstream issue 4759)
+
+- **Sebep (koddan, logsuz):** `ShortsPlaybackSpeedFlyoutPatch.showFlyoutButton` `VideoInformation.isLiveStream()`'e
+  bakıyor; o da son player response'a göre. Normal oynatıcıda açılan canlı yayın Shorts'a geçince "canlı" olarak kalıyor
+  (Shorts'ta player response video ID'si güncellenmiyor ya da canlı yayın arkada yenileniyor; kesin değil).
+- **Commit `c43a74b67`** (dal `fix/shorts-speed-after-live`, upstream `dev` `232f6d076` üzerinde): yeni
+  `VideoInformation.isLiveStream(String videoId)`; Shorts menüsü, menünün Short'unun kendisi canlıysa gizliyor
+  (`FlyoutUtils.addShortsPlayerFlyoutButtons` Short ID'sini veriyor). Aynı takılma `RememberPlaybackSpeedPatch
+  .getPlaybackSpeedInShorts`'ta Shorts varsayılan hızını da atlatıyor olabilir; dokunulmadı (yeni Short yüklenirken video
+  ID'si geride kalabiliyor). Test APK yt-morphe run 43672939502 (#118), cihazda deneme bekleniyor.
+
 ### 2026-11-15: YT Music Beğenilenler'de Oynat düğmesi cam çubuğun altında (upstream issue 4693)
 
 - **Sebep (9.45.51 APK, androguard):** Beğenilenler sayfası düzeninde (CoordinatorLayout, çökebilir başlık) "Oynat"
