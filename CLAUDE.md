@@ -101,6 +101,15 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: YT Music Beğenilenler'de Oynat düğmesi cam çubuğun altında (upstream issue 4693)
+
+- **Sebep (9.45.51 APK, androguard):** Beğenilenler sayfası düzeninde (CoordinatorLayout, çökebilir başlık) "Oynat"
+  düğmesi `extended_floating_action_button` (ExtendedFloatingActionButton, kaydırınca yuvarlak); `MusicGlassNavigationBar`
+  yalnızca `floating_action_button`'a alt boşluk ekliyordu.
+- **Commit `488dd84c5`** (dal `fix/music-liked-play-button`, upstream `dev` `232f6d076` üzerinde): iki id de aynı alt
+  kenar boşluğunu alıyor. Derleme kontrolü ve YT Music test APK (yt-music-morphe run 43670937998, #27; bu depoda
+  `official_only` yok, ekler giriyor) başlatıldı, cihazda deneme bekleniyor.
+
 ### 2026-11-15: Kart düzeninde Daha sonra izle düğmesi kenara taşıyor (upstream issue 4802)
 
 - **Durum:** test APK #117 ile kullanıcı onayladı ("sorun düzeldi"). PR dalı **`fix/feed-watch-later-button-card`**
