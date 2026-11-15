@@ -149,21 +149,17 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `dev` `a04b05c6c` üzerinde); `fix/post-image-download-language` geçmiş olarak duruyor. Karşılaştırma bağlantısı
   verildi, PR'ı kullanıcı açacak.
 
-### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok, Shorts varsayılan hızı sıfırlanıyor (upstream issue 4759)
+### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok (upstream issue 4759)
 
-- **Sebep (koddan, logsuz):** `VideoInformation.isLiveStream()` son player response'a göre; normal oynatıcıda açılan
-  canlı yayından sonra Shorts'ta "canlı" kalıyor (Shorts'un player response'u yeniden okunmuyor olabilir). Bu hem
-  Shorts menüsündeki Hız'ı gizliyor hem de `RememberPlaybackSpeedPatch.applyShortsPlaybackSpeed`'i atlatıyor:
-  kullanıcıda ikisi de oluşmuyor (hız sıfırlanıyor demesi yanlış yazımdı, düzeltti).
-- **Dal `fix/shorts-speed-after-live`** (upstream `dev` `232f6d076` üzerinde): ilk commit `c43a74b67` yalnızca menüye
-  bakıyordu (#118); ikinci commit `dd7e5597a` onu geri alıp kaynağı düzeltiyor: `liveStreamIsShort` (canlı yayın Shorts
-  oynatıcısında mı), Shorts oynatıcısı açıkken normal oynatıcıdaki canlı yayın canlı sayılmıyor. Net fark yalnızca
-  `VideoInformation.java`. Test APK yt-morphe run 43694667257 (#119). PR öncesi tek commit'e sıkıştırılacak.
-- **Issue sahibi** Build pull request #149'u (ilk commit) denedi: "yalnızca Shorts oynatıcısında canlı yayın açınca
-  düzeliyor", normal oynatıcıdan sonra sorun sürüyor. Olası: Shorts'ta `flyoutVideoId` ve `getVideoId()` boş (21.15+),
-  eski kontrole düşüyor; ya da arkadaki canlı yayın Shorts açıkken `setLiveStream(true)`'yu yeniden çağırıyor (o zaman
-  ikinci commit de yetmez, video ID'si player response'tan alınmalı: patch değişikliği). Build pull request #150
-  (`dd7e5597a`) denemesi ve olmazsa debug log istendi.
+- **Gerçek sebep (issue sahibinin debug logu):** canlı yayının sohbet paneli `live-chat-item-section` iki kez açılıp
+  (`EngagementPanel.open`) bir kez kapanıyor; kuyrukta bir kopyası kalıyor. `FlyoutUtils.isShortsPlayerMenu`
+  `EngagementPanel.getLastOpenedPanelId() != null` ise menüyü panel içi menü sayıyor, Shorts eklerini (Hız) koymuyor.
+  Yeniden başlatınca kuyruk boşalıyor. Logda Shorts'ta `isLiveStream` doğru şekilde false: ilk iki deneme yanlış izdi.
+- **Dal `fix/shorts-speed-live-chat`** (`b779a5086`, tek commit, upstream `dev` `197969bc9` üzerinde):
+  `EngagementPanel.open` aynı paneli kuyruktan çıkarıp sona ekliyor. Build pull request #156 (run 43743477562),
+  test APK yt-morphe #122 (run 43743480681). Issue sahibinin denemesi bekleniyor.
+- Eski dal `fix/shorts-speed-after-live` (canlı yayın durumu denemeleri, #149/#150) gereksiz.
+- Kullanıcıda sorun oluşmuyor; Shorts varsayılan hızı da canlı yayından sonra korunuyor.
 
 ### 2026-11-15: YT Music Beğenilenler'de Oynat düğmesi cam çubuğun altında (upstream issue 4693)
 
