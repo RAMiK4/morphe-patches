@@ -42,6 +42,10 @@ public final class EngagementPanel {
      */
     public static void open(@Nullable String panelId) {
         if (Utils.isNotEmpty(panelId)) {
+            // A panel can be opened again while it is open, such as the live chat of a live stream,
+            // and is closed only once. Otherwise it would stay open after it is closed, and the menu
+            // of the Shorts player would be taken for a menu of the panel, without the items of the patches.
+            engagementPanelIds.remove(panelId);
             engagementPanelIds.addLast(panelId);
             Logger.printDebug(() -> "EngagementPanel open: " + panelId);
         }
