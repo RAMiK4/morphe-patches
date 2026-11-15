@@ -101,6 +101,18 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-15: YT Music 9.30.53'te cam navigasyon çubuğu ve mini oynatıcı bozuk (upstream issue 4799)
+
+- **Bildirim:** YT Music 9.30.53; issue'da yalnızca ekran görüntüleri (proxy'de 403) ve 3 yorum (okunamadı). Kullanıcının
+  ilettiği debug logda çubuk uygulanıyor (yükseklik 184, sistem boşluğu 46, kapsül 143), hata yok.
+- **Sebep (koddan):** cam çubuk ve mini oynatıcı uygulamanın floating miniplayer'ına göre yerleşiyor; yama onu
+  (`FloatingMiniplayerFeatureFlagFingerprint`, bayrak 45823962) ve yan boşluğunu yalnızca 9.39+'da açıyor. 9.30.53'te
+  mini oynatıcı tam genişlik/yerleşik kalıyor. 9.30.53 APK'sı elde yok, bayrağın orada olup olmadığı doğrulanmadı.
+- **Commit `2b23a8890`** (dal `fix/music-glass-bar`, upstream `dev` `57b14fca2` üzerinde): 9.39 öncesinde cam
+  ayarları eklenmiyor, `MusicGlassNavigationBar.isGlassSupported()` yalnızca 9.39+'da `true` döndürülüyor (önceden
+  kaydedilmiş ayar kullanılmıyor; `ChangeMiniplayerColorPatch` da bu kontrolü kullanıyor). Derleme kontrolü başlatıldı.
+  Kullanıcıya issue ekran görüntülerinde ne göründüğü soruldu.
+
 ### 2026-11-15: Gönderilerde indirme düğmesi yok, Morphe dili YouTube dilinden farklı (upstream issue 4660)
 
 - **Sebep (issue sahibinin debug logu):** öğeler kaydediliyor ("Post element ... with N images"), ama
