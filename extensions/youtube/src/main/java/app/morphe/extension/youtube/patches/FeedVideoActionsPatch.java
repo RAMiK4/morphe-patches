@@ -215,6 +215,11 @@ public final class FeedVideoActionsPatch {
         boolean badgeAdded;
         /** Top of the thumbnail in the host, or -1 if it is not known. */
         int thumbnailTop = -1;
+        /**
+         * Space between the sides of the thumbnail and the host, such as of the cards of the
+         * "Feed card layout" patch, whose thumbnail is inside the card.
+         */
+        int thumbnailInset;
 
         @Nullable
         View getMenuButton() {
@@ -225,7 +230,7 @@ public final class FeedVideoActionsPatch {
         void placeBadge(ComponentHost host) {
             final int size = dp(host, BADGE_SIZE_DP);
             final int top = thumbnailTop + dp(host, BADGE_MARGIN_DP);
-            final int right = host.getWidth() - dp(host, BADGE_RIGHT_MARGIN_DP);
+            final int right = host.getWidth() - thumbnailInset - dp(host, BADGE_RIGHT_MARGIN_DP);
             badge.setBounds(right - size, top, right, top + size);
             badge.hostRef = new WeakReference<>(host);
             if (!badgeAdded) {
@@ -440,16 +445,20 @@ public final class FeedVideoActionsPatch {
     }
 
     /**
-     * @return The bottom of the lowest duration badge in the host, or -1 if none is shown.
+     * Finds the lowest duration badge in the host.
+     *
+     * @param duration Set to the duration badge, if it is lower than the one it is set to.
+     *                 Its bottom must be -1 before the search.
      */
-    private static int findDurationBottom(ComponentHost root, View view, Rect rect) {
-        int bottom = -1;
+    private static void findDurationBadge(ComponentHost root, View view, Rect duration, Rect rect) {
         List<CharSequence> texts = getTexts(view);
         if (texts != null) {
             for (CharSequence text : texts) {
                 if (text != null && DURATION_PATTERN.matcher(text.toString().trim()).matches()) {
                     setRectInRoot(root, view, rect);
-                    bottom = rect.bottom;
+                    if (rect.bottom > duration.bottom) {
+                        duration.set(rect);
+                    }
                     break;
                 }
             }
@@ -459,11 +468,10 @@ public final class FeedVideoActionsPatch {
             for (int i = 0, count = group.getChildCount(); i < count; i++) {
                 View child = group.getChildAt(i);
                 if (child.getVisibility() == View.VISIBLE) {
-                    bottom = Math.max(bottom, findDurationBottom(root, child, rect));
+                    findDurationBadge(root, child, duration, rect);
                 }
             }
         }
-        return bottom;
     }
 
     /**
@@ -500,16 +508,31 @@ public final class FeedVideoActionsPatch {
      * header and the text of the post. The duration badge is at the bottom of the thumbnail.
      * Thumbnails can be square, such as of music, so a thumbnail is at the top of the card
      * unless a text is shown above it.
+     * <p>
+     * The thumbnail can be narrower than the host, such as in the cards of the "Feed card layout"
+     * patch, so its sides are found from the duration badge, which is at the same distance from
+     * the end of the thumbnail as from its bottom.
      *
+     * @param inset Set to the space between the sides of the thumbnail and the host.
      * @return The top of the thumbnail in the host, or -1 if it is not known.
      */
-    private static int findThumbnailTop(ComponentHost host, View menuButton) {
+    private static int findThumbnailTop(ComponentHost host, View menuButton, int[] inset) {
         final int width = host.getWidth();
-        final int thumbnailHeight = Math.round(width * THUMBNAIL_RATIO);
+        inset[0] = 0;
         Rect rect = new Rect();
-        final int durationBottom = findDurationBottom(host, host, rect);
-        if (durationBottom >= 0) {
-            final int top = durationBottom + dp(host, DURATION_BOTTOM_MARGIN_DP) - thumbnailHeight;
+        Rect duration = new Rect(0, -1, 0, -1);
+        findDurationBadge(host, host, duration, rect);
+        if (duration.bottom >= 0) {
+            final int margin = dp(host, DURATION_BOTTOM_MARGIN_DP);
+            final int durationInset = FeedViewCountPatch.isRtl(host)
+                    ? duration.left - margin
+                    : width - duration.right - margin;
+            // The duration badge of a thumbnail as wide as the host can be a little further from its end.
+            if (durationInset > dp(host, THUMBNAIL_OVERLAP_DP) && durationInset < width / 8) {
+                inset[0] = durationInset;
+            }
+            final int thumbnailHeight = Math.round((width - 2 * inset[0]) * THUMBNAIL_RATIO);
+            final int top = duration.bottom + margin - thumbnailHeight;
             return top > 0 && hasTextAbove(host, host, top, rect) ? top : 0;
         }
 
@@ -702,11 +725,13 @@ public final class FeedVideoActionsPatch {
         final boolean sameMenuButton = card.menuButtonRef.get() == menuButton;
         card.menuButtonRef = new WeakReference<>(menuButton);
         if (WATCH_LATER_BUTTON) {
-            final int thumbnailTop = findThumbnailTop(host, menuButton);
+            final int[] thumbnailInset = new int[1];
+            final int thumbnailTop = findThumbnailTop(host, menuButton, thumbnailInset);
             // Litho mounts only the part of a card that is shown, so the duration badge
             // may not be mounted. The thumbnail of the same video does not move.
             if (thumbnailTop >= 0 || !sameMenuButton) {
                 card.thumbnailTop = thumbnailTop;
+                card.thumbnailInset = thumbnailInset[0];
             }
             if (card.thumbnailTop >= 0) {
                 card.placeBadge(host);
