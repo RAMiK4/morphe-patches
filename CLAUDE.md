@@ -162,7 +162,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   Shorts açılınca kapanış hiç kaydedilmiyor: yalnızca tekilleştirme yetmez. Commit `6f5fa8f2c`: `EngagementPanel` panelleri
   Shorts oynatıcısında açılıp açılmadığıyla tutuyor, yeni `getLastOpenedShortsPanelId()`; `FlyoutUtils.isShortsPlayerMenu`
   ve `ShortsAutoplayPatch` (panel açıkken Short ilerlemiyordu) onu kullanıyor. Build pull request #157 (run 43749276592),
-  test APK #123 (run 43749279545). Dal 2 commit; PR öncesi tek commit (force-push izni yoksa yeni dal).
+  test APK #123 (run 43749279545). Kullanıcı onayladı ("sorun çözüldü").
+- **PR dalı `fix/shorts-live-chat-panel`** (`7c346d5fc`, tek commit, upstream `dev` `b33b2f7e7` üzerinde); çalışma dalları
+  `fix/shorts-speed-live-chat` ve `fix/shorts-speed-after-live` gereksiz. Karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
 - Eski dal `fix/shorts-speed-after-live` (canlı yayın durumu denemeleri, #149/#150) gereksiz.
 - Kullanıcıda sorun oluşmuyor; Shorts varsayılan hızı da canlı yayından sonra korunuyor.
 
