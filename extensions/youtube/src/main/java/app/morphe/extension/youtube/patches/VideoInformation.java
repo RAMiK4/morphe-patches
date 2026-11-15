@@ -151,6 +151,10 @@ public final class VideoInformation extends BaseVideoInformation {
     private static volatile boolean videoIdIsShort;
     private static volatile boolean liveStream;
     private static volatile String liveStreamVideoId = "";
+    /**
+     * If the live stream is played in the Shorts player.
+     */
+    private static volatile boolean liveStreamIsShort;
 
     /**
      * The current playback speed.
@@ -904,6 +908,7 @@ public final class VideoInformation extends BaseVideoInformation {
         final boolean wasLive = isLiveStream();
         liveStreamVideoId = playerResponseVideoId;
         liveStream = isLive;
+        liveStreamIsShort = playerResponseVideoIdIsShort || ShortsPlayerState.isOpen();
 
         final boolean nowLive = isLiveStream();
         if (wasLive == nowLive) {
@@ -919,17 +924,12 @@ public final class VideoInformation extends BaseVideoInformation {
      * @return If the video that is currently loading is an ongoing live stream.
      */
     public static boolean isLiveStream() {
-        return liveStream && liveStreamVideoId.equals(playerResponseVideoId);
-    }
-
-    /**
-     * The last player response can be of another video than the one shown, such as of a live stream
-     * opened in the regular player before the Shorts player.
-     *
-     * @return If the video is an ongoing live stream.
-     */
-    public static boolean isLiveStream(String videoId) {
-        return liveStream && liveStreamVideoId.equals(videoId);
+        // A live stream opened in the regular player is not what the Shorts player plays.
+        // The player response of the Shorts that play after it may not be read again,
+        // such as of the Shorts loaded before, so it would otherwise stay live
+        // and hide the speed of the Shorts (https://github.com/MorpheApp/morphe-patches/issues/4759).
+        return liveStream && liveStreamVideoId.equals(playerResponseVideoId)
+                && (liveStreamIsShort || !ShortsPlayerState.isOpen());
     }
 
     /**
