@@ -103,6 +103,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 
 ### 2026-11-15: Kart düzeninde Daha sonra izle düğmesi kenara taşıyor (upstream issue 4802)
 
+- **Durum:** test APK #117 ile kullanıcı onayladı ("sorun düzeldi"). PR dalı **`fix/feed-watch-later-button-card`**
+  (`fd3ac21de`, tek commit, upstream `dev` `e0c196358` üzerinde, debug log ve süre yazısından boşluk hesaplayan ilk
+  deneme çıkarıldı); çalışma dalı `fix/feed-watch-later-card-offset` geçmiş olarak duruyor. Karşılaştırma bağlantısı
+  verildi, PR'ı kullanıcı açacak. Sonraki adım: PR numarasını kaydetmek.
 - **Sorun:** "Feed card layout" kartlarında küçük resim kartın içinde, düğme ise host'un sağ kenarına göre (8dp)
   konuyordu; süre rozetinden sağda ve üstte kalıyordu.
 - **Commit `703ec31bf`** (dal `fix/feed-watch-later-card-offset`, upstream `dev` `b1241c045` üzerinde):
