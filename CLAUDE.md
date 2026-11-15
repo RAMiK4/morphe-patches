@@ -114,7 +114,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `FeedViewCountPatch.findThumbnailFrame` (RYD satırının kullandığı) ile küçük resim ve süre rozeti bulunuyor; küçük
   resim host'tan darsa üst kenar ondan, sağ kenar süre rozetinden. Debug logda "Watch later button:" satırı.
   Test APK yt-morphe run 43666916936 (#117).
-- **Ortam:** `RAMiK4/yt-morphe` ve `RAMiK4/yt-music-morphe` `add_repo` ile oturuma eklenebiliyor (kullanıcı derlemeleri
+- **Ortam:** `RAMiK4/yt-morphe` `add_repo` ile oturuma eklenebiliyor (YouTube işlerinde yalnızca bu; `yt-music-morphe` yalnızca Music işlerinde. Kullanıcı derlemeleri
   gerektiğinde Claude'un başlatmasını istedi). Test derlemesi: `patches=dev`, `patches_source=RAMiK4/morphe-patches@<dal>`,
   `official_only=true`, `publish=false`.
 
