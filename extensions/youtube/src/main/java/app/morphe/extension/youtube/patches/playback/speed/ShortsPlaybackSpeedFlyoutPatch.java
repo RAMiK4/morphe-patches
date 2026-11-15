@@ -42,15 +42,20 @@ public final class ShortsPlaybackSpeedFlyoutPatch {
     /**
      * Called by {@link FlyoutUtils} for the menu of the Shorts player.
      *
+     * @param shortVideoId The Short the menu is opened for.
      * @return If the menu gets the playback speed item.
      */
-    public static boolean showFlyoutButton() {
+    public static boolean showFlyoutButton(String shortVideoId) {
+        // The live stream the speed is hidden for is the Short itself, not a live stream
+        // opened before in the regular player.
         return Settings.SHORTS_PLAYBACK_SPEED_FLYOUT_BUTTON.get()
-                && !VideoInformation.isLiveStream();
+                && !(shortVideoId.isEmpty()
+                ? VideoInformation.isLiveStream()
+                : VideoInformation.isLiveStream(shortVideoId));
     }
 
     /**
-     * Called by {@link FlyoutUtils} if {@link #showFlyoutButton()} is true.
+     * Called by {@link FlyoutUtils} if {@link #showFlyoutButton(String)} is true.
      */
     public static int addFlyoutButton(Object flyoutPanel, int nextButtonIndex) {
         try {

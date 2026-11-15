@@ -681,13 +681,13 @@ public final class FlyoutUtils {
     }
 
     private static int addShortsPlayerFlyoutButtons(Object flyoutPanel, int nextButtonIndex) {
-        if (ShortsPlaybackSpeedFlyoutPatch.isPatchIncluded()
-                && ShortsPlaybackSpeedFlyoutPatch.showFlyoutButton()) {
-            nextButtonIndex = ShortsPlaybackSpeedFlyoutPatch.addFlyoutButton(flyoutPanel, nextButtonIndex);
-        }
-
         final String flyoutVideoId = getFlyoutVideoId();
         final String shortVideoId = flyoutVideoId.isEmpty() ? VideoInformation.getVideoId() : flyoutVideoId;
+
+        if (ShortsPlaybackSpeedFlyoutPatch.isPatchIncluded()
+                && ShortsPlaybackSpeedFlyoutPatch.showFlyoutButton(shortVideoId)) {
+            nextButtonIndex = ShortsPlaybackSpeedFlyoutPatch.addFlyoutButton(flyoutPanel, nextButtonIndex);
+        }
 
         if (ShortsDownloadButton.isPatchIncluded()) {
             nextButtonIndex = ShortsDownloadButton.addFlyoutButton(flyoutPanel, nextButtonIndex, shortVideoId);

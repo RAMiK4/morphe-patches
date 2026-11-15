@@ -923,6 +923,16 @@ public final class VideoInformation extends BaseVideoInformation {
     }
 
     /**
+     * The last player response can be of another video than the one shown, such as of a live stream
+     * opened in the regular player before the Shorts player.
+     *
+     * @return If the video is an ongoing live stream.
+     */
+    public static boolean isLiveStream(String videoId) {
+        return liveStream && liveStreamVideoId.equals(videoId);
+    }
+
+    /**
      * @return The current playback speed.
      */
     public static float getPlaybackSpeed() {
