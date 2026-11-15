@@ -101,16 +101,18 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
-### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok (upstream issue 4759)
+### 2026-11-15: Canlı yayından sonra Shorts menüsünde Hız yok, Shorts varsayılan hızı sıfırlanıyor (upstream issue 4759)
 
-- **Sebep (koddan, logsuz):** `ShortsPlaybackSpeedFlyoutPatch.showFlyoutButton` `VideoInformation.isLiveStream()`'e
-  bakıyor; o da son player response'a göre. Normal oynatıcıda açılan canlı yayın Shorts'a geçince "canlı" olarak kalıyor
-  (Shorts'ta player response video ID'si güncellenmiyor ya da canlı yayın arkada yenileniyor; kesin değil).
-- **Commit `c43a74b67`** (dal `fix/shorts-speed-after-live`, upstream `dev` `232f6d076` üzerinde): yeni
-  `VideoInformation.isLiveStream(String videoId)`; Shorts menüsü, menünün Short'unun kendisi canlıysa gizliyor
-  (`FlyoutUtils.addShortsPlayerFlyoutButtons` Short ID'sini veriyor). Aynı takılma `RememberPlaybackSpeedPatch
-  .getPlaybackSpeedInShorts`'ta Shorts varsayılan hızını da atlatıyor olabilir; dokunulmadı (yeni Short yüklenirken video
-  ID'si geride kalabiliyor). Test APK yt-morphe run 43672939502 (#118), cihazda deneme bekleniyor.
+- **Sebep (koddan, logsuz):** `VideoInformation.isLiveStream()` son player response'a göre; normal oynatıcıda açılan
+  canlı yayından sonra Shorts'ta "canlı" kalıyor (Shorts'un player response'u yeniden okunmuyor olabilir). Bu hem
+  Shorts menüsündeki Hız'ı gizliyor hem de `RememberPlaybackSpeedPatch.applyShortsPlaybackSpeed`'i atlatıyor:
+  kullanıcıda menü sorunu yok ama Shorts varsayılan hızı canlı yayından sonra uygulanmıyor (2026-11-15).
+- **Dal `fix/shorts-speed-after-live`** (upstream `dev` `232f6d076` üzerinde): ilk commit `c43a74b67` yalnızca menüye
+  bakıyordu (#118); ikinci commit `dd7e5597a` onu geri alıp kaynağı düzeltiyor: `liveStreamIsShort` (canlı yayın Shorts
+  oynatıcısında mı), Shorts oynatıcısı açıkken normal oynatıcıdaki canlı yayın canlı sayılmıyor. Net fark yalnızca
+  `VideoInformation.java`. Test APK yt-morphe run 43694667257 (#119). PR öncesi tek commit'e sıkıştırılacak.
+- Menü hatası kullanıcıda oluşmuyor; issue sahibine #119 ile aynı dalın `.mpp`'si (Build pull request artifact'ı)
+  denemesi için önerildi.
 
 ### 2026-11-15: YT Music Beğenilenler'de Oynat düğmesi cam çubuğun altında (upstream issue 4693)
 
