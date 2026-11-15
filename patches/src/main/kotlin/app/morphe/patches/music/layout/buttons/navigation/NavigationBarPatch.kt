@@ -7,6 +7,7 @@ import app.morphe.patcher.patch.classDefBy
 import app.morphe.patcher.patch.mutableClassDefBy
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.patch.resourceXml
+import app.morphe.patcher.util.returnEarly
 import app.morphe.patches.music.layout.miniplayer.miniplayerColorHookPatch
 import app.morphe.patches.music.misc.extension.sharedExtensionPatch
 import app.morphe.patches.music.misc.mediasession.addSetPlaybackStateHook
@@ -75,6 +76,27 @@ val navigationBarPatch = patch(
     compatibleWith(COMPATIBILITY_YOUTUBE_MUSIC)
 
     execute {
+        // The glass navigation bar and miniplayer are laid out around the floating miniplayer,
+        // which older app versions do not have.
+        val glassPreferences = if (is_9_39_or_greater) setOf(
+            SwitchPreference("morphe_music_navigation_bar_glass", summary = true),
+            // Height, width, button spacing, opacity and rim brightness, with a preview.
+            NonInteractivePreference(
+                key = "morphe_music_navigation_bar_glass_height",
+                titleKey = "morphe_music_navigation_bar_glass_size_title",
+                summaryKey = "morphe_music_navigation_bar_glass_size_summary",
+                tag = "app.morphe.extension.music.settings.preference.MusicGlassNavigationBarPreference",
+                selectable = true
+            ),
+            NonInteractivePreference(
+                key = "morphe_music_navigation_bar_glass_blur",
+                tag = "app.morphe.extension.shared.settings.preference.SeekBarPreference"
+            ),
+            SwitchPreference("morphe_music_navigation_bar_glass_light", summary = true),
+            SwitchPreference("morphe_music_navigation_bar_glass_album_tint", summary = true),
+            SwitchPreference("morphe_music_navigation_bar_glass_hide_indicator", summary = true),
+        ) else emptySet()
+
         PreferenceScreen.GENERAL.addPreferences(
             PreferenceScreenPreference(
                 key = "morphe_music_navigation_bar_screen",
@@ -87,45 +109,35 @@ val navigationBarPatch = patch(
                     SwitchPreference("morphe_music_hide_navigation_bar_upgrade_button"),
                     SwitchPreference("morphe_music_hide_navigation_bar"),
                     SwitchPreference("morphe_music_hide_navigation_bar_labels"),
-                    SwitchPreference("morphe_music_navigation_bar_glass", summary = true),
-                    // Height, width, button spacing, opacity and rim brightness, with a preview.
-                    NonInteractivePreference(
-                        key = "morphe_music_navigation_bar_glass_height",
-                        titleKey = "morphe_music_navigation_bar_glass_size_title",
-                        summaryKey = "morphe_music_navigation_bar_glass_size_summary",
-                        tag = "app.morphe.extension.music.settings.preference.MusicGlassNavigationBarPreference",
-                        selectable = true
-                    ),
-                    NonInteractivePreference(
-                        key = "morphe_music_navigation_bar_glass_blur",
-                        tag = "app.morphe.extension.shared.settings.preference.SeekBarPreference"
-                    ),
-                    SwitchPreference("morphe_music_navigation_bar_glass_light", summary = true),
-                    SwitchPreference("morphe_music_navigation_bar_glass_album_tint", summary = true),
-                    SwitchPreference("morphe_music_navigation_bar_glass_hide_indicator", summary = true),
-                )
+                ) + glassPreferences
             )
         )
 
-        PreferenceScreen.addMiniplayerPreferences(
-            SwitchPreference("morphe_music_miniplayer_glass", summary = true),
-            // Corner radius, artwork padding, rim brightness and opacity, with a preview.
-            NonInteractivePreference(
-                key = "morphe_music_miniplayer_glass_corner_radius",
-                titleKey = "morphe_music_miniplayer_glass_style_title",
-                summaryKey = "morphe_music_miniplayer_glass_style_summary",
-                tag = "app.morphe.extension.music.settings.preference.MusicGlassMiniplayerPreference",
-                selectable = true
-            ),
-            NonInteractivePreference(
-                key = "morphe_music_miniplayer_glass_blur",
-                tag = "app.morphe.extension.shared.settings.preference.SeekBarPreference"
-            ),
-            SwitchPreference("morphe_music_miniplayer_glass_light", summary = true),
-            SwitchPreference("morphe_music_miniplayer_glass_album_tint", summary = true),
-            SwitchPreference("morphe_music_miniplayer_glass_spinning_artwork", summary = true),
-            SwitchPreference("morphe_music_miniplayer_glass_hide_progress_bar", summary = true),
-        )
+        if (is_9_39_or_greater) {
+            PreferenceScreen.addMiniplayerPreferences(
+                SwitchPreference("morphe_music_miniplayer_glass", summary = true),
+                // Corner radius, artwork padding, rim brightness and opacity, with a preview.
+                NonInteractivePreference(
+                    key = "morphe_music_miniplayer_glass_corner_radius",
+                    titleKey = "morphe_music_miniplayer_glass_style_title",
+                    summaryKey = "morphe_music_miniplayer_glass_style_summary",
+                    tag = "app.morphe.extension.music.settings.preference.MusicGlassMiniplayerPreference",
+                    selectable = true
+                ),
+                NonInteractivePreference(
+                    key = "morphe_music_miniplayer_glass_blur",
+                    tag = "app.morphe.extension.shared.settings.preference.SeekBarPreference"
+                ),
+                SwitchPreference("morphe_music_miniplayer_glass_light", summary = true),
+                SwitchPreference("morphe_music_miniplayer_glass_album_tint", summary = true),
+                SwitchPreference("morphe_music_miniplayer_glass_spinning_artwork", summary = true),
+                SwitchPreference("morphe_music_miniplayer_glass_hide_progress_bar", summary = true),
+            )
+
+            // A setting saved on another app version is not used without the floating miniplayer.
+            mutableClassDefBy(EXTENSION_GLASS_CLASS).methods.first { it.name == "isGlassSupported" }
+                .returnEarly(true)
+        }
 
         addSetPlaybackStateHook(
             "$EXTENSION_GLASS_MINIPLAYER_CLASS->onSetPlaybackState(Landroid/media/session/PlaybackState;)V"

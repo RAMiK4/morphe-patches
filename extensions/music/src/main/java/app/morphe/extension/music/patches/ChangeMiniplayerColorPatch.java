@@ -34,15 +34,15 @@ public class ChangeMiniplayerColorPatch {
      */
     public static boolean changeMiniplayerColor() {
         return changeColor()
-                || (Settings.MINIPLAYER_GLASS.get() && Settings.MINIPLAYER_GLASS_ALBUM_TINT.get())
-                || (Settings.NAVIGATION_BAR_GLASS.get() && Settings.NAVIGATION_BAR_GLASS_ALBUM_TINT.get());
+                || (MusicGlassNavigationBar.isMiniplayerGlassEnabled() && Settings.MINIPLAYER_GLASS_ALBUM_TINT.get())
+                || (MusicGlassNavigationBar.isNavigationBarGlassEnabled() && Settings.NAVIGATION_BAR_GLASS_ALBUM_TINT.get());
     }
 
     /**
      * @return If the miniplayer gets the color of the album art. The glass miniplayer has a tint instead.
      */
     private static boolean changeColor() {
-        return Settings.CHANGE_MINIPLAYER_COLOR.get() && !Settings.MINIPLAYER_GLASS.get();
+        return Settings.CHANGE_MINIPLAYER_COLOR.get() && !MusicGlassNavigationBar.isMiniplayerGlassEnabled();
     }
 
     /**
@@ -96,7 +96,7 @@ public class ChangeMiniplayerColorPatch {
      */
     public static int overrideNavigationBarColor(int defaultColor) {
         // The glass is drawn instead, which is translucent.
-        if (Settings.NAVIGATION_BAR_GLASS.get()) {
+        if (MusicGlassNavigationBar.isNavigationBarGlassEnabled()) {
             return Color.TRANSPARENT;
         }
         final Integer color = lastMiniplayerColor;
@@ -127,6 +127,6 @@ public class ChangeMiniplayerColorPatch {
     private static boolean matchNavigationBarEnabled() {
         return Settings.CHANGE_MINIPLAYER_COLOR.get()
                 && Settings.CHANGE_NAVIGATION_BAR_COLOR.get()
-                && !Settings.NAVIGATION_BAR_GLASS.get();
+                && !MusicGlassNavigationBar.isNavigationBarGlassEnabled();
     }
 }

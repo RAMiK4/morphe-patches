@@ -75,7 +75,7 @@ public final class MusicGlassMiniplayer {
     public interface TimeBar {
     }
 
-    static final boolean ENABLED = Settings.MINIPLAYER_GLASS.get() && MINI_PLAYER != 0;
+    static final boolean ENABLED = MusicGlassNavigationBar.isMiniplayerGlassEnabled() && MINI_PLAYER != 0;
 
     /**
      * The least room between the buttons and the end of the card.

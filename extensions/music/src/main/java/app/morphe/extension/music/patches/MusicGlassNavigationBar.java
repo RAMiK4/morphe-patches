@@ -76,7 +76,7 @@ public final class MusicGlassNavigationBar {
     public static final int BUTTON_ICON = ResourceUtils.getIdentifier(ResourceType.ID, "icon");
     public static final int BUTTON_LABEL = ResourceUtils.getIdentifier(ResourceType.ID, "text1");
 
-    private static final boolean ENABLED = Settings.NAVIGATION_BAR_GLASS.get()
+    private static final boolean ENABLED = isNavigationBarGlassEnabled()
             && !Settings.HIDE_NAVIGATION_BAR.get()
             && PIVOT_BAR != 0;
 
@@ -245,6 +245,31 @@ public final class MusicGlassNavigationBar {
     private static final int MAX_LIST_DEPTH = 12;
 
     private MusicGlassNavigationBar() {
+    }
+
+    /**
+     * The glass navigation bar and miniplayer are laid out around the floating miniplayer of the app,
+     * which older app versions do not have.
+     *
+     * @return If the app version has the floating miniplayer.
+     */
+    @SuppressWarnings("SameReturnValue")
+    public static boolean isGlassSupported() {
+        return false; // Modified during patching.
+    }
+
+    /**
+     * @return If the navigation bar is glass, set in the settings and supported by the app version.
+     */
+    public static boolean isNavigationBarGlassEnabled() {
+        return isGlassSupported() && Settings.NAVIGATION_BAR_GLASS.get();
+    }
+
+    /**
+     * @return If the miniplayer is glass, set in the settings and supported by the app version.
+     */
+    public static boolean isMiniplayerGlassEnabled() {
+        return isGlassSupported() && Settings.MINIPLAYER_GLASS.get();
     }
 
     /**
