@@ -141,6 +141,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   "uygulamanın eklediği" sayılıp `getAddedRoom` 0 dönüyor, uygulama yeniden başlayana kadar kalıyor.
 - **Commit `73bfd2d4d`:** oda 0 ise taşıma yapılmıyor (`if (room <= 0) return;`). Test APK ve derleme kontrolü başlatıldı.
   Düzelirse PR için teşhis log commit'i çıkarılıp tek commit'e indirilecek.
+- **Kullanıcı onayladı (2026-11-18):** gizli moda girip çıkınca cam çubuk sorunsuz. PR dalı **`fix/glass-bar-incognito-room`**
+  (`213f6819d`, tek commit, teşhis logu yok, upstream `dev` `f0014c44e` üzerinde); `fix/glass-bar-incognito` çalışma
+  dalı. Karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-15: YouTube cam navigasyon çubuğu bulanık değil (upstream issue 4831)
 
