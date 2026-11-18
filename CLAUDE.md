@@ -101,6 +101,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-18: Akış önizlemesinde rozetler ve Daha sonra izle düğmesi kalsın
+
+- **İstek:** akışta önizleme oynarken izlenme ve beğeni rozetleri ile Daha sonra izle düğmesi görünmüyor; kalmalı.
+- **Sebep:** üçü de `FeedVideoCardsPatch.isCardPlayingInline` iken bilinçli gizleniyordu. Satır içi oynatıcı listenin
+  altında, kart onu küçük resimden gösteriyor (`FeedCardLayoutPatch` yorumu), yani kart overlay'i oynatıcının üstünde.
+- **Commit `047e9dcd0`** (dal `feat/feed-badges-inline-preview`, upstream `dev` `f0014c44e` üzerinde): rozetler
+  önizlemede yerinde kalıyor; düğmeler (Daha sonra izle, sıra) oynatıcının sağ üstteki sessiz düğmesinden kaçmak için
+  sol üst köşeye, beğeni sayıları sol üstteyse (`FeedEngagementCountsPatch.isAtTopLeft`) sessiz düğmesinin altına
+  iniyor; dokunma da önizlemede çalışıyor. Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı,
+  cihazda deneme bekleniyor (altyazı/kalan süre ile çakışma kontrol edilecek).
+
 ### 2026-11-18: Gizli modda navigasyon çubuğu yok, cam çubuk açık (upstream issue 4907)
 
 - **Bildirim:** cam çubuk açıkken gizli modda (incognito) navigasyon çubuğu görünmüyor (GmsCore); root'lu sürümde
