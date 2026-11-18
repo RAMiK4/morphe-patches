@@ -120,6 +120,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   (`isHorizontalBottomBar` false). Commit `aef4c1fd3`: boşluk açıkken `getAppRoom` uygulamanın alanını
   (`patch_getSystemButtonsRoom`) kullanıyor; ön çizimde ham padding'e boşluk ekleniyor (`getFloatingRoom(room)`).
   Test APK (yt-morphe, `official_only`) ve derleme kontrolü başlatıldı, kullanıcı denemesi bekleniyor.
+  İşe yaramadı: loglarda alan hep 0 (yükseklik 462 = 168 + 147 + 147). Commit `9e3be1311`: uygulamanın odası
+  ölçülen yükseklikten (`height - baseHeight`) tanınıyor, padding'e eşitse veya `max(oda, 10dp) + boşluk`'a eşitse
+  (`isAppRoom`); boşluk açıkken `getAppRoom` görülen odayı döndürüyor. Yeni test APK ve derleme kontrolü başlatıldı.
 
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
