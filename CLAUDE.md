@@ -111,8 +111,8 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   ve `morphe_navigation_bar_glass_bottom_margin` (0-48 dp, adım 2, varsayılan 0). Boşluk
   `YouTubeGlassNavigationBar.getFloatingRoom`'da odaya ekleniyor; padding birden çok yerden yeniden verildiği için
   son üretilen odalar tutuluyor, aynı değer gelince tekrar eklenmiyor. Kapsülün odaya uzanması boşluk kadar azaltıldı.
-  Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı, cihazda deneme bekleniyor (gizli mod/bağlantı
-  çubuğu ve kaydırınca gizlenmede boşluğun doğru kalması kontrol edilecek).
+  Kullanıcı test APK ile ikisini de onayladı. Karşılaştırma bağlantısı verildi (upstream issue 4796 ve 4843'ü kapatıyor),
+  PR'ı kullanıcı açacak (muhtemelen PR 4974).
 
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
@@ -121,9 +121,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   boyutuyla çiziliyor. Kullanıcı "+2px" istedi; sabit büyütme yerine orijinalin boyutu kullanılıyor.
 - **Commit `9025fa02c`** (dal `fix/post-translate-text-size`, upstream `dev` `f0014c44e` üzerinde): rengin yanında
   ilk harfin boyut/yazı tipi span'ları (`MetricAffectingSpan`) da kopyalanıyor. Debug logda "Translation text spans:".
-  Kullanıcı test APK ile onayladı (çeviri orijinalle aynı boyutta). **PR açıldı** (2026-11-18; kullanıcı 4971, 4972,
-  4973 numaralı üç PR açtı: gizli mod cam çubuk, akış önizleme rozetleri, çeviri boyutu; hangisinin hangi numara
-  olduğu belirtilmedi).
+  Kullanıcı test APK ile onayladı (çeviri orijinalle aynı boyutta). **PR açıldı: upstream PR 4972**.
 
 ### 2026-11-18: Akış önizlemesinde rozetler ve Daha sonra izle düğmesi kalsın
 
@@ -136,7 +134,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   iniyor; dokunma da önizlemede çalışıyor. Kullanıcı test APK ile onayladı (sol üstte düğme, sağda ses + CC).
   Commit `18a25ffef`: "Top left vertical" modunda düğmeler ses düğmesinin altına değil (CC'ye çarpıyordu) ses/CC
   sütununun soluna. Beğeni oranı ayarı zaten varsayılan kapalı. Force-push izni yok, dalda 2 commit. PR karşılaştırma
-  bağlantısı verildi, PR'ı kullanıcı açacak.
+  bağlantısı verildi. **PR açıldı: upstream PR 4973**.
 
 ### 2026-11-18: Gizli modda navigasyon çubuğu yok, cam çubuk açık (upstream issue 4907)
 
@@ -158,7 +156,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   Düzelirse PR için teşhis log commit'i çıkarılıp tek commit'e indirilecek.
 - **Kullanıcı onayladı (2026-11-18):** gizli moda girip çıkınca cam çubuk sorunsuz. PR dalı **`fix/glass-bar-incognito-room`**
   (`213f6819d`, tek commit, teşhis logu yok, upstream `dev` `f0014c44e` üzerinde); `fix/glass-bar-incognito` çalışma
-  dalı. Karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
+  dalı. Karşılaştırma bağlantısı verildi. **PR açıldı: upstream PR 4971**.
 
 ### 2026-11-15: YouTube cam navigasyon çubuğu bulanık değil (upstream issue 4831)
 
