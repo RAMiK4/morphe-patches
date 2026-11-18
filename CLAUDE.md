@@ -101,6 +101,19 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-18: Cam navigasyon çubuğu alt boşluk ve kenar çizgisi ayarları
+
+- **İstek (kullanıcıların özellik istekleri):** kapsül ile sistem gezinme alanı arasına ayarlanabilir alt boşluk
+  (iOS gibi yüzen çubuk); kapsülün beyaz kenar çizgisini kapatma ayarı. Aşağı kaydırınca gizlenme zaten YouTube'un
+  kendi davranışı (20.31+), "Disable auto-hide navigation bar" açıksa gizlenmez: kod değişikliği yok.
+- **Commit `e1cc84cc0`** (dal `feat/glass-bar-margin-edge`, upstream `dev` `f0014c44e` üzerinde): yeni ayarlar
+  `morphe_navigation_bar_glass_edge` (varsayılan açık; kapalıyken `GlassCapsuleDrawable` rimScale 0, önizleme dahil)
+  ve `morphe_navigation_bar_glass_bottom_margin` (0-48 dp, adım 2, varsayılan 0). Boşluk
+  `YouTubeGlassNavigationBar.getFloatingRoom`'da odaya ekleniyor; padding birden çok yerden yeniden verildiği için
+  son üretilen odalar tutuluyor, aynı değer gelince tekrar eklenmiyor. Kapsülün odaya uzanması boşluk kadar azaltıldı.
+  Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı, cihazda deneme bekleniyor (gizli mod/bağlantı
+  çubuğu ve kaydırınca gizlenmede boşluğun doğru kalması kontrol edilecek).
+
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
 - **Sebep (tahmin, koddan):** `PostTranslatePatch.createTranslationText` yalnızca tüm metni kaplayan span'ları
@@ -108,8 +121,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   boyutuyla çiziliyor. Kullanıcı "+2px" istedi; sabit büyütme yerine orijinalin boyutu kullanılıyor.
 - **Commit `9025fa02c`** (dal `fix/post-translate-text-size`, upstream `dev` `f0014c44e` üzerinde): rengin yanında
   ilk harfin boyut/yazı tipi span'ları (`MetricAffectingSpan`) da kopyalanıyor. Debug logda "Translation text spans:".
-  Kullanıcı test APK ile onayladı (çeviri orijinalle aynı boyutta). Dal tek commit, PR karşılaştırma bağlantısı
-  verildi, PR'ı kullanıcı açacak.
+  Kullanıcı test APK ile onayladı (çeviri orijinalle aynı boyutta). **PR açıldı** (2026-11-18; kullanıcı 4971, 4972,
+  4973 numaralı üç PR açtı: gizli mod cam çubuk, akış önizleme rozetleri, çeviri boyutu; hangisinin hangi numara
+  olduğu belirtilmedi).
 
 ### 2026-11-18: Akış önizlemesinde rozetler ve Daha sonra izle düğmesi kalsın
 
