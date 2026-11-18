@@ -108,7 +108,8 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   boyutuyla çiziliyor. Kullanıcı "+2px" istedi; sabit büyütme yerine orijinalin boyutu kullanılıyor.
 - **Commit `9025fa02c`** (dal `fix/post-translate-text-size`, upstream `dev` `f0014c44e` üzerinde): rengin yanında
   ilk harfin boyut/yazı tipi span'ları (`MetricAffectingSpan`) da kopyalanıyor. Debug logda "Translation text spans:".
-  Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı. Hâlâ küçükse log satırı gerekli.
+  Kullanıcı test APK ile onayladı (çeviri orijinalle aynı boyutta). Dal tek commit, PR karşılaştırma bağlantısı
+  verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-18: Akış önizlemesinde rozetler ve Daha sonra izle düğmesi kalsın
 
