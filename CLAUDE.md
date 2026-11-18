@@ -101,6 +101,15 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
+
+- **Sebep (tahmin, koddan):** `PostTranslatePatch.createTranslationText` yalnızca tüm metni kaplayan span'ları
+  kopyalıyor; bağlantılı/çok parçalı metinlerde boyut her parçanın span'ında, paint'te değil. Çeviri paint'in küçük
+  boyutuyla çiziliyor. Kullanıcı "+2px" istedi; sabit büyütme yerine orijinalin boyutu kullanılıyor.
+- **Commit `9025fa02c`** (dal `fix/post-translate-text-size`, upstream `dev` `f0014c44e` üzerinde): rengin yanında
+  ilk harfin boyut/yazı tipi span'ları (`MetricAffectingSpan`) da kopyalanıyor. Debug logda "Translation text spans:".
+  Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı. Hâlâ küçükse log satırı gerekli.
+
 ### 2026-11-18: Akış önizlemesinde rozetler ve Daha sonra izle düğmesi kalsın
 
 - **İstek:** akışta önizleme oynarken izlenme ve beğeni rozetleri ile Daha sonra izle düğmesi görünmüyor; kalmalı.
