@@ -123,6 +123,9 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   İşe yaramadı: loglarda alan hep 0 (yükseklik 462 = 168 + 147 + 147). Commit `9e3be1311`: uygulamanın odası
   ölçülen yükseklikten (`height - baseHeight`) tanınıyor, padding'e eşitse veya `max(oda, 10dp) + boşluk`'a eşitse
   (`isAppRoom`); boşluk açıkken `getAppRoom` görülen odayı döndürüyor. Yeni test APK ve derleme kontrolü başlatıldı.
+- **Kullanıcı onayladı (2026-11-18).** PR 4975 bu arada upstream'de birleşmişti (`96b7181d8`), düzeltme ayrı PR:
+  dal **`fix/glass-bar-bottom-margin-room`** (`a5e186eb9`, tek commit, upstream `dev` `7014677db` / v2.4.0-dev.2 üzerinde,
+  dosya test edilen sürümle aynı). Derleme kontrolü başlatıldı, karşılaştırma bağlantısı verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
