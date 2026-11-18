@@ -112,7 +112,7 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   `YouTubeGlassNavigationBar.getFloatingRoom`'da odaya ekleniyor; padding birden çok yerden yeniden verildiği için
   son üretilen odalar tutuluyor, aynı değer gelince tekrar eklenmiyor. Kapsülün odaya uzanması boşluk kadar azaltıldı.
   Kullanıcı test APK ile ikisini de onayladı. Karşılaştırma bağlantısı verildi (upstream issue 4796 ve 4843'ü kapatıyor),
-  PR'ı kullanıcı açacak (muhtemelen PR 4974).
+  **PR açıldı: upstream PR 4975**.
 
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
