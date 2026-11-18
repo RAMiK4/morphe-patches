@@ -113,6 +113,12 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Dal `fix/glass-bar-incognito`** (`83e170f67`, upstream `dev` `f0014c44e` üzerinde): yalnızca teşhis, debug logda
   "Slim status bar layout:" satırı (kap türü, iki çubuğun konum/yükseklik/margin/padding/translation değerleri).
   Test APK (yt-morphe, `official_only`) ve derleme kontrolü başlatıldı. Kullanıcı gizli moda girip çıkarak log alacak.
+- **Log (kullanıcı, jest çubuğu gizli, sistem boşluğu 0):** FrameLayout kap; gizli mod açılınca çubuk 203→168 (yüzer
+  35 px kayboluyor), sonra üst boşluk kare kare 0→132'ye çıkıyor (tuş içeriği kapsülden taşıyor). Sebep:
+  `watchSlimStatusBar` oda 0 iken de `setAppRoom(35)` ve `patch_setSystemButtonsRoom(35)` yapıyor; yüzer boşluk
+  "uygulamanın eklediği" sayılıp `getAddedRoom` 0 dönüyor, uygulama yeniden başlayana kadar kalıyor.
+- **Commit `73bfd2d4d`:** oda 0 ise taşıma yapılmıyor (`if (room <= 0) return;`). Test APK ve derleme kontrolü başlatıldı.
+  Düzelirse PR için teşhis log commit'i çıkarılıp tek commit'e indirilecek.
 
 ### 2026-11-15: YouTube cam navigasyon çubuğu bulanık değil (upstream issue 4831)
 
