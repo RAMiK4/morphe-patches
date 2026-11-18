@@ -101,6 +101,19 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-18: Gizli modda navigasyon çubuğu yok, cam çubuk açık (upstream issue 4907)
+
+- **Bildirim:** cam çubuk açıkken gizli modda (incognito) navigasyon çubuğu görünmüyor (GmsCore); root'lu sürümde
+  az görünüyor, normal moda dönünce de YouTube yeniden başlatılana kadar bozuk kalıyor.
+- **APK (21.45.82, androguard):** `bottom_bar_container`, "bottom_bar_refactor" düzenlerinde FrameLayout, diğerlerinde
+  LinearLayout. `slim_status_bar` (gravity bottom) `Lawhp` ile `addView` ediliyor, kapta LayoutTransition var.
+  `Lkhn.e()` çubuğa `bottomMargin = gizli mod çubuğu yüksekliği × görünme oranı`, yükseklik `(1-h)×(b+d)`, alt boşluk
+  `d` (sistem çubuğu), translationY veriyor; gizli mod çubuğuna alt boşluk `d` ve translationY `d - f×d`. Bizim
+  `setSlimStatusBarRoom` (eski LinearLayout düzenine göre) aynı boşlukları ikinci kez değiştiriyor: şüpheli.
+- **Dal `fix/glass-bar-incognito`** (`83e170f67`, upstream `dev` `f0014c44e` üzerinde): yalnızca teşhis, debug logda
+  "Slim status bar layout:" satırı (kap türü, iki çubuğun konum/yükseklik/margin/padding/translation değerleri).
+  Test APK (yt-morphe, `official_only`) ve derleme kontrolü başlatıldı. Kullanıcı gizli moda girip çıkarak log alacak.
+
 ### 2026-11-15: YouTube cam navigasyon çubuğu bulanık değil (upstream issue 4831)
 
 - **Bildirim:** YouTube **21.46.520 Beta** (desteklenen en yeni 21.45.82), log yok, HyperOS ekran görüntüsü: kapsülün
