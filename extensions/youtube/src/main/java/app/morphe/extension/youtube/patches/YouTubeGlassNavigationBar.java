@@ -216,6 +216,7 @@ public final class YouTubeGlassNavigationBar {
      */
     private static volatile int seenAppRoom;
     private static volatile int seenAppRoomPadding;
+    private static volatile boolean seenAppRoomKnown;
 
     /**
      * How far the room the app adds to the height may differ from the bottom padding.
@@ -234,29 +235,42 @@ public final class YouTubeGlassNavigationBar {
         if (padding != seenAppRoomPadding) {
             seenAppRoom = 0;
             seenAppRoomPadding = padding;
+            seenAppRoomKnown = false;
         }
 
         // The app can round the room it adds differently from the padding, such as 109 for a padding of 110.
         final int base = baseHeight;
         final int room = height - base;
-        if (base > 0 && padding > 0 && Math.abs(room - padding) <= SEEN_ROOM_TOLERANCE && seenAppRoom != room) {
+        if (base > 0 && padding > 0 && isAppRoom(room, padding) && (seenAppRoom != room || !seenAppRoomKnown)) {
             seenAppRoom = room;
+            seenAppRoomKnown = true;
             Logger.printDebug(() -> "Glass navigation bar room added by the app: " + room + " padding: " + padding);
         }
+    }
+
+    /**
+     * @param room    The height the app gives the bar, less its height without the room below the buttons.
+     * @param padding The bottom padding of the bar.
+     * @return If the room is the room the app added for that padding: the padding itself, or with the bottom
+     *         margin, the room for the system navigation buttons the margin was added to.
+     */
+    private static boolean isAppRoom(int room, int padding) {
+        if (Math.abs(room - padding) <= SEEN_ROOM_TOLERANCE) return true;
+        return BOTTOM_MARGIN > 0 && room >= 0
+                && Math.abs(Math.max(room, FLOATING_ROOM) + BOTTOM_MARGIN - padding) <= SEEN_ROOM_TOLERANCE;
     }
 
     /**
      * @return The room below the buttons the app added to the height of the bar itself.
      */
     private static int getAppRoom(View navigationBar) {
-        // With the bottom margin, the padding is more than the room the app adds to the height, such as when the
-        // padding was set before the bar had a size, or with no room set by the app, and the room is then never
-        // seen. The app adds the room stored in its field to the height of the bar.
-        if (BOTTOM_MARGIN > 0 && navigationBar instanceof NavigationBarPatch.PivotBarAccess access) {
-            return Math.max(0, access.patch_getSystemButtonsRoom());
+        final int padding = navigationBar.getPaddingBottom();
+        // With the bottom margin, the app adds only the room for the system navigation buttons to the height,
+        // not the margin, so the room seen is the room it added.
+        if (BOTTOM_MARGIN > 0 && padding == seenAppRoomPadding && seenAppRoomKnown) {
+            return seenAppRoom;
         }
 
-        final int padding = navigationBar.getPaddingBottom();
         final int seenRoom = padding == seenAppRoomPadding ? seenAppRoom : 0;
         // The stored room can still be the room of a previous bar, such as after switching between
         // gesture and 3-button navigation, and the app never adds more room than the padding.
