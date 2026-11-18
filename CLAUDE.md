@@ -113,6 +113,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   son üretilen odalar tutuluyor, aynı değer gelince tekrar eklenmiyor. Kapsülün odaya uzanması boşluk kadar azaltıldı.
   Kullanıcı test APK ile ikisini de onayladı. Karşılaştırma bağlantısı verildi (upstream issue 4796 ve 4843'ü kapatıyor),
   **PR açıldı: upstream PR 4975**.
+- **Hata (kullanıcı, 2026-11-18):** boşluk açıkken 3 tuşlu gezinmede ve görünür jest çubuğunda kapsül aşağıya,
+  sistem alanına uzuyor. Log: çubuğun alanındaki oda (147/63) uygulamanın yüksekliğine ekleniyor, padding ise boşlukla
+  (231) veya ön çizimde `getFloatingRoom(0)` ile 203 oluyor; `getAppRoom` padding'e göre "görülen oda"yı bulamayıp 0
+  dönüyor, padding'in tamamı yüksekliğe ikinci kez ekleniyor. İlk padding çubuğun yüksekliği 0 iken ham geliyor
+  (`isHorizontalBottomBar` false). Commit `aef4c1fd3`: boşluk açıkken `getAppRoom` uygulamanın alanını
+  (`patch_getSystemButtonsRoom`) kullanıyor; ön çizimde ham padding'e boşluk ekleniyor (`getFloatingRoom(room)`).
+  Test APK (yt-morphe, `official_only`) ve derleme kontrolü başlatıldı, kullanıcı denemesi bekleniyor.
 
 ### 2026-11-18: Gönderi çevirisi metni orijinalden küçük
 
