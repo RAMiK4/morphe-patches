@@ -672,6 +672,42 @@ public final class NavigationBarPatch {
     }
 
     /**
+     * The last layout of the slim status bar and the navigation bar written to the debug log.
+     */
+    private static String lastSlimStatusBarLayout;
+
+    /**
+     * Writes the layout of the slim status bar and the navigation bar to the debug log when it changes.
+     */
+    private static void logSlimStatusBarLayout(View container, View navigationBar, View slimStatusBar) {
+        ViewGroup.LayoutParams params = navigationBar.getLayoutParams();
+        final int bottomMargin = params instanceof ViewGroup.MarginLayoutParams margins
+                ? margins.bottomMargin
+                : 0;
+        final String layout = "container: " + container.getClass().getSimpleName()
+                + " " + container.getHeight()
+                + " navigation bar: top " + navigationBar.getTop()
+                + " height " + navigationBar.getHeight()
+                + " layout height " + (params == null ? null : params.height)
+                + " bottom margin " + bottomMargin
+                + " padding " + navigationBar.getPaddingTop() + "/" + navigationBar.getPaddingBottom()
+                + " translation " + navigationBar.getTranslationY()
+                + " visibility " + navigationBar.getVisibility()
+                + " slim status bar: top " + slimStatusBar.getTop()
+                + " height " + slimStatusBar.getHeight()
+                + " padding " + slimStatusBar.getPaddingTop() + "/" + slimStatusBar.getPaddingBottom()
+                + " translation " + slimStatusBar.getTranslationY()
+                + " visibility " + slimStatusBar.getVisibility()
+                + " index " + (container instanceof ViewGroup group
+                ? group.indexOfChild(slimStatusBar) + "/" + group.indexOfChild(navigationBar) : "?")
+                + " system buttons room: " + systemButtonsRoom
+                + " translucent forced: " + translucentNavigationBarForced;
+        if (layout.equals(lastSlimStatusBarLayout)) return;
+        lastSlimStatusBarLayout = layout;
+        Logger.printDebug(() -> "Slim status bar layout: " + layout);
+    }
+
+    /**
      * Injection point.
      * <p>
      * The window insets are not sent again when the slim status bar is shown or hidden,
@@ -694,6 +730,10 @@ public final class NavigationBarPatch {
                     View navigationBar = view.findViewById(PIVOT_BAR);
                     if (YouTubeGlassNavigationBar.isEnabled() && navigationBar != null) {
                         navigationBar.invalidate();
+                    }
+
+                    if (slimStatusBar != null && navigationBar != null) {
+                        logSlimStatusBarLayout(view, navigationBar, slimStatusBar);
                     }
 
                     if (shown == slimStatusBarShown) return;
