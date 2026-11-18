@@ -118,8 +118,10 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
 - **Commit `047e9dcd0`** (dal `feat/feed-badges-inline-preview`, upstream `dev` `f0014c44e` üzerinde): rozetler
   önizlemede yerinde kalıyor; düğmeler (Daha sonra izle, sıra) oynatıcının sağ üstteki sessiz düğmesinden kaçmak için
   sol üst köşeye, beğeni sayıları sol üstteyse (`FeedEngagementCountsPatch.isAtTopLeft`) sessiz düğmesinin altına
-  iniyor; dokunma da önizlemede çalışıyor. Derleme kontrolü ve test APK (yt-morphe, `official_only`) başlatıldı,
-  cihazda deneme bekleniyor (altyazı/kalan süre ile çakışma kontrol edilecek).
+  iniyor; dokunma da önizlemede çalışıyor. Kullanıcı test APK ile onayladı (sol üstte düğme, sağda ses + CC).
+  Commit `18a25ffef`: "Top left vertical" modunda düğmeler ses düğmesinin altına değil (CC'ye çarpıyordu) ses/CC
+  sütununun soluna. Beğeni oranı ayarı zaten varsayılan kapalı. Force-push izni yok, dalda 2 commit. PR karşılaştırma
+  bağlantısı verildi, PR'ı kullanıcı açacak.
 
 ### 2026-11-18: Gizli modda navigasyon çubuğu yok, cam çubuk açık (upstream issue 4907)
 
