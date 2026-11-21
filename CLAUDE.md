@@ -109,8 +109,13 @@ birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır 
   bakımcı da push ediyor, ona dokunulmadı): yalnızca bottom sheet'te gizlenen menü rengindeki dolguların birleşimi
   panel sayılıyor, cam ve bulanıklık `LayerDrawable` iç boşluklarıyla oraya çiziliyor, outline `tint`'ten, köşe yarıçapı
   en büyük dolgudan. Debug logda "Glass menu panel insets:".
-- **Derlenemedi:** fork'ta Actions kapalı; `RAMiK4/yt-morphe` `release.yml` artık yalnızca `rlx` (Ramik4/rlx-patches)
-  girdisi alıyor, `patches_source` yok. Kullanıcıya soruldu.
+- PR 5107 upstream `dev`'de birleşmiş (`ed52a0dda`). Upstream fix dalı **`fix/glass-menus-sheet-gap`** (`a73d2145b`,
+  tek commit, upstream `dev` `ac44b74ff` / v2.4.0-dev.7 üzerinde); `fix/glass-menus-sheet-panel` gereksiz.
+- **Test (kullanıcı kararı):** RLX üzerinden. `RAMiK4/yt-morphe` `release.yml` artık yalnızca `rlx` (Ramik4/rlx-patches
+  dal/etiket) ve `publish` alıyor; fork'ta Actions kapalı. RLX'in Glass menus kodu ayrı (`app.rlx...glassmenus.GlassMenus`,
+  `LithoDrawables`), düzeltme uyarlandı: rlx-patches dal `fix/glass-menus-sheet-gap` (`a897fde`), **rlx PR 20**
+  (cihaz onayı olmadan birleştirilmez). Test APK yt-morphe run 44930971486 (#145). Onaylanırsa upstream
+  karşılaştırma bağlantısı verilecek.
 
 ### 2026-11-18: Cam navigasyon çubuğu alt boşluk ve kenar çizgisi ayarları
 
