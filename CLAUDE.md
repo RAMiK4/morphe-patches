@@ -101,6 +101,17 @@ Bir iş tamamlandığında veya durumu değiştiğinde buraya kısa bir kayıt e
 commit edilir. Kayıtlar en yeni üstte. Devam eden işler ayrıntılı tutulur; PR'ı birleşen veya bırakılan işler
 birkaç satıra indirilip ayrıntısı `docs/is-gunlugu-arsiv.md`'ye taşınır (dosya ~20 KB'ı geçince toplu temizlik).
 
+### 2026-11-21: Glass menus (upstream PR 5107) alttaki menülerde üstte fazla boşluk
+
+- **Sorun (kullanıcı ekran görüntüleri):** cam, `design_bottom_sheet`'in tamamına çiziliyor; asıl panel onun içinde
+  üstte ve yanlarda boşluklu bir dolgu. Camlı menü panelden ~40dp yukarıda başlıyor, yanlarda kenara dayanıyor.
+- **Commit `8cddcf096`** (dal `fix/glass-menus-sheet-panel`, PR dalı `feat/glass-menus` `2f8031373` üzerinde; PR dalına
+  bakımcı da push ediyor, ona dokunulmadı): yalnızca bottom sheet'te gizlenen menü rengindeki dolguların birleşimi
+  panel sayılıyor, cam ve bulanıklık `LayerDrawable` iç boşluklarıyla oraya çiziliyor, outline `tint`'ten, köşe yarıçapı
+  en büyük dolgudan. Debug logda "Glass menu panel insets:".
+- **Derlenemedi:** fork'ta Actions kapalı; `RAMiK4/yt-morphe` `release.yml` artık yalnızca `rlx` (Ramik4/rlx-patches)
+  girdisi alıyor, `patches_source` yok. Kullanıcıya soruldu.
+
 ### 2026-11-18: Cam navigasyon çubuğu alt boşluk ve kenar çizgisi ayarları
 
 - **İstek (kullanıcıların özellik istekleri):** kapsül ile sistem gezinme alanı arasına ayarlanabilir alt boşluk
